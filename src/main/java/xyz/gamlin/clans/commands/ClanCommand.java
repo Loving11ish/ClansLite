@@ -123,8 +123,6 @@ public class ClanCommand implements CommandExecutor {
                         return new ClanKickSubCommand().clanKickSubCommand(sender, args);
                     case "info":
                         return new ClanInfoSubCommand().clanInfoSubCommand(sender);
-                    case "leave":
-                        return new ClanLeaveSubCommand().clanLeaveSubCommand(sender);
                     case "ally":
                         return new ClanAllySubCommand().clanAllySubCommand(sender, args);
                     case "enemy":

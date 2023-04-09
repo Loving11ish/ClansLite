@@ -36,10 +36,17 @@ commands:
     description: Join an invited clan
     usage: "Usage: /joinclan"
     permission: clanslite.join
+  leaveclan:
+    description: Leave a clan
+    usage: "Usage: /leaveclan"
+    permission: clanslite.leave
+
 permissions:
   clanslite.clan:
     default: true
   clanslite.join:
+    default: true
+  clanslite.leave:
     default: true
   clanslite.maxclansize.group1:
     default: true

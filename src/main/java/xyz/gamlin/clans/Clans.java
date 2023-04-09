@@ -5,10 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.geysermc.floodgate.api.FloodgateApi;
-import xyz.gamlin.clans.commands.ClanAdmin;
-import xyz.gamlin.clans.commands.ClanChatCommand;
-import xyz.gamlin.clans.commands.ClanCommand;
-import xyz.gamlin.clans.commands.JoinClanCommand;
+import xyz.gamlin.clans.commands.*;
 import xyz.gamlin.clans.commands.commandTabCompleters.ClanAdminTabCompleter;
 import xyz.gamlin.clans.commands.commandTabCompleters.ClanCommandTabCompleter;
 import xyz.gamlin.clans.expansions.PlayerClanExpansion;
@@ -123,6 +120,7 @@ public final class Clans extends JavaPlugin {
         this.getCommand("clanadmin").setExecutor(new ClanAdmin());
         this.getCommand("cc").setExecutor(new ClanChatCommand());
         this.getCommand("joinclan").setExecutor(new JoinClanCommand());
+        this.getCommand("leaveclan").setExecutor(new LeaveClanCommand());
 
         //Register the command tab completers
         this.getCommand("clan").setTabCompleter(new ClanCommandTabCompleter());
