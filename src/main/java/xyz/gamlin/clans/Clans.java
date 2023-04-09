@@ -8,6 +8,7 @@ import org.geysermc.floodgate.api.FloodgateApi;
 import xyz.gamlin.clans.commands.ClanAdmin;
 import xyz.gamlin.clans.commands.ClanChatCommand;
 import xyz.gamlin.clans.commands.ClanCommand;
+import xyz.gamlin.clans.commands.JoinClanCommand;
 import xyz.gamlin.clans.commands.commandTabCompleters.ClanAdminTabCompleter;
 import xyz.gamlin.clans.commands.commandTabCompleters.ClanCommandTabCompleter;
 import xyz.gamlin.clans.expansions.PlayerClanExpansion;
@@ -121,6 +122,7 @@ public final class Clans extends JavaPlugin {
         this.getCommand("clan").setExecutor(new ClanCommand());
         this.getCommand("clanadmin").setExecutor(new ClanAdmin());
         this.getCommand("cc").setExecutor(new ClanChatCommand());
+        this.getCommand("joinclan").setExecutor(new JoinClanCommand());
 
         //Register the command tab completers
         this.getCommand("clan").setTabCompleter(new ClanCommandTabCompleter());

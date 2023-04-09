@@ -1,9 +1,12 @@
-package xyz.gamlin.clans.commands.clanSubCommands;
+package xyz.gamlin.clans.commands;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.models.Clan;
 import xyz.gamlin.clans.models.ClanInvite;
@@ -11,12 +14,13 @@ import xyz.gamlin.clans.utils.ClanInviteUtil;
 import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
-public class ClanJoinSubCommand {
-
+public class JoinClanCommand implements CommandExecutor {
     Logger logger = Clans.getPlugin().getLogger();
 
     FileConfiguration clansConfig = Clans.getPlugin().getConfig();
@@ -24,7 +28,8 @@ public class ClanJoinSubCommand {
     private static final String PLAYER_PLACEHOLDER = "%PLAYER%";
     private static final String CLAN_PLACEHOLDER = "%CLAN%";
 
-    public boolean clanJoinSubCommand(CommandSender sender) {
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
         if (sender instanceof Player) {
             Player player = ((Player) sender).getPlayer();
             AtomicReference<String> inviterUUIDString = new AtomicReference<>("");

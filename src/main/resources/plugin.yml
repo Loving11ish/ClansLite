@@ -32,8 +32,14 @@ commands:
       - clanc
       - cchat
       - chat
+  joinclan:
+    description: Join an invited clan
+    usage: "Usage: /joinclan"
+    permission: clanslite.join
 permissions:
   clanslite.clan:
+    default: true
+  clanslite.join:
     default: true
   clanslite.maxclansize.group1:
     default: true

@@ -20,7 +20,6 @@ public class ClanCommandTabCompleter implements TabCompleter {
             arguments.add("create");
             arguments.add("disband");
             arguments.add("invite");
-            arguments.add("join");
             arguments.add("leave");
             arguments.add("kick");
             arguments.add("info");

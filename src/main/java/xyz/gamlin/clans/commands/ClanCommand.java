@@ -119,8 +119,6 @@ public class ClanCommand implements CommandExecutor {
                         return new ClanTransferOwnerSubCommand().transferClanOwnerSubCommand(sender, args);
                     case "list":
                         return new ClanListSubCommand().clanListSubCommand(sender);
-                    case "join":
-                        return new ClanJoinSubCommand().clanJoinSubCommand(sender);
                     case "kick":
                         return new ClanKickSubCommand().clanKickSubCommand(sender, args);
                     case "info":
