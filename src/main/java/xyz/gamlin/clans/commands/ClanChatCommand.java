@@ -10,9 +10,9 @@ import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.api.ClanChatMessageSendEvent;
 import xyz.gamlin.clans.models.Clan;
 import xyz.gamlin.clans.models.ClanPlayer;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.UsermapStorageUtil;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
+import xyz.gamlin.clans.utils.abstractUtils.UsermapUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +23,9 @@ public class ClanChatCommand implements CommandExecutor {
 
     FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
+
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
+    private UsermapUtils usermapUtils = Clans.getPlugin().usermapUtils;
 
     private static final String TIME_LEFT = "%TIMELEFT%";
 
@@ -50,14 +53,14 @@ public class ClanChatCommand implements CommandExecutor {
                 ArrayList<Player> onlinePlayers = new ArrayList<>(Bukkit.getServer().getOnlinePlayers());
                 ArrayList<Player> playersWithSpyPerms = new ArrayList<>();
                 for (Player p : onlinePlayers){
-                    ClanPlayer clanPlayer = UsermapStorageUtil.getClanPlayerByBukkitPlayer(p);
+                    ClanPlayer clanPlayer = usermapUtils.getClanPlayerByBukkitPlayer(p);
                     if (clanPlayer.getCanChatSpy() && p.hasPermission("clanslite.chat.spy")){
                         playersWithSpyPerms.add(p);
                     }
                 }
 
-                Clan clanByMember = ClansStorageUtil.findClanByPlayer(player);
-                Clan clanByOwner = ClansStorageUtil.findClanByOwner(player);
+                Clan clanByMember = storageUtils.findClanByPlayer(player);
+                Clan clanByOwner = storageUtils.findClanByOwner(player);
 
                 String chatSpyPrefix = clansConfig.getString("clan-chat.chat-spy.chat-spy-prefix");
                 StringBuilder messageString = new StringBuilder();

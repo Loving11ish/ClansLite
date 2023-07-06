@@ -10,9 +10,9 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import xyz.gamlin.clans.Clans;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.UsermapStorageUtil;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
+import xyz.gamlin.clans.utils.abstractUtils.UsermapUtils;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -23,6 +23,9 @@ public class ClanAdmin implements CommandExecutor {
     Logger logger = Clans.getPlugin().getLogger();
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
 
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
+    private UsermapUtils usermapUtils = Clans.getPlugin().usermapUtils;
+
     private static final String PLAYER_TO_KICK = "%KICKEDPLAYER%";
 
     @Override
@@ -32,8 +35,8 @@ public class ClanAdmin implements CommandExecutor {
                 if (args[0].equalsIgnoreCase("save")) {
                     player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("saving-clans-start")));
                     try {
-                        if (!ClansStorageUtil.getRawClansList().isEmpty()){
-                            ClansStorageUtil.saveClans();
+                        if (!storageUtils.getRawClansList().isEmpty()){
+                            storageUtils.saveClans();
                         }else {
                             player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("save-failed-no-clans")));
                         }
@@ -73,10 +76,10 @@ public class ClanAdmin implements CommandExecutor {
                     if (args.length == 2){
                         if (args[1].length() > 1){
                             Player onlinePlayerOwner = Bukkit.getPlayer(args[1]);
-                            OfflinePlayer offlinePlayerOwner = UsermapStorageUtil.getBukkitOfflinePlayerByName(args[1]);
+                            OfflinePlayer offlinePlayerOwner = usermapUtils.getBukkitOfflinePlayerByName(args[1]);
                             if (onlinePlayerOwner != null){
                                 try {
-                                    if (ClansStorageUtil.deleteClan(onlinePlayerOwner)){
+                                    if (storageUtils.deleteClan(onlinePlayerOwner)){
                                         player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-successfully-disbanded")));
                                     }else {
                                         player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-admin-disband-failure")));
@@ -88,7 +91,7 @@ public class ClanAdmin implements CommandExecutor {
                                 }
                             }else if (offlinePlayerOwner != null){
                                 try {
-                                    if (ClansStorageUtil.deleteOfflineClan(offlinePlayerOwner)){
+                                    if (storageUtils.deleteOfflineClan(offlinePlayerOwner)){
                                         player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-successfully-disbanded")));
                                     }else {
                                         player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-admin-disband-failure")));
@@ -139,8 +142,8 @@ public class ClanAdmin implements CommandExecutor {
                 if (args[0].equalsIgnoreCase("save")) {
                     logger.info(ColorUtils.translateColorCodes(messagesConfig.getString("saving-clans-start")));
                     try {
-                        if (!ClansStorageUtil.getRawClansList().isEmpty()){
-                            ClansStorageUtil.saveClans();
+                        if (!storageUtils.getRawClansList().isEmpty()){
+                            storageUtils.saveClans();
                         }else {
                             logger.warning(ColorUtils.translateColorCodes(messagesConfig.getString("save-failed-no-clans")));
                         }
@@ -180,10 +183,10 @@ public class ClanAdmin implements CommandExecutor {
                     if (args.length == 2){
                         if (args[1].length() > 1){
                             Player onlinePlayerOwner = Bukkit.getPlayer(args[1]);
-                            OfflinePlayer offlinePlayerOwner = UsermapStorageUtil.getBukkitOfflinePlayerByName(args[1]);
+                            OfflinePlayer offlinePlayerOwner = usermapUtils.getBukkitOfflinePlayerByName(args[1]);
                             if (onlinePlayerOwner != null){
                                 try {
-                                    if (ClansStorageUtil.deleteClan(onlinePlayerOwner)){
+                                    if (storageUtils.deleteClan(onlinePlayerOwner)){
                                         logger.info(ColorUtils.translateColorCodes(messagesConfig.getString("clan-successfully-disbanded")));
                                     }else {
                                         logger.warning(ColorUtils.translateColorCodes(messagesConfig.getString("clan-admin-disband-failure")));
@@ -195,7 +198,7 @@ public class ClanAdmin implements CommandExecutor {
                                 }
                             }else if (offlinePlayerOwner != null){
                                 try {
-                                    if (ClansStorageUtil.deleteOfflineClan(offlinePlayerOwner)){
+                                    if (storageUtils.deleteOfflineClan(offlinePlayerOwner)){
                                         logger.info(ColorUtils.translateColorCodes(messagesConfig.getString("clan-successfully-disbanded")));
                                     }else {
                                         logger.warning(ColorUtils.translateColorCodes(messagesConfig.getString("clan-admin-disband-failure")));

@@ -5,20 +5,22 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.models.Clan;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 public class ClanPvpSubCommand {
 
     FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
 
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
+
     public boolean clanPvpSubCommand(CommandSender sender) {
         if (sender instanceof Player player) {
             if (clansConfig.getBoolean("protections.pvp.pvp-command-enabled")){
-                if (ClansStorageUtil.isClanOwner(player)){
-                    if (ClansStorageUtil.findClanByOwner(player) != null){
-                        Clan clan = ClansStorageUtil.findClanByOwner(player);
+                if (storageUtils.isClanOwner(player)){
+                    if (storageUtils.findClanByOwner(player) != null){
+                        Clan clan = storageUtils.findClanByOwner(player);
                         if (clan.isFriendlyFireAllowed()){
                             clan.setFriendlyFireAllowed(false);
                             player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("disabled-friendly-fire")));

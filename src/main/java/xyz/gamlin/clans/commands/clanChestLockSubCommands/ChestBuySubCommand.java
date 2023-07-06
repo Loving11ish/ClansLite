@@ -7,8 +7,8 @@ import org.bukkit.entity.Player;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.api.ChestBuyEvent;
 import xyz.gamlin.clans.models.Clan;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 import java.util.logging.Logger;
 
@@ -18,6 +18,8 @@ public class ChestBuySubCommand {
 
     FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
+
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
 
     private final int purchasePrice = clansConfig.getInt("protections.chests.clan-points-purchase-value");
     private static final String AMOUNT_PLACEHOLDER = "%AMOUNT%";
@@ -29,8 +31,8 @@ public class ChestBuySubCommand {
                 if (args[1] != null){
                     int amountOfChests = Integer.parseInt(args[1]);
                     if (amountOfChests != 0){
-                        Clan clanByOwner = ClansStorageUtil.findClanByOwner(player);
-                        Clan clanByPlayer = ClansStorageUtil.findClanByPlayer(player);
+                        Clan clanByOwner = storageUtils.findClanByOwner(player);
+                        Clan clanByPlayer = storageUtils.findClanByPlayer(player);
 
                         if (clanByOwner != null){
                             addNewChestLock(clanByOwner, player, amountOfChests);
@@ -46,8 +48,8 @@ public class ChestBuySubCommand {
                 }
             }else {
                 if (args.length == 1){
-                    Clan clanByOwner = ClansStorageUtil.findClanByOwner(player);
-                    Clan clanByPlayer = ClansStorageUtil.findClanByPlayer(player);
+                    Clan clanByOwner = storageUtils.findClanByOwner(player);
+                    Clan clanByPlayer = storageUtils.findClanByPlayer(player);
 
                     if (clanByOwner != null){
                         addNewChestLock(clanByOwner, player);
@@ -67,8 +69,8 @@ public class ChestBuySubCommand {
 
     private void addNewChestLock(Clan clan, Player player, int amountOfChests){
         int maxAllowedChests = clan.getMaxAllowedProtectedChests();
-        if (ClansStorageUtil.hasEnoughPoints(clan, purchasePrice * maxAllowedChests)){
-            if (ClansStorageUtil.withdrawPoints(clan, purchasePrice * maxAllowedChests)){
+        if (storageUtils.hasEnoughPoints(clan, purchasePrice * maxAllowedChests)){
+            if (storageUtils.withdrawPoints(clan, purchasePrice * maxAllowedChests)){
                 clan.setMaxAllowedProtectedChests(maxAllowedChests + amountOfChests);
                 player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("chest-purchased-successfully")
                         .replace(AMOUNT_PLACEHOLDER, String.valueOf(amountOfChests))));
@@ -88,8 +90,8 @@ public class ChestBuySubCommand {
 
     private void addNewChestLock(Clan clan, Player player){
         int maxAllowedChests = clan.getMaxAllowedProtectedChests();
-        if (ClansStorageUtil.hasEnoughPoints(clan, purchasePrice * maxAllowedChests)){
-            if (ClansStorageUtil.withdrawPoints(clan, purchasePrice * maxAllowedChests)){
+        if (storageUtils.hasEnoughPoints(clan, purchasePrice * maxAllowedChests)){
+            if (storageUtils.withdrawPoints(clan, purchasePrice * maxAllowedChests)){
                 clan.setMaxAllowedProtectedChests(maxAllowedChests + 1);
                 player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("chest-purchased-successfully")
                         .replace(AMOUNT_PLACEHOLDER, String.valueOf(1))));

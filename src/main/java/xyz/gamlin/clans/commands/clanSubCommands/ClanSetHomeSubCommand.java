@@ -8,8 +8,8 @@ import org.bukkit.entity.Player;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.api.ClanHomeCreateEvent;
 import xyz.gamlin.clans.models.Clan;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 import java.util.logging.Logger;
 
@@ -19,12 +19,14 @@ public class ClanSetHomeSubCommand {
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
     Logger logger = Clans.getPlugin().getLogger();
 
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
+
     public boolean setClanHomeSubCommand(CommandSender sender) {
         if (sender instanceof Player player) {
             if (clansConfig.getBoolean("clan-home.enabled")){
-                if (ClansStorageUtil.isClanOwner(player)){
-                    if (ClansStorageUtil.findClanByOwner(player) != null){
-                        Clan clan = ClansStorageUtil.findClanByOwner(player);
+                if (storageUtils.isClanOwner(player)){
+                    if (storageUtils.findClanByOwner(player) != null){
+                        Clan clan = storageUtils.findClanByOwner(player);
                         Location location = player.getLocation();
                         fireClanHomeSetEvent(player, clan, location);
                         if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){

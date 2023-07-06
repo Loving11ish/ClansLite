@@ -10,8 +10,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.api.ClanFriendlyFireAttackEvent;
 import xyz.gamlin.clans.models.Clan;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -22,14 +22,16 @@ public class PlayerDamageEvent implements Listener {
     FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
 
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
+
     @EventHandler (priority = EventPriority.NORMAL)
     public void onPlayerHit(EntityDamageByEntityEvent event){
         if (event.getEntity() instanceof Player hurtPlayer) {
             String hurtUUID = hurtPlayer.getUniqueId().toString();
             if (event.getDamager() instanceof Player attackingPlayer) {
                 attackingPlayer.setInvulnerable(false);
-                Clan attackingClan = ClansStorageUtil.findClanByOwner(attackingPlayer);
-                Clan victimClan = ClansStorageUtil.findClanByOwner(hurtPlayer);
+                Clan attackingClan = storageUtils.findClanByOwner(attackingPlayer);
+                Clan victimClan = storageUtils.findClanByOwner(hurtPlayer);
 
 
                 if (attackingClan != null){
@@ -61,8 +63,8 @@ public class PlayerDamageEvent implements Listener {
 
 
                 else {
-                    Clan attackingClanByPlayer = ClansStorageUtil.findClanByPlayer(attackingPlayer);
-                    Clan victimClanByPlayer = ClansStorageUtil.findClanByPlayer(hurtPlayer);
+                    Clan attackingClanByPlayer = storageUtils.findClanByPlayer(attackingPlayer);
+                    Clan victimClanByPlayer = storageUtils.findClanByPlayer(hurtPlayer);
                     if (attackingClanByPlayer != null){
                         ArrayList<String> attackingMembers = attackingClanByPlayer.getClanMembers();
                         if (attackingMembers.contains(hurtUUID) || attackingClanByPlayer.getClanOwner().equals(hurtUUID)){

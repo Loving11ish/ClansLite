@@ -5,8 +5,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.models.Clan;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 import java.util.*;
 
@@ -15,10 +15,12 @@ public class ClanPrefixSubCommand {
     FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
 
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
+
     int MIN_CHAR_LIMIT = clansConfig.getInt("clan-tags.min-character-limit");
     int MAX_CHAR_LIMIT = clansConfig.getInt("clan-tags.max-character-limit");
 
-    Set<Map.Entry<UUID, Clan>> clans = ClansStorageUtil.getClans();
+    Set<Map.Entry<UUID, Clan>> clans = storageUtils.getClans();
     ArrayList<String> clansPrefixList = new ArrayList<>();
 
     public boolean clanPrefixSubCommand(CommandSender sender, String[] args, List<String> bannedTags) {
@@ -34,10 +36,10 @@ public class ClanPrefixSubCommand {
                     player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-prefix-already-taken").replace("%CLANPREFIX%", args[1])));
                     return true;
                 }
-                if (ClansStorageUtil.isClanOwner(player)){
+                if (storageUtils.isClanOwner(player)){
                     if (args[1].length() >= MIN_CHAR_LIMIT && args[1].length() <= MAX_CHAR_LIMIT) {
-                        Clan playerClan = ClansStorageUtil.findClanByOwner(player);
-                        ClansStorageUtil.updatePrefix(player, args[1]);
+                        Clan playerClan = storageUtils.findClanByOwner(player);
+                        storageUtils.updatePrefix(player, args[1]);
                         String prefixConfirmation = ColorUtils.translateColorCodes(messagesConfig.getString("clan-prefix-change-successful")).replace("%CLANPREFIX%", playerClan.getClanPrefix());
                         sender.sendMessage(prefixConfirmation);
                         clansPrefixList.clear();

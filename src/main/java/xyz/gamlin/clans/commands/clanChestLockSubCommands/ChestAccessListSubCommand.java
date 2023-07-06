@@ -11,15 +11,18 @@ import org.bukkit.entity.Player;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.models.Chest;
 import xyz.gamlin.clans.models.ClanPlayer;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
-import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.UsermapStorageUtil;
+import xyz.gamlin.clans.utils.*;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
+import xyz.gamlin.clans.utils.abstractUtils.UsermapUtils;
 
 import java.util.List;
 
 public class ChestAccessListSubCommand {
 
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
+
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
+    private UsermapUtils usermapUtils = Clans.getPlugin().usermapUtils;
 
     private static final String PLAYER_PLACEHOLDER = "%PLAYER%";
 
@@ -31,15 +34,15 @@ public class ChestAccessListSubCommand {
             if (block != null){
                 if (block.getType().equals(Material.CHEST)){
                     Location location = block.getLocation();
-                    if (ClansStorageUtil.isChestLocked(location)){
-                        Chest chest = ClansStorageUtil.getChestByLocation(location);
+                    if (storageUtils.isChestLocked(location)){
+                        Chest chest = storageUtils.getChestByLocation(location);
                         if (chest != null){
-                            if (ClansStorageUtil.hasAccessToLockedChest(offlinePlayer, chest)){
-                                List<OfflinePlayer> offlinePlayersWithAccess = ClansStorageUtil.getOfflinePlayersWithChestAccessByChest(chest);
+                            if (storageUtils.hasAccessToLockedChest(offlinePlayer, chest)){
+                                List<OfflinePlayer> offlinePlayersWithAccess = storageUtils.getOfflinePlayersWithChestAccessByChest(chest);
                                 StringBuilder stringBuilder = new StringBuilder();
                                 stringBuilder.append(messagesConfig.getString("players-with-access-list.header"));
                                 for (OfflinePlayer offlinePlayerWithAccess : offlinePlayersWithAccess){
-                                    ClanPlayer clanPlayer = UsermapStorageUtil.getClanPlayerByBukkitOfflinePlayer(offlinePlayerWithAccess);
+                                    ClanPlayer clanPlayer = usermapUtils.getClanPlayerByBukkitOfflinePlayer(offlinePlayerWithAccess);
                                     if (clanPlayer != null){
                                         String playerName = clanPlayer.getLastPlayerName();
                                         stringBuilder.append(messagesConfig.getString("players-with-access-list.player-entry")

@@ -8,8 +8,8 @@ import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.api.ClanAllyAddEvent;
 import xyz.gamlin.clans.api.ClanAllyRemoveEvent;
 import xyz.gamlin.clans.models.Clan;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +20,9 @@ public class ClanAllySubCommand {
     FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
     Logger logger = Clans.getPlugin().getLogger();
+
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
+
     private static final String ALLY_CLAN = "%ALLYCLAN%";
     private static final String ALLY_OWNER = "%ALLYOWNER%";
     private static final String CLAN_OWNER = "%CLANOWNER%";
@@ -29,16 +32,16 @@ public class ClanAllySubCommand {
             if (args.length > 2){
                 if (args[1].equalsIgnoreCase("add")){
                     if (args[2].length() > 1){
-                        if (ClansStorageUtil.isClanOwner(player)){
-                            if (ClansStorageUtil.findClanByOwner(player) != null) {
-                                Clan clan = ClansStorageUtil.findClanByOwner(player);
+                        if (storageUtils.isClanOwner(player)){
+                            if (storageUtils.findClanByOwner(player) != null) {
+                                Clan clan = storageUtils.findClanByOwner(player);
                                 Player allyClanOwner = Bukkit.getPlayer(args[2]);
                                 if (allyClanOwner != null){
-                                    if (ClansStorageUtil.findClanByOwner(allyClanOwner) != null){
-                                        if (ClansStorageUtil.findClanByOwner(player) != ClansStorageUtil.findClanByOwner(allyClanOwner)){
-                                            Clan allyClan = ClansStorageUtil.findClanByOwner(allyClanOwner);
+                                    if (storageUtils.findClanByOwner(allyClanOwner) != null){
+                                        if (storageUtils.findClanByOwner(player) != storageUtils.findClanByOwner(allyClanOwner)){
+                                            Clan allyClan = storageUtils.findClanByOwner(allyClanOwner);
                                             String allyOwnerUUIDString = allyClan.getClanOwner();
-                                            if (ClansStorageUtil.findClanByOwner(player).getClanAllies().size() >= clansConfig.getInt("max-clan-allies")){
+                                            if (storageUtils.findClanByOwner(player).getClanAllies().size() >= clansConfig.getInt("max-clan-allies")){
                                                 int maxSize = clansConfig.getInt("max-clan-allies");
                                                 player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-ally-max-amount-reached")).replace("%LIMIT%", String.valueOf(maxSize)));
                                                 return true;
@@ -51,7 +54,7 @@ public class ClanAllySubCommand {
                                                 player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("failed-clan-already-your-ally")));
                                                 return true;
                                             }else {
-                                                ClansStorageUtil.addClanAlly(player, allyClanOwner);
+                                                storageUtils.addClanAlly(player, allyClanOwner);
                                                 fireClanAllyAddEvent(player, clan, allyClanOwner, allyClan);
                                                 if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
                                                     logger.info(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanAllyAddEvent"));
@@ -82,13 +85,13 @@ public class ClanAllySubCommand {
                     return true;
                 }else if (args[1].equalsIgnoreCase("remove")){
                     if (args[2].length() > 1){
-                        if (ClansStorageUtil.isClanOwner(player)){
-                            if (ClansStorageUtil.findClanByOwner(player) != null){
+                        if (storageUtils.isClanOwner(player)){
+                            if (storageUtils.findClanByOwner(player) != null){
                                 Player allyClanOwner = Bukkit.getPlayer(args[2]);
                                 if (allyClanOwner != null){
-                                    if (ClansStorageUtil.findClanByOwner(allyClanOwner) != null){
-                                        Clan allyClan = ClansStorageUtil.findClanByOwner(allyClanOwner);
-                                        List<String> alliedClans = ClansStorageUtil.findClanByOwner(player).getClanAllies();
+                                    if (storageUtils.findClanByOwner(allyClanOwner) != null){
+                                        Clan allyClan = storageUtils.findClanByOwner(allyClanOwner);
+                                        List<String> alliedClans = storageUtils.findClanByOwner(player).getClanAllies();
                                         UUID allyClanOwnerUUID = allyClanOwner.getUniqueId();
                                         String allyClanOwnerString = allyClanOwnerUUID.toString();
                                         if (alliedClans.contains(allyClanOwnerString)){
@@ -96,7 +99,7 @@ public class ClanAllySubCommand {
                                             if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
                                                 logger.info(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanAllyRemoveEvent"));
                                             }
-                                            ClansStorageUtil.removeClanAlly(player, allyClanOwner);
+                                            storageUtils.removeClanAlly(player, allyClanOwner);
                                             player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("removed-clan-from-your-allies").replace(ALLY_CLAN, allyClan.getClanFinalName())));
                                             if (allyClanOwner.isOnline()){
                                                 allyClanOwner.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-removed-from-other-allies").replace(CLAN_OWNER, player.getName())));
@@ -127,12 +130,12 @@ public class ClanAllySubCommand {
         }
         return false;
     }
-    private static void fireClanAllyRemoveEvent(Player player, Player allyClanOwner, Clan allyClan) {
-        ClanAllyRemoveEvent clanAllyRemoveEvent = new ClanAllyRemoveEvent(player, ClansStorageUtil.findClanByOwner(player), allyClan, allyClanOwner);
+    private void fireClanAllyRemoveEvent(Player player, Player allyClanOwner, Clan allyClan) {
+        ClanAllyRemoveEvent clanAllyRemoveEvent = new ClanAllyRemoveEvent(player, storageUtils.findClanByOwner(player), allyClan, allyClanOwner);
         Bukkit.getPluginManager().callEvent(clanAllyRemoveEvent);
     }
 
-    private static void fireClanAllyAddEvent(Player player, Clan clan, Player allyClanOwner, Clan allyClan) {
+    private void fireClanAllyAddEvent(Player player, Clan clan, Player allyClanOwner, Clan allyClan) {
         ClanAllyAddEvent clanAllyAddEvent = new ClanAllyAddEvent(player, clan, allyClan, allyClanOwner);
         Bukkit.getPluginManager().callEvent(clanAllyAddEvent);
     }

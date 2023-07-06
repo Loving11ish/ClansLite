@@ -11,8 +11,8 @@ import org.bukkit.persistence.PersistentDataType;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.api.ChestUnlockEvent;
 import xyz.gamlin.clans.models.Chest;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -23,6 +23,8 @@ public class ChestUnlockSubCommand {
 
     FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
+
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
 
     private static final String X_PLACEHOLDER = "%X%";
     private static final String Y_PLACEHOLDER = "%Y%";
@@ -40,9 +42,9 @@ public class ChestUnlockSubCommand {
                     int y = (int) Math.round(location.getY());
                     int z = (int) Math.round(location.getZ());
 
-                    if (ClansStorageUtil.isChestLocked(location)){
-                        Chest chest = ClansStorageUtil.getChestByLocation(location);
-                        if (ClansStorageUtil.hasAccessToLockedChest(offlinePlayer, chest)){
+                    if (storageUtils.isChestLocked(location)){
+                        Chest chest = storageUtils.getChestByLocation(location);
+                        if (storageUtils.hasAccessToLockedChest(offlinePlayer, chest)){
 
                             TileState tileState = (TileState) block.getState();
                             PersistentDataContainer container = tileState.getPersistentDataContainer();
@@ -50,7 +52,7 @@ public class ChestUnlockSubCommand {
                             if (clanOwnerUUIDString != null){
 
                                 try {
-                                    if (ClansStorageUtil.removeProtectedChest(clanOwnerUUIDString, location, player)){
+                                    if (storageUtils.removeProtectedChest(clanOwnerUUIDString, location, player)){
                                         fireChestUnlockEvent(player, location);
                                         if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
                                             logger.info(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ChestUnlockEvent"));

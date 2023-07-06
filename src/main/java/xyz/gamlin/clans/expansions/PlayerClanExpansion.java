@@ -7,11 +7,14 @@ import org.jetbrains.annotations.NotNull;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.models.Clan;
 import xyz.gamlin.clans.models.ClanPlayer;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
-import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.UsermapStorageUtil;
+import xyz.gamlin.clans.utils.*;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
+import xyz.gamlin.clans.utils.abstractUtils.UsermapUtils;
 
 public class PlayerClanExpansion extends PlaceholderExpansion {
+
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
+    private UsermapUtils usermapUtils = Clans.getPlugin().usermapUtils;
 
     @Override
     public @NotNull String getIdentifier() {
@@ -36,9 +39,9 @@ public class PlayerClanExpansion extends PlaceholderExpansion {
     @Override
     public String onRequest(OfflinePlayer player, String params) {
         FileConfiguration configFile = Clans.getPlugin().getConfig();
-        Clan clanOwner = ClansStorageUtil.findClanByOfflineOwner(player);
-        Clan clanMember = ClansStorageUtil.findClanByOfflinePlayer(player);
-        ClanPlayer clanPlayer = UsermapStorageUtil.getClanPlayerByBukkitOfflinePlayer(player);
+        Clan clanOwner = storageUtils.findClanByOfflineOwner(player);
+        Clan clanMember = storageUtils.findClanByOfflinePlayer(player);
+        ClanPlayer clanPlayer = usermapUtils.getClanPlayerByBukkitOfflinePlayer(player);
         if (params.equalsIgnoreCase("clanName")){
             //%clansLite_clanName%
             if (clanOwner != null){
@@ -101,9 +104,9 @@ public class PlayerClanExpansion extends PlaceholderExpansion {
         if (params.equalsIgnoreCase("clanHomeSet")){
             //%clansLite_clanHomeSet%
             if (clanOwner != null){
-                return String.valueOf(ClansStorageUtil.isHomeSet(clanOwner));
+                return String.valueOf(storageUtils.isHomeSet(clanOwner));
             }else if (clanMember != null){
-                return String.valueOf(ClansStorageUtil.isHomeSet(clanMember));
+                return String.valueOf(storageUtils.isHomeSet(clanMember));
             }else {
                 return "";
             }

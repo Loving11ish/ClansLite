@@ -3,6 +3,7 @@ package xyz.gamlin.clans.utils;
 import com.tcoded.folialib.FoliaLib;
 import com.tcoded.folialib.wrapper.task.WrappedTask;
 import xyz.gamlin.clans.Clans;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -12,6 +13,8 @@ public class TaskTimerUtils {
 
     static Logger logger = Clans.getPlugin().getLogger();
     static FoliaLib foliaLib = new FoliaLib(Clans.getPlugin());
+
+    private static StorageUtils storageUtils = Clans.getPlugin().storageUtils;
 
     public static WrappedTask task1;
     public static WrappedTask task2;
@@ -25,7 +28,7 @@ public class TaskTimerUtils {
             public void run() {
                 if (time == 1){
                     try {
-                        ClansStorageUtil.saveClans();
+                        storageUtils.saveClans();
                         if (Clans.getPlugin().getConfig().getBoolean("general.show-auto-save-task-message.enabled")){
                             logger.info(ColorUtils.translateColorCodes(Clans.getPlugin().messagesFileManager.getMessagesConfig().getString("auto-save-complete")));
                         }
@@ -51,7 +54,7 @@ public class TaskTimerUtils {
             public void run() {
                 if (time == 1){
                     try {
-                        ClansStorageUtil.saveClans();
+                        storageUtils.saveClans();
                         if (Clans.getPlugin().getConfig().getBoolean("general.show-auto-save-task-message.enabled")){
                             logger.info(ColorUtils.translateColorCodes(Clans.getPlugin().messagesFileManager.getMessagesConfig().getString("auto-save-complete")));
                         }

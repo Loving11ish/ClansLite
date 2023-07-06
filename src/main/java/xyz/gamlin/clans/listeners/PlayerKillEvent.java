@@ -9,9 +9,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.api.PlayerPointsAwardedEvent;
 import xyz.gamlin.clans.models.Clan;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
-import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.UsermapStorageUtil;
+import xyz.gamlin.clans.utils.*;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
+import xyz.gamlin.clans.utils.abstractUtils.UsermapUtils;
 
 import java.util.logging.Logger;
 
@@ -21,6 +21,9 @@ public class PlayerKillEvent implements Listener {
 
     FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
+
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
+    private UsermapUtils usermapUtils = Clans.getPlugin().usermapUtils;
 
     private Integer nonEnemyPointValue = clansConfig.getInt("points.player-points.non-enemy-clan-point-amount-on-kill");
     private Integer enemyPointValue = clansConfig.getInt("points.player-points.enemy-clan-point-amount-on-kill");
@@ -34,11 +37,11 @@ public class PlayerKillEvent implements Listener {
             if (event.getEntity() instanceof Player victim){
                 if (victim.getLastDamage() >= victim.getHealth()){
 
-                    if (ClansStorageUtil.findClanByPlayer(killer) == null||ClansStorageUtil.findClanByPlayer(victim) == null){
+                    if (storageUtils.findClanByPlayer(killer) == null || storageUtils.findClanByPlayer(victim) == null){
                         killer.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("player-points-killer-non-enemy-received-success")
                                 .replace("%PLAYER%", victim.getName()).replace("%POINTVALUE%", nonEnemyPointValue.toString())));
                         if (clansConfig.getBoolean("points.player-points.take-points-from-victim")){
-                            if (UsermapStorageUtil.withdrawPoints(victim, nonEnemyPointValue)){
+                            if (usermapUtils.withdrawPoints(victim, nonEnemyPointValue)){
                                 victim.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("player-points-victim-non-enemy-withdrawn-success")
                                         .replace("%KILLER%", killer.getName()).replace("%POINTVALUE%", nonEnemyPointValue.toString())));
                             }else {
@@ -47,7 +50,7 @@ public class PlayerKillEvent implements Listener {
                                         .replace("%VICTIM%", victim.getName())));
                             }
                         }
-                        UsermapStorageUtil.addPointsToOnlinePlayer(killer, nonEnemyPointValue);
+                        usermapUtils.addPointsToOnlinePlayer(killer, nonEnemyPointValue);
                         //TODO -> fix this non clan event firing!
 //                        firePlayerPointsAwardedEvent(killer, killer, victim, null, null, nonEnemyPointValue, false);
 //                        if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
@@ -55,14 +58,14 @@ public class PlayerKillEvent implements Listener {
 //                        }
                     }
 
-                    else if (ClansStorageUtil.findClanByOwner(killer) != null || ClansStorageUtil.findClanByOwner(victim) != null){
-                        Clan killerClanOwner = ClansStorageUtil.findClanByOwner(killer);
-                        Clan victimClanOwner = ClansStorageUtil.findClanByOwner(victim);
+                    else if (storageUtils.findClanByOwner(killer) != null || storageUtils.findClanByOwner(victim) != null){
+                        Clan killerClanOwner = storageUtils.findClanByOwner(killer);
+                        Clan victimClanOwner = storageUtils.findClanByOwner(victim);
                         if (killerClanOwner.getClanEnemies().contains(victimClanOwner.getClanOwner())||victimClanOwner.getClanEnemies().contains(killerClanOwner.getClanOwner())){
                             killer.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("player-points-killer-enemy-received-success")
                                     .replace("%PLAYER%", victim.getName()).replace("%ENEMYPOINTVALUE%", enemyPointValue.toString())));
                             if (clansConfig.getBoolean("points.player-points.take-points-from-victim")){
-                                if (UsermapStorageUtil.withdrawPoints(victim, enemyPointValue)){
+                                if (usermapUtils.withdrawPoints(victim, enemyPointValue)){
                                     victim.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("player-points-victim-enemy-withdrawn-success")
                                             .replace("%KILLER%", killer.getName()).replace("%ENEMYPOINTVALUE%", enemyPointValue.toString())));
                                 }else {
@@ -71,7 +74,7 @@ public class PlayerKillEvent implements Listener {
                                             .replace("%VICTIM%", victim.getName())));
                                 }
                             }
-                            UsermapStorageUtil.addPointsToOnlinePlayer(killer, enemyPointValue);
+                            usermapUtils.addPointsToOnlinePlayer(killer, enemyPointValue);
                             firePlayerPointsAwardedEvent(killer, killer, victim, killerClanOwner, victimClanOwner, enemyPointValue, true);
                             if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
                                 logger.info(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired PlayerPointsAwardedEvent"));
@@ -80,7 +83,7 @@ public class PlayerKillEvent implements Listener {
                             killer.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("player-points-killer-non-enemy-received-success")
                                     .replace("%PLAYER%", victim.getName()).replace("%POINTVALUE%", nonEnemyPointValue.toString())));
                             if (clansConfig.getBoolean("points.player-points.take-points-from-victim")){
-                                if (UsermapStorageUtil.withdrawPoints(victim, nonEnemyPointValue)){
+                                if (usermapUtils.withdrawPoints(victim, nonEnemyPointValue)){
                                     victim.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("player-points-victim-non-enemy-withdrawn-success")
                                             .replace("%KILLER%", killer.getName()).replace("%POINTVALUE%", nonEnemyPointValue.toString())));
                                 }else {
@@ -89,7 +92,7 @@ public class PlayerKillEvent implements Listener {
                                             .replace("%VICTIM%", victim.getName())));
                                 }
                             }
-                            UsermapStorageUtil.addPointsToOnlinePlayer(killer, nonEnemyPointValue);
+                            usermapUtils.addPointsToOnlinePlayer(killer, nonEnemyPointValue);
                             firePlayerPointsAwardedEvent(killer, killer, victim, killerClanOwner, victimClanOwner, nonEnemyPointValue, false);
                             if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
                                 logger.info(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired PlayerPointsAwardedEvent"));
@@ -98,15 +101,15 @@ public class PlayerKillEvent implements Listener {
                     }
 
                     else {
-                        if (ClansStorageUtil.findClanByPlayer(killer) != null || ClansStorageUtil.findClanByPlayer(victim) != null){
-                            Clan killerClan = ClansStorageUtil.findClanByPlayer(killer);
-                            Clan victimClan = ClansStorageUtil.findClanByPlayer(victim);
+                        if (storageUtils.findClanByPlayer(killer) != null || storageUtils.findClanByPlayer(victim) != null){
+                            Clan killerClan = storageUtils.findClanByPlayer(killer);
+                            Clan victimClan = storageUtils.findClanByPlayer(victim);
                             if (killerClan.getClanEnemies() != null && !killerClan.getClanEnemies().isEmpty() || victimClan.getClanEnemies() != null && !victimClan.getClanEnemies().isEmpty()){
                                 if (killerClan.getClanEnemies().contains(victimClan.getClanOwner()) || victimClan.getClanEnemies().contains(killerClan.getClanOwner())) {
                                     killer.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("player-points-killer-enemy-received-success")
                                             .replace("%PLAYER%", victim.getName()).replace("%ENEMYPOINTVALUE%", enemyPointValue.toString())));
                                     if (clansConfig.getBoolean("points.player-points.take-points-from-victim")) {
-                                        if (UsermapStorageUtil.withdrawPoints(victim, enemyPointValue)) {
+                                        if (usermapUtils.withdrawPoints(victim, enemyPointValue)) {
                                             victim.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("player-points-victim-enemy-withdrawn-success")
                                                     .replace("%KILLER%", killer.getName()).replace("%ENEMYPOINTVALUE%", enemyPointValue.toString())));
                                         }else {
@@ -115,7 +118,7 @@ public class PlayerKillEvent implements Listener {
                                                     .replace("%VICTIM%", victim.getName())));
                                         }
                                     }
-                                    UsermapStorageUtil.addPointsToOnlinePlayer(killer, enemyPointValue);
+                                    usermapUtils.addPointsToOnlinePlayer(killer, enemyPointValue);
                                     firePlayerPointsAwardedEvent(killer, killer, victim, killerClan, victimClan, enemyPointValue, true);
                                     if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
                                         logger.info(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired PlayerPointsAwardedEvent"));
@@ -124,7 +127,7 @@ public class PlayerKillEvent implements Listener {
                                     killer.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("player-points-killer-non-enemy-received-success")
                                             .replace("%PLAYER%", victim.getName()).replace("%POINTVALUE%", nonEnemyPointValue.toString())));
                                     if (clansConfig.getBoolean("points.player-points.take-points-from-victim")){
-                                        if (UsermapStorageUtil.withdrawPoints(victim, nonEnemyPointValue)){
+                                        if (usermapUtils.withdrawPoints(victim, nonEnemyPointValue)){
                                             victim.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("player-points-victim-non-enemy-withdrawn-success")
                                                     .replace("%KILLER%", killer.getName()).replace("%POINTVALUE%", nonEnemyPointValue.toString())));
                                         }else {
@@ -133,7 +136,7 @@ public class PlayerKillEvent implements Listener {
                                                     .replace("%VICTIM%", victim.getName())));
                                         }
                                     }
-                                    UsermapStorageUtil.addPointsToOnlinePlayer(killer, nonEnemyPointValue);
+                                    usermapUtils.addPointsToOnlinePlayer(killer, nonEnemyPointValue);
                                     firePlayerPointsAwardedEvent(killer, killer, victim, killerClan, victimClan, nonEnemyPointValue, false);
                                     if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
                                         logger.info(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired PlayerPointsAwardedEvent"));

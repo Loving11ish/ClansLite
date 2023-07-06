@@ -9,9 +9,9 @@ import xyz.gamlin.clans.api.ClanPointsAddedEvent;
 import xyz.gamlin.clans.api.ClanPointsRemovedEvent;
 import xyz.gamlin.clans.models.Clan;
 import xyz.gamlin.clans.models.ClanPlayer;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.UsermapStorageUtil;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
+import xyz.gamlin.clans.utils.abstractUtils.UsermapUtils;
 
 import java.util.logging.Logger;
 
@@ -20,6 +20,9 @@ public class ClanPointSubCommand {
     Logger logger = Clans.getPlugin().getLogger();
     FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
+
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
+    private UsermapUtils usermapUtils = Clans.getPlugin().usermapUtils;
 
     private static final String CLAN_PLACEHOLDER = "%CLAN%";
     private static final String POINT_PLACEHOLDER = "%POINTS%";
@@ -32,13 +35,13 @@ public class ClanPointSubCommand {
                         if (args[2] != null){
                             int depositValue = Integer.parseInt(args[2]);
                             if (depositValue != 0){
-                                Clan clan = ClansStorageUtil.findClanByPlayer(player);
-                                ClanPlayer clanPlayer = UsermapStorageUtil.getClanPlayerByBukkitPlayer(player);
+                                Clan clan = storageUtils.findClanByPlayer(player);
+                                ClanPlayer clanPlayer = usermapUtils.getClanPlayerByBukkitPlayer(player);
                                 int previousClanPlayerPointValue = clanPlayer.getPointBalance();
                                 if (clan != null){
                                     int previousClanPointValue = clan.getClanPoints();
-                                    if (UsermapStorageUtil.withdrawPoints(player, depositValue)){
-                                        ClansStorageUtil.addPoints(clan, depositValue);
+                                    if (usermapUtils.withdrawPoints(player, depositValue)){
+                                        storageUtils.addPoints(clan, depositValue);
                                         int newClanPlayerPointValue = clanPlayer.getPointBalance();
                                         int newClanPointValue = clan.getClanPoints();
                                         fireClanPointsAddedEvent(player, clan, clanPlayer, previousClanPlayerPointValue, newClanPlayerPointValue, depositValue, previousClanPointValue, newClanPointValue);
@@ -68,13 +71,13 @@ public class ClanPointSubCommand {
                         if (args[2] != null){
                             int withdrawValue = Integer.parseInt(args[2]);
                             if (withdrawValue != 0){
-                                Clan clan = ClansStorageUtil.findClanByPlayer(player);
-                                ClanPlayer clanPlayer = UsermapStorageUtil.getClanPlayerByBukkitPlayer(player);
+                                Clan clan = storageUtils.findClanByPlayer(player);
+                                ClanPlayer clanPlayer = usermapUtils.getClanPlayerByBukkitPlayer(player);
                                 int previousClanPlayerPointValue = clanPlayer.getPointBalance();
                                 if (clan != null){
                                     int previousClanPointValue = clan.getClanPoints();
-                                    if (ClansStorageUtil.withdrawPoints(clan, withdrawValue)){
-                                        UsermapStorageUtil.addPointsToOnlinePlayer(player, withdrawValue);
+                                    if (storageUtils.withdrawPoints(clan, withdrawValue)){
+                                        usermapUtils.addPointsToOnlinePlayer(player, withdrawValue);
                                         int newClanPlayerPointValue = clanPlayer.getPointBalance();
                                         int newClanPointValue = clan.getClanPoints();
                                         fireClanPointsRemovedEvent(player, clan, clanPlayer, previousClanPlayerPointValue, newClanPlayerPointValue, withdrawValue, previousClanPointValue, newClanPointValue);

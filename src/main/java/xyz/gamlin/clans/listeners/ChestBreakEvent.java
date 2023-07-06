@@ -15,8 +15,8 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.models.Chest;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +27,8 @@ public class ChestBreakEvent implements Listener {
     FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
     Logger logger = Clans.getPlugin().getLogger();
+
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
 
     private static final String CLAN_PLACEHOLDER = "%CLAN%";
     private static final String X_PLACEHOLDER = "%X%";
@@ -44,7 +46,7 @@ public class ChestBreakEvent implements Listener {
             double y = Math.round(chestLocation.getY());
             double z = Math.round(chestLocation.getZ());
 
-            if (!ClansStorageUtil.isChestLocked(chestLocation)){
+            if (!storageUtils.isChestLocked(chestLocation)){
                 return;
             }
 
@@ -55,10 +57,10 @@ public class ChestBreakEvent implements Listener {
             Player player = event.getPlayer();
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player.getUniqueId());
 
-            Chest chest = ClansStorageUtil.getChestByLocation(chestLocation);
+            Chest chest = storageUtils.getChestByLocation(chestLocation);
 
             if (chest != null){
-                if (!ClansStorageUtil.hasAccessToLockedChest(offlinePlayer, chest)){
+                if (!storageUtils.hasAccessToLockedChest(offlinePlayer, chest)){
                     if (!(player.hasPermission("clanslite.bypass.chests")||player.hasPermission("clanslite.bypass.*")
                                 ||player.hasPermission("clanslite.bypass")||player.hasPermission("clanslite.*")||player.isOp())){
                         event.setCancelled(true);
@@ -70,7 +72,7 @@ public class ChestBreakEvent implements Listener {
                         }
                     }else {
                         try {
-                            if (ClansStorageUtil.removeProtectedChest(owningClanOwnerUUID, chestLocation, player)){
+                            if (storageUtils.removeProtectedChest(owningClanOwnerUUID, chestLocation, player)){
                                 player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("chest-protection-removed-successfully")
                                         .replace(X_PLACEHOLDER, String.valueOf(x))
                                         .replace(Y_PLACEHOLDER, String.valueOf(y))
@@ -100,7 +102,7 @@ public class ChestBreakEvent implements Listener {
             for (Block block : new ArrayList<>(event.blockList())){
                 if (block.getType().equals(Material.CHEST)){
                     Location chestLocation = block.getLocation();
-                    if (ClansStorageUtil.isChestLocked(chestLocation)){
+                    if (storageUtils.isChestLocked(chestLocation)){
                         TileState tileState = (TileState) block.getState();
                         PersistentDataContainer container = tileState.getPersistentDataContainer();
                         String owningClanOwnerUUID = container.get(new NamespacedKey(Clans.getPlugin(), "owningClanOwnerUUID"), PersistentDataType.STRING);
@@ -124,7 +126,7 @@ public class ChestBreakEvent implements Listener {
             for (Block block : new ArrayList<>(event.blockList())){
                 if (block.getType().equals(Material.CHEST)){
                     Location chestLocation = block.getLocation();
-                    if (ClansStorageUtil.isChestLocked(chestLocation)){
+                    if (storageUtils.isChestLocked(chestLocation)){
                         TileState tileState = (TileState) block.getState();
                         PersistentDataContainer container = tileState.getPersistentDataContainer();
                         String owningClanOwnerUUID = container.get(new NamespacedKey(Clans.getPlugin(), "owningClanOwnerUUID"), PersistentDataType.STRING);
@@ -141,7 +143,7 @@ public class ChestBreakEvent implements Listener {
 
     private void removeLockedChest(String owningClanOwnerUUID, Location chestLocation, PersistentDataContainer container, TileState tileState){
         try {
-            if (ClansStorageUtil.removeProtectedChest(owningClanOwnerUUID, chestLocation)){
+            if (storageUtils.removeProtectedChest(owningClanOwnerUUID, chestLocation)){
                 container.remove(new NamespacedKey(Clans.getPlugin(), "owningClanName"));
                 container.remove(new NamespacedKey(Clans.getPlugin(), "owningClanOwnerUUID"));
                 tileState.update();

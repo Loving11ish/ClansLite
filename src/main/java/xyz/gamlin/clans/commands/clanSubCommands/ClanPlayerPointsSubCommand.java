@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.models.ClanPlayer;
 import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.UsermapStorageUtil;
+import xyz.gamlin.clans.utils.abstractUtils.UsermapUtils;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -18,6 +18,8 @@ public class ClanPlayerPointsSubCommand {
 
     FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
+
+    private UsermapUtils usermapUtils = Clans.getPlugin().usermapUtils;
 
     private static final String POINT_PLACEHOLDER = "%POINTVALUE%";
 
@@ -35,7 +37,7 @@ public class ClanPlayerPointsSubCommand {
                     }
                 }
             }else {
-                ClanPlayer clanPlayer = UsermapStorageUtil.getClanPlayerByBukkitPlayer(player);
+                ClanPlayer clanPlayer = usermapUtils.getClanPlayerByBukkitPlayer(player);
                 if (clanPlayer != null){
                     int playerPointValue = clanPlayer.getPointBalance();
                     player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("player-points-list-command")
@@ -57,7 +59,7 @@ public class ClanPlayerPointsSubCommand {
     }
 
     private boolean listAllPoints(CommandSender sender){
-        HashMap<UUID, ClanPlayer> allUsersMap = new HashMap<>(UsermapStorageUtil.getUsermap());
+        HashMap<UUID, ClanPlayer> allUsersMap = new HashMap<>(usermapUtils.getUsermap());
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(ColorUtils.translateColorCodes(messagesConfig.getString("all-points-list-header")));
         for (Map.Entry<UUID, ClanPlayer> entry : allUsersMap.entrySet()){

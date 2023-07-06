@@ -8,8 +8,8 @@ import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.models.Clan;
 import xyz.gamlin.clans.models.ClanInvite;
 import xyz.gamlin.clans.utils.ClanInviteUtil;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -21,6 +21,9 @@ public class ClanJoinSubCommand {
 
     FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
+
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
+
     private static final String PLAYER_PLACEHOLDER = "%PLAYER%";
     private static final String CLAN_PLACEHOLDER = "%CLAN%";
 
@@ -33,9 +36,9 @@ public class ClanJoinSubCommand {
                         inviterUUIDString.set(invites.getValue().getInviter()));
                 logger.info(String.valueOf(inviterUUIDString.get()));
                 Player inviterPlayer = Bukkit.getPlayer(UUID.fromString(inviterUUIDString.get()));
-                Clan clan = ClansStorageUtil.findClanByOwner(inviterPlayer);
+                Clan clan = storageUtils.findClanByOwner(inviterPlayer);
                 if (clan != null) {
-                    if (ClansStorageUtil.addClanMember(clan, player)) {
+                    if (storageUtils.addClanMember(clan, player)) {
                         ClanInviteUtil.removeInvite(inviterUUIDString.get());
                         String joinMessage = ColorUtils.translateColorCodes(messagesConfig.getString("clan-join-successful")).replace(CLAN_PLACEHOLDER, clan.getClanFinalName());
                         player.sendMessage(joinMessage);

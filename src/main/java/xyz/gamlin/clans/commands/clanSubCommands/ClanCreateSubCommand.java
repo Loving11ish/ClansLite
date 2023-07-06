@@ -8,8 +8,8 @@ import org.bukkit.entity.Player;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.api.ClanCreateEvent;
 import xyz.gamlin.clans.models.Clan;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -19,13 +19,16 @@ public class ClanCreateSubCommand {
     FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
     Logger logger = Clans.getPlugin().getLogger();
+
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
+
     private static final String CLAN_PLACEHOLDER = "%CLAN%";
     private static final String CLAN_OWNER = "%CLANOWNER%";
 
     int MIN_CHAR_LIMIT = clansConfig.getInt("clan-tags.min-character-limit");
     int MAX_CHAR_LIMIT = clansConfig.getInt("clan-tags.max-character-limit");
 
-    Set<Map.Entry<UUID, Clan>> clans = ClansStorageUtil.getClans();
+    Set<Map.Entry<UUID, Clan>> clans = storageUtils.getClans();
     ArrayList<String> clanNamesList = new ArrayList<>();
 
     public boolean createClanSubCommand(CommandSender sender, String[] args, List<String> bannedTags) {
@@ -51,11 +54,11 @@ public class ClanCreateSubCommand {
                     player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-name-cannot-contain-colours")));
                     return true;
                 }
-                if (ClansStorageUtil.isClanOwner(player)){
+                if (storageUtils.isClanOwner(player)){
                     player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-creation-failed").replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(args[1]))));
                     return true;
                 }
-                if (ClansStorageUtil.findClanByPlayer(player) != null){
+                if (storageUtils.findClanByPlayer(player) != null){
                     player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-creation-failed").replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(args[1]))));
                     return true;
                 }
@@ -68,8 +71,8 @@ public class ClanCreateSubCommand {
                     player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-name-too-long").replace("%CHARMAX%", Integer.toString(maxCharLimit))));
                     return true;
                 } else {
-                    if (!ClansStorageUtil.isClanExisting(player)) {
-                        Clan clan = ClansStorageUtil.createClan(player, args[1]);
+                    if (!storageUtils.isClanExisting(player)) {
+                        Clan clan = storageUtils.createClan(player, args[1]);
                         String clanCreated = ColorUtils.translateColorCodes(messagesConfig.getString("clan-created-successfully")).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(args[1]));
                         player.sendMessage(clanCreated);
                         fireClanCreateEvent(player, clan);

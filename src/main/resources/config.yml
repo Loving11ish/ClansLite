@@ -9,6 +9,19 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 #ClansLite config for ${version}
 
+storage:
+  mysql:
+    #Do you want to use a remote MySQL database to store the clan and usermap information? [Default value: false]
+    #If this is false ALL data is stored locally per server in a YAML flat file system.
+    enabled: false
+    #Please provide your database connection details as listed below.
+    host: ''
+    port: ''
+    database: ''
+    username: ''
+    password: ''
+    useSSL: false
+
 #Do you want to use the GUI system? [Default value: true]
 use-global-GUI-system: true
 
@@ -87,10 +100,6 @@ protections:
     #Enable the ability for a player to bypass the pvp protection using 'clanslite.bypass.pvp'. [Default value: true]
     enable-bypass-permission: true
   chests:
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-    ##THIS FEATURE IS EXTREMELY EXPERIMENTAL CURRENTLY!##
-    ##USE WITH CAUTION AND FREQUENT BACKUPS!##
     #Globaly enable the clan protected chests system. [Default value: false]
     enabled: false
     #Enable the ability for a player to bypass the chest protection using 'clanslite.bypass.chests'. [Default value: true]
@@ -101,8 +110,6 @@ protections:
     enable-creeper-destruction: true
     #Set the value of clan points required to purchase a new protected chest. [Default value: 250]
     clan-points-purchase-value: 250
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
 #Clan & Player Points
 points:

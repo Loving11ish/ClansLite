@@ -4,8 +4,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import xyz.gamlin.clans.Clans;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 import java.io.IOException;
 
@@ -13,10 +13,12 @@ public class ClanDisbandSubCommand {
 
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
 
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
+
     public boolean disbandClanSubCommand(CommandSender sender) {
         if (sender instanceof Player player) {
                 try {
-                    if (ClansStorageUtil.deleteClan(player)) {
+                    if (storageUtils.deleteClan(player)) {
                         sender.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-successfully-disbanded")));
                     } else {
                         sender.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-disband-failure")));

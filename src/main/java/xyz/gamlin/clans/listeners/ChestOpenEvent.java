@@ -13,13 +13,15 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.models.Chest;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 public class ChestOpenEvent implements Listener {
 
     FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
+
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
 
     private static final String CLAN_PLACEHOLDER = "%CLAN%";
 
@@ -34,7 +36,7 @@ public class ChestOpenEvent implements Listener {
                 if (block.getType().equals(Material.CHEST)){
                     Location chestLocation = block.getLocation();
 
-                    if (!ClansStorageUtil.isChestLocked(chestLocation)){
+                    if (!storageUtils.isChestLocked(chestLocation)){
                         return;
                     }
 
@@ -44,10 +46,10 @@ public class ChestOpenEvent implements Listener {
                     Player player = event.getPlayer();
                     OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player.getUniqueId());
 
-                    Chest chest = ClansStorageUtil.getChestByLocation(chestLocation);
+                    Chest chest = storageUtils.getChestByLocation(chestLocation);
 
                     if (chest != null) {
-                        if (!ClansStorageUtil.hasAccessToLockedChest(offlinePlayer, chest)) {
+                        if (!storageUtils.hasAccessToLockedChest(offlinePlayer, chest)) {
                             if (!(player.hasPermission("clanslite.bypass.chests") || player.hasPermission("clanslite.bypass.*")
                                     || player.hasPermission("clanslite.bypass") || player.hasPermission("clanslite.*") || player.isOp())) {
                                 event.setCancelled(true);

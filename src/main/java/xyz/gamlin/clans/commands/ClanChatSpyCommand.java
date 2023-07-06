@@ -7,12 +7,14 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.UsermapStorageUtil;
+import xyz.gamlin.clans.utils.abstractUtils.UsermapUtils;
 
 public class ClanChatSpyCommand implements CommandExecutor {
 
     FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
+
+    private UsermapUtils usermapUtils = Clans.getPlugin().usermapUtils;
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -20,7 +22,7 @@ public class ClanChatSpyCommand implements CommandExecutor {
             if (clansConfig.getBoolean("clan-chat.chat-spy.enabled")){
                 if (player.hasPermission("clanslite.chat.spy")||player.hasPermission("clanslite.*")
                         ||player.hasPermission("clanslite.admin")||player.isOp()){
-                    if (UsermapStorageUtil.toggleChatSpy(player)){
+                    if (usermapUtils.toggleChatSpy(player)){
                         player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("chatspy-toggle-on")));
                     }else {
                         player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("chatspy-toggle-off")));

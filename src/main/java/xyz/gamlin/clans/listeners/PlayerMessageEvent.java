@@ -8,12 +8,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.models.Clan;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 public class PlayerMessageEvent implements Listener {
 
     FileConfiguration configFile = Clans.getPlugin().getConfig();
+
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
 
     @EventHandler
     public void onChatPlayer (AsyncPlayerChatEvent event) {
@@ -22,11 +24,11 @@ public class PlayerMessageEvent implements Listener {
         String format = event.getFormat();
         String openBracket = configFile.getString("clan-tags.brackets-opening");
         String closeBracket = configFile.getString("clan-tags.brackets-closing");
-        if (ClansStorageUtil.findClanByPlayer(player) == null){
+        if (storageUtils.findClanByPlayer(player) == null){
             format = StringUtils.replace(format, clanMergeTag, "");
         }
-        else if (ClansStorageUtil.findClanByOwner(player) != null){
-            Clan clan = ClansStorageUtil.findClanByOwner(player);
+        else if (storageUtils.findClanByOwner(player) != null){
+            Clan clan = storageUtils.findClanByOwner(player);
             if (configFile.getBoolean("clan-tags.prefix-add-brackets")){
                 if (configFile.getBoolean("clan-tags.prefix-add-space-after")){
                     format = StringUtils.replace(format, clanMergeTag, ColorUtils.translateColorCodes(openBracket + clan.getClanPrefix() + closeBracket + "&r "));
@@ -46,7 +48,7 @@ public class PlayerMessageEvent implements Listener {
             }
 
         }else {
-            Clan clan = ClansStorageUtil.findClanByPlayer(player);
+            Clan clan = storageUtils.findClanByPlayer(player);
             if (configFile.getBoolean("clan-tags.prefix-add-brackets")){
                 if (configFile.getBoolean("clan-tags.prefix-add-space-after")){
                     format = StringUtils.replace(format, clanMergeTag, ColorUtils.translateColorCodes(openBracket + clan.getClanPrefix() + closeBracket + "&r "));

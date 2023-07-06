@@ -15,8 +15,8 @@ import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.api.ChestLockEvent;
 import xyz.gamlin.clans.models.Chest;
 import xyz.gamlin.clans.models.Clan;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 import java.util.logging.Logger;
 
@@ -27,6 +27,8 @@ public class ChestLockSubCommand {
     FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
 
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
+
     private static final String LIMIT_PLACEHOLDER = "%LIMIT%";
     private static final String X_PLACEHOLDER = "%X%";
     private static final String Y_PLACEHOLDER = "%Y%";
@@ -35,13 +37,13 @@ public class ChestLockSubCommand {
     public boolean clanChestLockSubCommand(CommandSender sender){
         if (sender instanceof Player player){
             Block block = player.getTargetBlockExact(5);
-            Clan clanByOwner = ClansStorageUtil.findClanByOwner(player);
-            Clan clanByPlayer = ClansStorageUtil.findClanByPlayer(player);
+            Clan clanByOwner = storageUtils.findClanByOwner(player);
+            Clan clanByPlayer = storageUtils.findClanByPlayer(player);
             if (clanByOwner != null){
                 if (block != null){
                     if (block.getType().equals(Material.CHEST)){
                         int maxAllowedChests = clanByOwner.getMaxAllowedProtectedChests();
-                        if (ClansStorageUtil.getAllProtectedChestsByClan(clanByOwner).size() >= maxAllowedChests){
+                        if (storageUtils.getAllProtectedChestsByClan(clanByOwner).size() >= maxAllowedChests){
                             player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("chest-max-amount-reached")
                                     .replace(LIMIT_PLACEHOLDER, String.valueOf(maxAllowedChests))));
                             return true;
@@ -60,7 +62,7 @@ public class ChestLockSubCommand {
                     if (block != null){
                         if (block.getType().equals(Material.CHEST)){
                             int maxAllowedChests = clanByPlayer.getMaxAllowedProtectedChests();
-                            if (ClansStorageUtil.getAllProtectedChestsByClan(clanByPlayer).size() >= maxAllowedChests){
+                            if (storageUtils.getAllProtectedChestsByClan(clanByPlayer).size() >= maxAllowedChests){
                                 player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("chest-max-amount-reached")
                                         .replace(LIMIT_PLACEHOLDER, String.valueOf(maxAllowedChests))));
                                 return true;
@@ -87,7 +89,7 @@ public class ChestLockSubCommand {
         int x = (int) Math.round(location.getX());
         int y = (int) Math.round(location.getY());
         int z = (int) Math.round(location.getZ());
-        if (ClansStorageUtil.addProtectedChest(clan, location, player)){
+        if (storageUtils.addProtectedChest(clan, location, player)){
             player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("chest-protected-successfully")
                     .replace(X_PLACEHOLDER, String.valueOf(x))
                     .replace(Y_PLACEHOLDER, String.valueOf(y))
@@ -97,7 +99,7 @@ public class ChestLockSubCommand {
             container.set(new NamespacedKey(Clans.getPlugin(), "owningClanName"), PersistentDataType.STRING, clan.getClanFinalName());
             container.set(new NamespacedKey(Clans.getPlugin(), "owningClanOwnerUUID"), PersistentDataType.STRING, clan.getClanOwner());
             tileState.update();
-            fireChestLockEvent(player, clan, ClansStorageUtil.getChestByLocation(location));
+            fireChestLockEvent(player, clan, storageUtils.getChestByLocation(location));
             if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
                 logger.info(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ChestLockEvent"));
             }

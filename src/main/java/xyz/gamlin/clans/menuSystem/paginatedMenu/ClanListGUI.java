@@ -15,8 +15,8 @@ import xyz.gamlin.clans.menuSystem.PaginatedMenu;
 import xyz.gamlin.clans.menuSystem.PlayerMenuUtility;
 import xyz.gamlin.clans.menuSystem.menu.ClanJoinRequestMenu;
 import xyz.gamlin.clans.models.Clan;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -33,6 +33,8 @@ public class ClanListGUI extends PaginatedMenu {
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
     FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     Logger logger = Clans.getPlugin().getLogger();
+
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
 
     public ClanListGUI(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
@@ -51,10 +53,10 @@ public class ClanListGUI extends PaginatedMenu {
     @Override
     public void handleMenu(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
-        ArrayList<Clan> clans = new ArrayList<>(ClansStorageUtil.getClanList());
+        ArrayList<Clan> clans = new ArrayList<>(storageUtils.getClanList());
         if (event.getCurrentItem().getType().equals(Material.PLAYER_HEAD)){
-            Clan onlineClanOwner = ClansStorageUtil.findClanByOwner(player);
-            Clan onlineClanPlayer = ClansStorageUtil.findClanByPlayer(player);
+            Clan onlineClanOwner = storageUtils.findClanByOwner(player);
+            Clan onlineClanPlayer = storageUtils.findClanByPlayer(player);
             UUID target = UUID.fromString(event.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(Clans.getPlugin(), "uuid"), PersistentDataType.STRING));
             if (onlineClanOwner != null){
                 player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-invite-failed-own-clan")));
@@ -112,7 +114,7 @@ public class ClanListGUI extends PaginatedMenu {
                 @Override
                 public void run() {
                     //The thing you will be looping through to place items
-                    ArrayList<Clan> clans = new ArrayList<>(ClansStorageUtil.getClanList());
+                    ArrayList<Clan> clans = new ArrayList<>(storageUtils.getClanList());
 
                     //Pagination loop template
                     if (clans != null && !clans.isEmpty()){
@@ -125,7 +127,7 @@ public class ClanListGUI extends PaginatedMenu {
                                 String clanOwnerUUIDString = clans.get(i).getClanOwner();
                                 UUID ownerUUID = UUID.fromString(clanOwnerUUIDString);
                                 OfflinePlayer clanOwnerPlayer = Bukkit.getOfflinePlayer(ownerUUID);
-                                Clan clan = ClansStorageUtil.findClanByOfflineOwner(clanOwnerPlayer);
+                                Clan clan = storageUtils.findClanByOfflineOwner(clanOwnerPlayer);
 
                                 ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
                                 SkullMeta skull = (SkullMeta) playerHead.getItemMeta();
@@ -211,7 +213,7 @@ public class ClanListGUI extends PaginatedMenu {
             }, 0L, 5L, TimeUnit.SECONDS);
         }else {
             //The thing you will be looping through to place items
-            ArrayList<Clan> clans = new ArrayList<>(ClansStorageUtil.getClanList());
+            ArrayList<Clan> clans = new ArrayList<>(storageUtils.getClanList());
 
             //Pagination loop template
             if (clans != null && !clans.isEmpty()){
@@ -224,7 +226,7 @@ public class ClanListGUI extends PaginatedMenu {
                         String clanOwnerUUIDString = clans.get(i).getClanOwner();
                         UUID ownerUUID = UUID.fromString(clanOwnerUUIDString);
                         OfflinePlayer clanOwnerPlayer = Bukkit.getOfflinePlayer(ownerUUID);
-                        Clan clan = ClansStorageUtil.findClanByOfflineOwner(clanOwnerPlayer);
+                        Clan clan = storageUtils.findClanByOfflineOwner(clanOwnerPlayer);
 
                         ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
                         SkullMeta skull = (SkullMeta) playerHead.getItemMeta();

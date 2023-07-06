@@ -7,13 +7,17 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.models.Clan;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.UsermapStorageUtil;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
+import xyz.gamlin.clans.utils.abstractUtils.UsermapUtils;
 
 public class ClanKickSubCommand {
 
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
+
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
+    private UsermapUtils usermapUtils = Clans.getPlugin().usermapUtils;
+
     private static final String CLAN_PLACEHOLDER = "%CLAN%";
     private static final String PLAYER_TO_KICK = "%KICKEDPLAYER%";
 
@@ -21,15 +25,15 @@ public class ClanKickSubCommand {
         if (sender instanceof Player player) {
             if (args.length == 2) {
                 if (args[1].length() > 1) {
-                    Clan targetClan = ClansStorageUtil.findClanByOwner(player);
-                    if (ClansStorageUtil.findClanByOwner(player) != null) {
+                    Clan targetClan = storageUtils.findClanByOwner(player);
+                    if (storageUtils.findClanByOwner(player) != null) {
                         Player playerToKick = Bukkit.getPlayer(args[1]);
-                        OfflinePlayer offlinePlayerToKick = UsermapStorageUtil.getBukkitOfflinePlayerByName(args[1]);
+                        OfflinePlayer offlinePlayerToKick = usermapUtils.getBukkitOfflinePlayerByName(args[1]);
                         if (playerToKick != null) {
                             if (!player.getName().equalsIgnoreCase(args[1])){
-                                Clan playerClan = ClansStorageUtil.findClanByPlayer(playerToKick);
+                                Clan playerClan = storageUtils.findClanByPlayer(playerToKick);
                                 if (targetClan.equals(playerClan)) {
-                                    if (ClansStorageUtil.removeClanMember(targetClan, playerToKick)){
+                                    if (storageUtils.removeClanMember(targetClan, playerToKick)){
                                         String playerKickedMessage = ColorUtils.translateColorCodes(messagesConfig.getString("clan-member-kick-successful")).replace(PLAYER_TO_KICK, args[1]);
                                         player.sendMessage(playerKickedMessage);
                                         if (playerToKick.isOnline()) {
@@ -50,9 +54,9 @@ public class ClanKickSubCommand {
                             }
                         }else if (offlinePlayerToKick != null){
                             if (!player.getName().equalsIgnoreCase(args[1])){
-                                Clan offlinePlayerClan = ClansStorageUtil.findClanByOfflinePlayer(offlinePlayerToKick);
+                                Clan offlinePlayerClan = storageUtils.findClanByOfflinePlayer(offlinePlayerToKick);
                                 if (targetClan.equals(offlinePlayerClan)){
-                                    if (ClansStorageUtil.removeOfflineClanMember(targetClan, offlinePlayerToKick)){
+                                    if (storageUtils.removeOfflineClanMember(targetClan, offlinePlayerToKick)){
                                         String playerKickedMessage = ColorUtils.translateColorCodes(messagesConfig.getString("clan-member-kick-successful")).replace(PLAYER_TO_KICK, args[1]);
                                         player.sendMessage(playerKickedMessage);
                                     }else {

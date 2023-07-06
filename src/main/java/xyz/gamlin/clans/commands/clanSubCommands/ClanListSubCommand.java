@@ -5,8 +5,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.models.Clan;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 import java.util.Map;
 import java.util.Set;
@@ -16,9 +16,11 @@ public class ClanListSubCommand {
 
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
 
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
+
     public boolean clanListSubCommand(CommandSender sender) {
         if (sender instanceof Player player) {
-            Set<Map.Entry<UUID, Clan>> clans = ClansStorageUtil.getClans();
+            Set<Map.Entry<UUID, Clan>> clans = storageUtils.getClans();
             StringBuilder clansString = new StringBuilder();
             if (clans.size() == 0) {
                 player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("no-clans-to-list")));

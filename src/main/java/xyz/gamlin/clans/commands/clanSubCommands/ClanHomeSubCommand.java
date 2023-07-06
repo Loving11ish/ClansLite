@@ -11,8 +11,8 @@ import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.api.ClanHomePreTeleportEvent;
 import xyz.gamlin.clans.api.ClanHomeTeleportEvent;
 import xyz.gamlin.clans.models.Clan;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -25,6 +25,8 @@ public class ClanHomeSubCommand {
     Logger logger = Clans.getPlugin().getLogger();
     private static final String TIME_LEFT = "%TIMELEFT%";
 
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
+
     private static ClanHomePreTeleportEvent homePreTeleportEvent = null;
 
     HashMap<UUID, Long> homeCoolDownTimer = new HashMap<>();
@@ -33,8 +35,8 @@ public class ClanHomeSubCommand {
         if (sender instanceof Player player) {
             if (clansConfig.getBoolean("clan-home.enabled")){
                 UUID uuid = player.getUniqueId();
-                if (ClansStorageUtil.findClanByOwner(player) != null){
-                    Clan clanByOwner = ClansStorageUtil.findClanByOwner(player);
+                if (storageUtils.findClanByOwner(player) != null){
+                    Clan clanByOwner = storageUtils.findClanByOwner(player);
                     if (clanByOwner.getClanHomeWorld() != null){
                         fireClanHomePreTPEvent(player, clanByOwner);
                         if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
@@ -101,8 +103,8 @@ public class ClanHomeSubCommand {
                     }else {
                         player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("failed-no-home-set")));
                     }
-                }else if (ClansStorageUtil.findClanByPlayer(player) != null){
-                    Clan clanByPlayer = ClansStorageUtil.findClanByPlayer(player);
+                }else if (storageUtils.findClanByPlayer(player) != null){
+                    Clan clanByPlayer = storageUtils.findClanByPlayer(player);
                     fireClanHomePreTPEvent(player, clanByPlayer);
                     if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
                         logger.info(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanHomePreTPEvent"));

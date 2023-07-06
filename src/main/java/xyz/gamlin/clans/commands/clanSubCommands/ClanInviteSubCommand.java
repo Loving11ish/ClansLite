@@ -7,13 +7,16 @@ import org.bukkit.entity.Player;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.models.Clan;
 import xyz.gamlin.clans.utils.ClanInviteUtil;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 public class ClanInviteSubCommand {
 
     FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
+
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
+
     private static final String INVITED_PLAYER = "%INVITED%";
 
     public boolean clanInviteSubCommand(CommandSender sender, String[] args) {
@@ -23,7 +26,7 @@ public class ClanInviteSubCommand {
                     sender.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-invite-no-valid-player")));
                     return true;
                 }
-                if (ClansStorageUtil.findClanByOwner(player) == null) {
+                if (storageUtils.findClanByOwner(player) == null) {
                     sender.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-invite-not-clan-owner")));
                     return true;
                 } else {
@@ -35,11 +38,11 @@ public class ClanInviteSubCommand {
                         if (invitedPlayer == null) {
                             String playerNotFound = ColorUtils.translateColorCodes(messagesConfig.getString("clan-invitee-not-found")).replace(INVITED_PLAYER, invitedPlayerStr);
                             sender.sendMessage(playerNotFound);
-                        } else if (ClansStorageUtil.findClanByPlayer(invitedPlayer) != null) {
+                        } else if (storageUtils.findClanByPlayer(invitedPlayer) != null) {
                             String playerAlreadyInClan = ColorUtils.translateColorCodes(messagesConfig.getString("clan-invite-invited-already-in-clan")).replace(INVITED_PLAYER, invitedPlayerStr);
                             sender.sendMessage(playerAlreadyInClan);
                         } else {
-                            Clan clan = ClansStorageUtil.findClanByOwner(player);
+                            Clan clan = storageUtils.findClanByOwner(player);
                             if (!(player.hasPermission("clanslite.maxclansize.*")||player.hasPermission("clanslite.*")||player.isOp())){
                                 if (!clansConfig.getBoolean("clan-size.tiered-clan-system.enabled")){
                                     if (clan.getClanMembers().size() >= clansConfig.getInt("clan-size.default-max-clan-size")) {

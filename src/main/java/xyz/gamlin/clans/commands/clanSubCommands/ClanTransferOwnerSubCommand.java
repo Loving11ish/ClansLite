@@ -6,14 +6,16 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.models.Clan;
-import xyz.gamlin.clans.utils.ClansStorageUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
+import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
 
 import java.io.IOException;
 
 public class ClanTransferOwnerSubCommand {
 
     FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
+
+    private StorageUtils storageUtils = Clans.getPlugin().storageUtils;
 
     public boolean transferClanOwnerSubCommand(CommandSender sender, String[] args){
         if (sender instanceof Player player){
@@ -22,11 +24,11 @@ public class ClanTransferOwnerSubCommand {
                 Player newClanOwner = Bukkit.getPlayerExact(args[1]);
                 if (newClanOwner != null){
                     if (newClanOwner != player){
-                        if (ClansStorageUtil.isClanOwner(player)){
-                            Clan originalClan = ClansStorageUtil.findClanByOwner(player);
+                        if (storageUtils.isClanOwner(player)){
+                            Clan originalClan = storageUtils.findClanByOwner(player);
                             if (originalClan != null){
                                 try {
-                                    Clan newClan = ClansStorageUtil.transferClanOwner(originalClan, player, newClanOwner);
+                                    Clan newClan = storageUtils.transferClanOwner(originalClan, player, newClanOwner);
                                     if (newClan != null){
                                         String OLD_OWNER_PLACEHOLDER = "%OLDOWNER%";
                                         String NEW_CLAN_NAME = "%CLAN%";
