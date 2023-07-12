@@ -14,7 +14,7 @@ import org.bukkit.persistence.PersistentDataType;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.models.Chest;
 import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
+import xyz.gamlin.clans.utils.abstractClasses.StorageUtils;
 
 public class ChestOpenEvent implements Listener {
 

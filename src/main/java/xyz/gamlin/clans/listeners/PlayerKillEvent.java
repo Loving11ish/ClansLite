@@ -10,8 +10,8 @@ import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.api.PlayerPointsAwardedEvent;
 import xyz.gamlin.clans.models.Clan;
 import xyz.gamlin.clans.utils.*;
-import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
-import xyz.gamlin.clans.utils.abstractUtils.UsermapUtils;
+import xyz.gamlin.clans.utils.abstractClasses.StorageUtils;
+import xyz.gamlin.clans.utils.abstractClasses.UsermapUtils;
 
 import java.util.logging.Logger;
 

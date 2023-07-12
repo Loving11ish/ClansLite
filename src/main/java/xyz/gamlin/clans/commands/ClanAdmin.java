@@ -11,8 +11,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
-import xyz.gamlin.clans.utils.abstractUtils.UsermapUtils;
+import xyz.gamlin.clans.utils.abstractClasses.StorageUtils;
+import xyz.gamlin.clans.utils.abstractClasses.UsermapUtils;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;

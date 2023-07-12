@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.models.ClanPlayer;
 import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.abstractUtils.UsermapUtils;
+import xyz.gamlin.clans.utils.abstractClasses.UsermapUtils;
 
 import java.util.*;
 import java.util.logging.Logger;

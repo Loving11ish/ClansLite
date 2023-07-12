@@ -9,7 +9,7 @@ import xyz.gamlin.clans.models.Clan;
 import xyz.gamlin.clans.models.ClanInvite;
 import xyz.gamlin.clans.utils.ClanInviteUtil;
 import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
+import xyz.gamlin.clans.utils.abstractClasses.StorageUtils;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;

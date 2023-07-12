@@ -10,8 +10,8 @@ import xyz.gamlin.clans.api.ClanPointsRemovedEvent;
 import xyz.gamlin.clans.models.Clan;
 import xyz.gamlin.clans.models.ClanPlayer;
 import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
-import xyz.gamlin.clans.utils.abstractUtils.UsermapUtils;
+import xyz.gamlin.clans.utils.abstractClasses.StorageUtils;
+import xyz.gamlin.clans.utils.abstractClasses.UsermapUtils;
 
 import java.util.logging.Logger;
 

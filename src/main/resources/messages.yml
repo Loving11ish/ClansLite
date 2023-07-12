@@ -237,6 +237,7 @@ clans-update-error-1: "&6ClansLite: &4Failed to update clans.yml file!"
 clans-update-error-2: "&6ClansLite: &4Check the console for errors!"
 clan-player-not-found-1: "&6ClansLite: &4Failed to find player by name of &6%PLAYER%&4!"
 clan-player-not-found-2: "&6ClansLite: &4Ensure that &6%PLAYER% &4has joined before!"
+mysql-connection-task-started: "&6ClansLite: &aStarted auto database refresh task."
 
 #/chest Command Responses
 chest-command-incorrect-usage:

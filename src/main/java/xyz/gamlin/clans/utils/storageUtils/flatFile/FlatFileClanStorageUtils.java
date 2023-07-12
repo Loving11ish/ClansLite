@@ -1,4 +1,4 @@
-package xyz.gamlin.clans.utils.storageUtils;
+package xyz.gamlin.clans.utils.storageUtils.flatFile;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -14,7 +14,7 @@ import xyz.gamlin.clans.api.ClanTransferOwnershipEvent;
 import xyz.gamlin.clans.models.Chest;
 import xyz.gamlin.clans.models.Clan;
 import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
+import xyz.gamlin.clans.utils.abstractClasses.StorageUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -23,15 +23,15 @@ import java.util.regex.Pattern;
 
 public class FlatFileClanStorageUtils extends StorageUtils {
 
-    private static final Logger logger = Clans.getPlugin().getLogger();
+    private Logger logger = Clans.getPlugin().getLogger();
 
     private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + String.valueOf('&') + "[0-9A-FK-OR]");
 
-    private static Map<UUID, Clan> clansList = new HashMap<>();
+    private  Map<UUID, Clan> clansList = new HashMap<>();
 
-    private static final FileConfiguration clansStorage = Clans.getPlugin().clansFileManager.getClansConfig();
-    private static final FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
-    private static final FileConfiguration clansConfig = Clans.getPlugin().getConfig();
+    private FileConfiguration clansStorage = Clans.getPlugin().clansFileManager.getClansConfig();
+    private FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
+    private FileConfiguration clansConfig = Clans.getPlugin().getConfig();
 
     public void saveClans() throws IOException {
         for (Map.Entry<UUID, Clan> entry : clansList.entrySet()){

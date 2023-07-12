@@ -1,4 +1,4 @@
-package xyz.gamlin.clans.utils.abstractUtils;
+package xyz.gamlin.clans.utils.abstractClasses;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;

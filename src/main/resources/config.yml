@@ -15,12 +15,13 @@ storage:
     #If this is false ALL data is stored locally per server in a YAML flat file system.
     enabled: false
     #Please provide your database connection details as listed below.
-    host: ''
-    port: ''
-    database: ''
-    username: ''
-    password: ''
-    useSSL: false
+    #If you struggle to connect try setting 'useSSL' to false.
+    host: '0.0.0.0'
+    port: '3306'
+    database: 'your_database'
+    username: 'your_username'
+    password: 'YOUR_PASSWORD'
+    useSSL: true
 
 #Do you want to use the GUI system? [Default value: true]
 use-global-GUI-system: true
@@ -28,7 +29,7 @@ use-global-GUI-system: true
 clan-tags:
   #Set the minimum length of the clan prefix and name. [Default value: 3]
   min-character-limit: 3
-  #Set the maximum length of the clan prefix and name. [Default value: 32]
+  #Set the maximum length of the clan prefix and name. (Min: 3 Max: 256) [Default value: 32]
   max-character-limit: 32
   #Set below names that are not allowed to be used in prefixes or names. [They ARE case & syntax sensitive]
   disallowed-tags:

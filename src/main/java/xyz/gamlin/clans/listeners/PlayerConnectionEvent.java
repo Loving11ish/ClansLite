@@ -8,7 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.abstractUtils.UsermapUtils;
+import xyz.gamlin.clans.utils.abstractClasses.UsermapUtils;
 
 import java.util.UUID;
 import java.util.logging.Logger;

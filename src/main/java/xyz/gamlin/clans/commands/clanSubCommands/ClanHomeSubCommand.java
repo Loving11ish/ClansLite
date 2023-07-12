@@ -12,7 +12,7 @@ import xyz.gamlin.clans.api.ClanHomePreTeleportEvent;
 import xyz.gamlin.clans.api.ClanHomeTeleportEvent;
 import xyz.gamlin.clans.models.Clan;
 import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
+import xyz.gamlin.clans.utils.abstractClasses.StorageUtils;
 
 import java.util.HashMap;
 import java.util.UUID;

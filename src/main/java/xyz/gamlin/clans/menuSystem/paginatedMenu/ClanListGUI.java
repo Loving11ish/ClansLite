@@ -16,7 +16,7 @@ import xyz.gamlin.clans.menuSystem.PlayerMenuUtility;
 import xyz.gamlin.clans.menuSystem.menu.ClanJoinRequestMenu;
 import xyz.gamlin.clans.models.Clan;
 import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
+import xyz.gamlin.clans.utils.abstractClasses.StorageUtils;
 
 import java.util.ArrayList;
 import java.util.UUID;

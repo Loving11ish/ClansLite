@@ -1,4 +1,4 @@
-package xyz.gamlin.clans.utils.storageUtils;
+package xyz.gamlin.clans.utils.storageUtils.flatFile;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -9,7 +9,7 @@ import xyz.gamlin.clans.Clans;
 import xyz.gamlin.clans.api.ClanChatSpyToggledEvent;
 import xyz.gamlin.clans.models.ClanPlayer;
 import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.abstractUtils.UsermapUtils;
+import xyz.gamlin.clans.utils.abstractClasses.UsermapUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -17,13 +17,13 @@ import java.util.logging.Logger;
 
 public class FlatFileUsermapStorageUtils extends UsermapUtils {
 
-    private static Logger logger = Clans.getPlugin().getLogger();
+    private Logger logger = Clans.getPlugin().getLogger();
 
-    private static Map<UUID, ClanPlayer> usermap = new HashMap<>();
+    private Map<UUID, ClanPlayer> usermap = new HashMap<>();
 
-    private static FileConfiguration clansConfig = Clans.getPlugin().getConfig();
-    private static FileConfiguration usermapConfig = Clans.getPlugin().usermapFileManager.getUsermapConfig();
-    private static FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
+    private FileConfiguration clansConfig = Clans.getPlugin().getConfig();
+    private FileConfiguration usermapConfig = Clans.getPlugin().usermapFileManager.getUsermapConfig();
+    private FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
 
     private static final String PLAYER_PLACEHOLDER = "%PLAYER%";
 
@@ -295,7 +295,7 @@ public class FlatFileUsermapStorageUtils extends UsermapUtils {
         return usermap;
     }
 
-    private static void fireClanChatSpyToggledEvent(Player player, ClanPlayer clanPlayer, boolean chatSpyToggledState) {
+    private void fireClanChatSpyToggledEvent(Player player, ClanPlayer clanPlayer, boolean chatSpyToggledState) {
         ClanChatSpyToggledEvent clanChatSpyToggledEvent = new ClanChatSpyToggledEvent(player, clanPlayer, chatSpyToggledState);
         Bukkit.getPluginManager().callEvent(clanChatSpyToggledEvent);
     }

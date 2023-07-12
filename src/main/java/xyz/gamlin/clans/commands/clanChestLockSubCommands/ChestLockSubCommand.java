@@ -16,7 +16,7 @@ import xyz.gamlin.clans.api.ChestLockEvent;
 import xyz.gamlin.clans.models.Chest;
 import xyz.gamlin.clans.models.Clan;
 import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
+import xyz.gamlin.clans.utils.abstractClasses.StorageUtils;
 
 import java.util.logging.Logger;
 

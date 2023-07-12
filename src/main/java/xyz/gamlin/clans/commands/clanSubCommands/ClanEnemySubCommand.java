@@ -9,7 +9,7 @@ import xyz.gamlin.clans.api.ClanEnemyAddEvent;
 import xyz.gamlin.clans.api.ClanEnemyRemoveEvent;
 import xyz.gamlin.clans.models.Clan;
 import xyz.gamlin.clans.utils.ColorUtils;
-import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
+import xyz.gamlin.clans.utils.abstractClasses.StorageUtils;
 
 import java.util.ArrayList;
 import java.util.List;

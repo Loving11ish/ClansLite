@@ -3,7 +3,7 @@ package xyz.gamlin.clans.utils;
 import com.tcoded.folialib.FoliaLib;
 import com.tcoded.folialib.wrapper.task.WrappedTask;
 import xyz.gamlin.clans.Clans;
-import xyz.gamlin.clans.utils.abstractUtils.StorageUtils;
+import xyz.gamlin.clans.utils.abstractClasses.StorageUtils;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -32,13 +32,16 @@ public class TaskTimerUtils {
                         if (Clans.getPlugin().getConfig().getBoolean("general.show-auto-save-task-message.enabled")){
                             logger.info(ColorUtils.translateColorCodes(Clans.getPlugin().messagesFileManager.getMessagesConfig().getString("auto-save-complete")));
                         }
-                    } catch (IOException e) {
+                        runClansAutoSaveTwo();
+                        task1.cancel();
+                        return;
+                    }catch (IOException e) {
                         logger.severe(ColorUtils.translateColorCodes(Clans.getPlugin().messagesFileManager.getMessagesConfig().getString("auto-save-failed")));
                         e.printStackTrace();
+                        runClansAutoSaveTwo();
+                        task1.cancel();
+                        return;
                     }
-                    runClansAutoSaveTwo();
-                    task1.cancel();
-                    return;
                 }
                 else {
                     time --;
@@ -58,13 +61,16 @@ public class TaskTimerUtils {
                         if (Clans.getPlugin().getConfig().getBoolean("general.show-auto-save-task-message.enabled")){
                             logger.info(ColorUtils.translateColorCodes(Clans.getPlugin().messagesFileManager.getMessagesConfig().getString("auto-save-complete")));
                         }
+                        runClansAutoSaveOne();
+                        task2.cancel();
+                        return;
                     } catch (IOException e) {
                         logger.severe(ColorUtils.translateColorCodes(Clans.getPlugin().messagesFileManager.getMessagesConfig().getString("auto-save-failed")));
                         e.printStackTrace();
+                        runClansAutoSaveOne();
+                        task2.cancel();
+                        return;
                     }
-                    runClansAutoSaveOne();
-                    task2.cancel();
-                    return;
                 }
                 else {
                     time --;
@@ -84,12 +90,15 @@ public class TaskTimerUtils {
                         if (Clans.getPlugin().getConfig().getBoolean("general.show-auto-invite-wipe-message.enabled")){
                             logger.info(ColorUtils.translateColorCodes(Clans.getPlugin().messagesFileManager.getMessagesConfig().getString("auto-invite-wipe-complete")));
                         }
+                        runClanInviteClearTwo();
+                        task3.cancel();
+                        return;
                     }catch (UnsupportedOperationException exception){
                         logger.info(ColorUtils.translateColorCodes(Clans.getPlugin().messagesFileManager.getMessagesConfig().getString("invite-wipe-failed")));
+                        runClanInviteClearTwo();
+                        task3.cancel();
+                        return;
                     }
-                    runClanInviteClearTwo();
-                    task3.cancel();
-                    return;
                 }else {
                     time --;
                 }
@@ -108,12 +117,15 @@ public class TaskTimerUtils {
                         if (Clans.getPlugin().getConfig().getBoolean("general.show-auto-invite-wipe-message.enabled")){
                             logger.info(ColorUtils.translateColorCodes(Clans.getPlugin().messagesFileManager.getMessagesConfig().getString("auto-invite-wipe-complete")));
                         }
+                        runClanInviteClearOne();
+                        task4.cancel();
+                        return;
                     }catch (UnsupportedOperationException exception){
                         logger.info(ColorUtils.translateColorCodes(Clans.getPlugin().messagesFileManager.getMessagesConfig().getString("invite-wipe-failed")));
+                        runClanInviteClearOne();
+                        task4.cancel();
+                        return;
                     }
-                    runClanInviteClearOne();
-                    task4.cancel();
-                    return;
                 }else {
                     time --;
                 }
