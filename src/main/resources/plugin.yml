@@ -1,6 +1,6 @@
 name: ClansLite
 version: '${project.version}'
-main: xyz.gamlin.clans.Clans
+main: me.loving11ish.clans.Clans
 api-version: 1.13
 folia-supported: true
 prefix: ClansLite

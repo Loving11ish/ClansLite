@@ -75,7 +75,7 @@ clan-chat:
   #Enable the clan chat system. [Default value: true]
   enabled: true
   #Below is the prefix for the clan chat messages. [Default value: &6[&3CC&6]&r]
-  chat-prefix: "&6[&3CC&6]&r"
+  chat-prefix: "&6[&3CC&6]&r &b%CLAN%&r"
   cool-down:
     #Enable the cool down on the '/cc <message>' command to prevent chat spamming (RECOMMENDED). [Default value: true]
     enabled: true
@@ -133,6 +133,16 @@ clan-home:
     enabled: true
     #Cool-down time in seconds. [Default value: 120 = 2 minutes]
     time: 120
+  delay-before-teleport:
+    #Do you want to have a delay before teleporting the player to their clan home? [Default value: true]
+    enabled: true
+    #How long do you want the countdown delay to be? (In seconds) [Default value: 5]
+    time: 5
+    #Do you want the server to constantly check if the player moves when they have requested a clan home teleport?
+    ##WARNING - THIS ENABLES ADDITIONAL MOVEMENT EVENT CHECKS THAT MAY CAUSE INCREASED LOAD ON YOUR SERVER##
+    ##IF YOU EXPERIENCE PERFORMANCE ISSUES TRY SETTING BELOW TO 'FALSE'##
+    #[Default value: true]
+    cancel-teleport-on-move: true
 
 #ClansLite update system
 plugin-update-notifications:
@@ -141,12 +151,6 @@ plugin-update-notifications:
 
 #ClansLite general settings
 general:
-  run-auto-save-task:
-    #Do you want to enable the plugins ability to auto save the clans to disk? [Default value: true]
-    enabled: true
-  run-auto-invite-wipe-task:
-    #Do you want to enable the plugins ability to auto-wipe the invites list? [Default value: true]
-    enabled: true
   show-auto-save-task-message:
     #Do you want to see notifications in console when the auto-save task runs? [Default value: true]
     enabled: true
