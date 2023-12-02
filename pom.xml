@@ -6,7 +6,7 @@
 
     <groupId>me.loving11ish</groupId>
     <artifactId>ClansLite</artifactId>
-    <version>1.4.2</version>
+    <version>1.5.0-ALPHA-01</version>
     <packaging>jar</packaging>
 
     <name>ClansLite</name>
@@ -104,6 +104,11 @@
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>com.j256.ormlite</groupId>
+            <artifactId>ormlite-jdbc</artifactId>
+            <version>6.1</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
         <dependency>
             <groupId>org.apache.commons</groupId>

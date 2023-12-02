@@ -1,26 +1,45 @@
 package me.loving11ish.clans.models;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
+@DatabaseTable(tableName = "clans")
 public class Clan {
 
-    private final String clanFinalOwner;
+    @DatabaseField(id = true)
+    private String clanFinalOwner;
+    @DatabaseField(canBeNull = false)
     private String clanFinalName;
+    @DatabaseField
     private String clanPrefix;
     private ArrayList<String> clanMembers;
     private ArrayList<String> clanAllies;
     private ArrayList<String> clanEnemies;
+    @DatabaseField(canBeNull = false)
     private boolean friendlyFire;
+    @DatabaseField
     private int clanPoints;
+    @DatabaseField
     private String clanHomeWorld;
+    @DatabaseField
     private double clanHomeX;
+    @DatabaseField
     private double clanHomeY;
+    @DatabaseField
     private double clanHomeZ;
+    @DatabaseField
     private float clanHomeYaw;
+    @DatabaseField
     private float clanHomePitch;
+    @DatabaseField(canBeNull = false)
     private int maxAllowedProtectedChests;
     private HashMap<String, Chest> protectedChests = new HashMap<>();
+
+    public Clan() {
+    }
 
     public Clan(String clanOwner, String clanName) {
         clanFinalOwner = clanOwner;

@@ -72,7 +72,7 @@ public class PlayerPreConnectionEvent implements Listener {
                 }
             }catch (IOException e){
                 console.sendMessage(ColorUtils.translateColorCodes("&4-------------------------------------------"));
-                console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Unable to reach Mojang player database!"));
+                console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Unable to reach Mojang player databaseutils!"));
                 console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4See stacktrace below for more details."));
                 e.printStackTrace();
                 console.sendMessage(ColorUtils.translateColorCodes("&4-------------------------------------------"));

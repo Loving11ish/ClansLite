@@ -9,6 +9,20 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 #ClansLite config for ${version}
 
+storage:
+  mysql:
+    #Do you want to use a remote MySQL database to store the clan and usermap information? [Default value: false]
+    #If this is false ALL data is stored locally per server in a YAML flat file system.
+    enabled: false
+    #Please provide your database connection details as listed below.
+    #If you struggle to connect try setting 'useSSL' to false.
+    host: '0.0.0.0'
+    port: '3306'
+    database: 'your_database'
+    username: 'your_username'
+    password: 'YOUR_PASSWORD'
+    useSSL: true
+
 #Do you want to use the GUI system? [Default value: true]
 use-global-GUI-system: true
 

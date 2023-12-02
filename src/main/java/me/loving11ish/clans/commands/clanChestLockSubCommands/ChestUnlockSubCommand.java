@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import me.loving11ish.clans.Clans;
-import me.loving11ish.clans.api.ChestUnlockEvent;
+import me.loving11ish.clans.api.events.ChestUnlockEvent;
 import me.loving11ish.clans.models.Chest;
 import me.loving11ish.clans.utils.ClansStorageUtil;
 import me.loving11ish.clans.utils.ColorUtils;

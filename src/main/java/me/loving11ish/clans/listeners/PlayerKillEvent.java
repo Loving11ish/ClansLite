@@ -9,7 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.jetbrains.annotations.Nullable;
 import me.loving11ish.clans.Clans;
-import me.loving11ish.clans.api.PlayerPointsAwardedEvent;
+import me.loving11ish.clans.api.events.PlayerPointsAwardedEvent;
 import me.loving11ish.clans.models.Clan;
 import me.loving11ish.clans.utils.ClansStorageUtil;
 import me.loving11ish.clans.utils.ColorUtils;

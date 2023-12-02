@@ -1,12 +1,19 @@
 package me.loving11ish.clans;
 
+import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.rylinaux.plugman.api.PlugManAPI;
 import com.tcoded.folialib.FoliaLib;
 import com.tcoded.folialib.wrapper.task.WrappedTask;
 import io.papermc.lib.PaperLib;
+import me.loving11ish.clans.databaseconnection.SQLConnectionUtils;
 import me.loving11ish.clans.externalhooks.FloodgateAPI;
 import me.loving11ish.clans.externalhooks.PlaceholderAPI;
 import me.loving11ish.clans.externalhooks.PlugManXAPI;
+import me.loving11ish.clans.utils.databaseutils.StorageUtils;
+import me.loving11ish.clans.utils.databaseutils.UsermapUtils;
+import me.loving11ish.clans.utils.databaseutils.storageutils.flatfile.FlatFileClanStorageUtils;
+import me.loving11ish.clans.utils.databaseutils.storageutils.flatfile.FlatFileUsermapStorageUtils;
+import me.loving11ish.clans.utils.databaseutils.storageutils.mysql.MySQLClanStorageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -31,6 +38,7 @@ import me.loving11ish.clans.updatesystem.UpdateChecker;
 import me.loving11ish.clans.utils.*;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -55,6 +63,11 @@ public final class Clans extends JavaPlugin {
     public ClansFileManager clansFileManager;
     public ClanGUIFileManager clanGUIFileManager;
     public UsermapFileManager usermapFileManager;
+
+    public StorageUtils storageUtils;
+    public UsermapUtils usermapUtils;
+    public SQLConnectionUtils connectionUtils = null;
+    public JdbcPooledConnectionSource connection = null;
 
     public HashMap<UUID, WrappedTask> teleportQueue = new HashMap<>();
     public static HashMap<Player, String> connectedPlayers = new HashMap<>();
@@ -157,50 +170,112 @@ public final class Clans extends JavaPlugin {
         this.clanGUIFileManager = new ClanGUIFileManager();
         clanGUIFileManager.ClanGUIFileManager(this);
 
+        //Load MySQL connection if enabled
+        if (getConfig().getBoolean("storage.mysql.enabled")) {
+            this.connectionUtils = new SQLConnectionUtils();
+            try {
+                this.connection = connectionUtils.getConnection();
+                if (this.connection != null){
+                    console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &a&lSUCCESSFULLY &aconnected to MySQL database!"));
+                    console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &aContinuing plugin startup!"));
+                    console.sendMessage(ColorUtils.translateColorCodes("-------------------------------------------"));
+                }
+            }catch (SQLException e){
+                console.sendMessage(ColorUtils.translateColorCodes("-------------------------------------------"));
+                console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4An error occurred whilst attempting to connect to the MySQL database!"));
+                console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Please check you connection details in the config.yml"));
+                console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4If this error persists contact the developer and provide the below error!"));
+                e.printStackTrace();
+                console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Database connection failed!"));
+                console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Disabling ClansLite!"));
+                console.sendMessage(ColorUtils.translateColorCodes("-------------------------------------------"));
+                Bukkit.getPluginManager().disablePlugin(this);
+                return;
+            }
+        }
+
         //Load clans.yml
         this.clansFileManager = new ClansFileManager();
         clansFileManager.ClansFileManager(this);
-        if (clansFileManager != null){
-            if (clansFileManager.getClansConfig().contains("clans.data")){
+        if (getConfig().getBoolean("storage.mysql.enabled")) {
+            if (this.connection != null){
                 try {
-                    ClansStorageUtil.restoreClans();
-                } catch (IOException e) {
-                    console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Failed to load data from clans.yml!"));
+                    this.storageUtils = new MySQLClanStorageUtils(this.connectionUtils, this.connection);
+                    this.storageUtils.restoreClans();
+                    console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &aSuccessfully loaded clans data from remote MySQL database!"));
+                }catch (IOException | SQLException e) {
+                    console.sendMessage(ColorUtils.translateColorCodes("-------------------------------------------"));
+                    console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Failed to load data from remote MySQL database!"));
                     console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4See below for errors!"));
                     console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Disabling Plugin!"));
                     e.printStackTrace();
+                    console.sendMessage(ColorUtils.translateColorCodes("-------------------------------------------"));
                     Bukkit.getPluginManager().disablePlugin(this);
                     return;
                 }
+            }else {
+                console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Failed to connect to remote MySQL database!"));
+                console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Disabling Plugin!"));
+                console.sendMessage(ColorUtils.translateColorCodes("-------------------------------------------"));
+                Bukkit.getPluginManager().disablePlugin(this);
+                return;
             }
         }else {
-            console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Failed to load data from clans.yml!"));
-            console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Disabling Plugin!"));
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
+            this.storageUtils = new FlatFileClanStorageUtils();
+            if (clansFileManager != null){
+                if (clansFileManager.getClansConfig().contains("clans.data")){
+                    try {
+                        storageUtils.restoreClans();
+                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &aSuccessfully loaded clans data from clans.yml!"));
+                    } catch (IOException e) {
+                        console.sendMessage(ColorUtils.translateColorCodes("-------------------------------------------"));
+                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Failed to load data from clans.yml!"));
+                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4See below for errors!"));
+                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Disabling Plugin!"));
+                        e.printStackTrace();
+                        console.sendMessage(ColorUtils.translateColorCodes("-------------------------------------------"));
+                        Bukkit.getPluginManager().disablePlugin(this);
+                        return;
+                    }
+                }
+            }else {
+                console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Failed to load data from clans.yml!"));
+                console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Disabling Plugin!"));
+                console.sendMessage(ColorUtils.translateColorCodes("-------------------------------------------"));
+                Bukkit.getPluginManager().disablePlugin(this);
+                return;
+            }
         }
 
         //Load usermap.yml
         this.usermapFileManager = new UsermapFileManager();
         usermapFileManager.UsermapFileManager(this);
-        if (usermapFileManager != null){
-            if (usermapFileManager.getUsermapConfig().contains("users.data")){
-                try {
-                    UsermapStorageUtil.restoreUsermap();
-                } catch (IOException e) {
-                    console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Failed to load data from usermap.yml!"));
-                    console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4See below for errors!"));
-                    console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Disabling Plugin!"));
-                    e.printStackTrace();
-                    Bukkit.getPluginManager().disablePlugin(this);
-                    return;
-                }
-            }
+        if (getConfig().getBoolean("storage.mysql.enabled")) {
+            //TODO
         }else {
-            console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Failed to load data from usermap.yml!"));
-            console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Disabling Plugin!"));
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
+            this.usermapUtils = new FlatFileUsermapStorageUtils();
+            if (usermapFileManager != null){
+                if (usermapFileManager.getUsermapConfig().contains("users.data")){
+                    try {
+                        usermapUtils.restoreUsermap();
+                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &aSuccessfully loaded usermap data from usermap.yml!"));
+                    } catch (IOException e) {
+                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Failed to load data from usermap.yml!"));
+                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4See below for errors!"));
+                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Disabling Plugin!"));
+                        e.printStackTrace();
+                        console.sendMessage(ColorUtils.translateColorCodes("-------------------------------------------"));
+                        Bukkit.getPluginManager().disablePlugin(this);
+                        return;
+                    }
+                }
+            }else {
+                console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Failed to load data from usermap.yml!"));
+                console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Disabling Plugin!"));
+                console.sendMessage(ColorUtils.translateColorCodes("-------------------------------------------"));
+                Bukkit.getPluginManager().disablePlugin(this);
+                return;
+            }
         }
 
         //Register the plugin commands
@@ -370,36 +445,44 @@ public final class Clans extends JavaPlugin {
             console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &3Background tasks have disabled successfully!"));
         }
 
-        //Save clansList HashMap to clans.yml
-        if (clansFileManager != null){
-            if (!ClansStorageUtil.getRawClansList().isEmpty()){
-                try {
-                    ClansStorageUtil.saveClans();
-                    console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &3All clans saved to clans.yml successfully!"));
-                } catch (IOException e) {
-                    console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Failed to save clans to clans.yml!"));
-                    console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4See below error for reason!"));
-                    e.printStackTrace();
-                }
-            }
+        //Save clansList HashMap to MySQL or clans.yml
+        if (getConfig().getBoolean("storage.mysql.enabled")) {
+            //TODO
         }else {
-            console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Failed to save clans to clans.yml!"));
+            if (clansFileManager != null){
+                if (!storageUtils.getRawClansList().isEmpty()){
+                    try {
+                        storageUtils.saveClans();
+                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &3All clans saved to clans.yml successfully!"));
+                    } catch (IOException e) {
+                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Failed to save clans to clans.yml!"));
+                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4See below error for reason!"));
+                        e.printStackTrace();
+                    }
+                }
+            }else {
+                console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Failed to save clans to clans.yml!"));
+            }
         }
 
-        //Saver usermap to usermap.yml
-        if (usermapFileManager != null){
-            if (!UsermapStorageUtil.getRawUsermapList().isEmpty()){
-                try {
-                    UsermapStorageUtil.saveUsermap();
-                    console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &3All users saved to usermap.yml successfully!"));
-                } catch (IOException e) {
-                    console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Failed to save usermap to usermap.yml!"));
-                    console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4See below error for reason!"));
-                    e.printStackTrace();
-                }
-            }
+        //Saver usermap to MySQL or usermap.yml
+        if (getConfig().getBoolean("storage.mysql.enabled")) {
+            //TODO
         }else {
-            console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Failed to save usermap to usermap.yml!"));
+            if (usermapFileManager != null){
+                if (!usermapUtils.getRawUsermapList().isEmpty()){
+                    try {
+                        usermapUtils.saveUsermap();
+                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &3All users saved to usermap.yml successfully!"));
+                    } catch (IOException e) {
+                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Failed to save usermap to usermap.yml!"));
+                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4See below error for reason!"));
+                        e.printStackTrace();
+                    }
+                }
+            }else {
+                console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Failed to save usermap to usermap.yml!"));
+            }
         }
 
         //Final plugin shutdown message
