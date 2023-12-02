@@ -11,7 +11,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import me.loving11ish.clans.Clans;
 import me.loving11ish.clans.commands.clanSubCommands.*;
-import me.loving11ish.clans.menusystem.paginatedMenu.ClanListGUI;
+import me.loving11ish.clans.menusystem.paginatedmenu.ClanListGUI;
 import me.loving11ish.clans.utils.ColorUtils;
 
 import java.util.*;
@@ -19,11 +19,11 @@ import java.util.concurrent.TimeUnit;
 
 public class ClanCommand implements CommandExecutor {
 
-    ConsoleCommandSender console = Bukkit.getConsoleSender();
+    private final ConsoleCommandSender console = Bukkit.getConsoleSender();
 
     public static WrappedTask bannedTaskUpdateTask;
 
-    FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
+    private final FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
 
     private static List<String> bannedTags;
 

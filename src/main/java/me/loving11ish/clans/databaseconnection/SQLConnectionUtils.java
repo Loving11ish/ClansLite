@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 public class SQLConnectionUtils {
 
-    FileConfiguration clansConfig = Clans.getPlugin().getConfig();
+    private final FileConfiguration clansConfig = Clans.getPlugin().getConfig();
 
     private JdbcPooledConnectionSource connectionSource;
 

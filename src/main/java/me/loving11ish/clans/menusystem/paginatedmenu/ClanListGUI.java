@@ -1,4 +1,4 @@
-package me.loving11ish.clans.menusystem.paginatedMenu;
+package me.loving11ish.clans.menusystem.paginatedmenu;
 
 import com.tcoded.folialib.FoliaLib;
 import com.tcoded.folialib.wrapper.task.WrappedTask;
@@ -25,14 +25,14 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class ClanListGUI extends PaginatedMenu {
-    
-    ConsoleCommandSender console = Bukkit.getConsoleSender();
+
+    private final ConsoleCommandSender console = Bukkit.getConsoleSender();
 
     public static WrappedTask autoGUIRefreshTask;
 
-    FileConfiguration guiConfig = Clans.getPlugin().clanGUIFileManager.getClanGUIConfig();
-    FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
-    FileConfiguration clansConfig = Clans.getPlugin().getConfig();
+    private final FileConfiguration guiConfig = Clans.getPlugin().clanGUIFileManager.getClanGUIConfig();
+    private final FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
+    private final FileConfiguration clansConfig = Clans.getPlugin().getConfig();
 
     public ClanListGUI(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);

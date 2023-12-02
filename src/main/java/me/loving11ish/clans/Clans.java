@@ -32,7 +32,7 @@ import me.loving11ish.clans.files.MessagesFileManager;
 import me.loving11ish.clans.files.UsermapFileManager;
 import me.loving11ish.clans.listeners.*;
 import me.loving11ish.clans.menusystem.PlayerMenuUtility;
-import me.loving11ish.clans.menusystem.paginatedMenu.ClanListGUI;
+import me.loving11ish.clans.menusystem.paginatedmenu.ClanListGUI;
 import me.loving11ish.clans.updatesystem.JoinEvent;
 import me.loving11ish.clans.updatesystem.UpdateChecker;
 import me.loving11ish.clans.utils.*;
@@ -46,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 
 public final class Clans extends JavaPlugin {
 
-    ConsoleCommandSender console = Bukkit.getConsoleSender();
+    private final ConsoleCommandSender console = Bukkit.getConsoleSender();
 
     private final PluginDescriptionFile pluginInfo = getDescription();
     private final String pluginVersion = pluginInfo.getVersion();

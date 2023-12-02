@@ -9,13 +9,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 import me.loving11ish.clans.Clans;
 import me.loving11ish.clans.menusystem.Menu;
 import me.loving11ish.clans.menusystem.PlayerMenuUtility;
-import me.loving11ish.clans.menusystem.paginatedMenu.ClanListGUI;
+import me.loving11ish.clans.menusystem.paginatedmenu.ClanListGUI;
 import me.loving11ish.clans.utils.ColorUtils;
 
 public class ClanJoinRequestMenu extends Menu {
 
-    FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
-    FileConfiguration guiConfig = Clans.getPlugin().clanGUIFileManager.getClanGUIConfig();
+    private final FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
+    private final FileConfiguration guiConfig = Clans.getPlugin().clanGUIFileManager.getClanGUIConfig();
 
     public ClanJoinRequestMenu(PlayerMenuUtility playerMenuUtility){
         super(playerMenuUtility);

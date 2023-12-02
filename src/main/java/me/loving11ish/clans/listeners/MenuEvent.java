@@ -11,15 +11,15 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.InventoryHolder;
 import me.loving11ish.clans.Clans;
 import me.loving11ish.clans.menusystem.Menu;
-import me.loving11ish.clans.menusystem.paginatedMenu.ClanListGUI;
+import me.loving11ish.clans.menusystem.paginatedmenu.ClanListGUI;
 import me.loving11ish.clans.utils.ColorUtils;
 
 public class MenuEvent implements Listener {
 
-    ConsoleCommandSender console = Bukkit.getConsoleSender();
+    private final ConsoleCommandSender console = Bukkit.getConsoleSender();
 
-    FileConfiguration guiConfig = Clans.getPlugin().clanGUIFileManager.getClanGUIConfig();
-    FileConfiguration clansConfig = Clans.getPlugin().getConfig();
+    private final FileConfiguration guiConfig = Clans.getPlugin().clanGUIFileManager.getClanGUIConfig();
+    private final FileConfiguration clansConfig = Clans.getPlugin().getConfig();
 
     @EventHandler
     public void onMenuClick(InventoryClickEvent event){
