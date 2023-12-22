@@ -10,9 +10,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import me.loving11ish.clans.Clans;
-import me.loving11ish.clans.api.ClanDisbandEvent;
-import me.loving11ish.clans.api.ClanOfflineDisbandEvent;
-import me.loving11ish.clans.api.ClanTransferOwnershipEvent;
+import me.loving11ish.clans.api.events.ClanDisbandEvent;
+import me.loving11ish.clans.api.events.ClanOfflineDisbandEvent;
+import me.loving11ish.clans.api.events.ClanTransferOwnershipEvent;
 import me.loving11ish.clans.models.Chest;
 import me.loving11ish.clans.models.Clan;
 
@@ -37,6 +37,8 @@ public class ClansStorageUtil {
             clansStorage.set("clans.data." + entry.getKey() + ".clanOwner", entry.getValue().getClanOwner());
             clansStorage.set("clans.data." + entry.getKey() + ".clanFinalName", entry.getValue().getClanFinalName());
             clansStorage.set("clans.data." + entry.getKey() + ".clanPrefix", entry.getValue().getClanPrefix());
+            clansStorage.set("clans.data." + entry.getKey() + ".clanManager", entry.getValue().getClanManager());
+            clansStorage.set("clans.data." + entry.getKey() + ".clanOfficers", entry.getValue().getClanOfficers());
             clansStorage.set("clans.data." + entry.getKey() + ".clanMembers", entry.getValue().getClanMembers());
             clansStorage.set("clans.data." + entry.getKey() + ".clanAllies", entry.getValue().getClanAllies());
             clansStorage.set("clans.data." + entry.getKey() + ".clanEnemies", entry.getValue().getClanEnemies());
@@ -80,9 +82,12 @@ public class ClansStorageUtil {
             UUID uuid = UUID.fromString(key);
             String clanFinalName = clansStorage.getString("clans.data." + key + ".clanFinalName");
             String clanPrefix = clansStorage.getString("clans.data." + key + ".clanPrefix");
+            String clanManager = clansStorage.getString("clans.data." + key + ".clanManager");
+            List<String> clanOfficersConfigSection = clansStorage.getStringList("clans.data." + key + ".clanOfficers");
             List<String> clanMembersConfigSection = clansStorage.getStringList("clans.data." + key + ".clanMembers");
             List<String> clanAlliesConfigSection = clansStorage.getStringList("clans.data." + key + ".clanAllies");
             List<String> clanEnemiesConfigSection = clansStorage.getStringList("clans.data." + key + ".clanEnemies");
+            ArrayList<String> clanOfficers = new ArrayList<>(clanOfficersConfigSection);
             ArrayList<String> clanMembers = new ArrayList<>(clanMembersConfigSection);
             ArrayList<String> clanAllies = new ArrayList<>(clanAlliesConfigSection);
             ArrayList<String> clanEnemies = new ArrayList<>(clanEnemiesConfigSection);
@@ -101,6 +106,8 @@ public class ClansStorageUtil {
                 clan.setClanFinalName(stripClanNameColorCodes(clan));
             }
             clan.setClanPrefix(clanPrefix);
+            clan.setClanManager(clanManager);
+            clan.setClanOfficers(clanOfficers);
             clan.setClanMembers(clanMembers);
             clan.setClanAllies(clanAllies);
             clan.setClanEnemies(clanEnemies);
@@ -426,6 +433,8 @@ public class ClansStorageUtil {
 
                     String clanFinalName = originalClan.getClanFinalName();
                     String clanPrefix = originalClan.getClanPrefix();
+                    String clanManager = originalClan.getClanManager();
+                    ArrayList<String> clanOfficers = new ArrayList<>(originalClan.getClanOfficers());
                     ArrayList<String> clanMembers = new ArrayList<>(originalClan.getClanMembers());
                     ArrayList<String> clanAllies = new ArrayList<>(originalClan.getClanAllies());
                     ArrayList<String> clanEnemies = new ArrayList<>(originalClan.getClanEnemies());
@@ -442,6 +451,8 @@ public class ClansStorageUtil {
 
                     Clan newClan = new Clan(newOwnerUUID.toString(), clanFinalName);
                     newClan.setClanPrefix(clanPrefix);
+                    newClan.setClanManager(clanManager);
+                    newClan.setClanOfficers(clanOfficers);
                     newClan.setClanMembers(clanMembers);
                     newClan.setClanAllies(clanAllies);
                     newClan.setClanEnemies(clanEnemies);

@@ -1,5 +1,6 @@
 package me.loving11ish.clans.commands;
 
+import me.loving11ish.clans.api.events.ClanChatMessageSendEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -8,7 +9,6 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import me.loving11ish.clans.Clans;
-import me.loving11ish.clans.api.ClanChatMessageSendEvent;
 import me.loving11ish.clans.models.Clan;
 import me.loving11ish.clans.models.ClanPlayer;
 import me.loving11ish.clans.utils.ClansStorageUtil;

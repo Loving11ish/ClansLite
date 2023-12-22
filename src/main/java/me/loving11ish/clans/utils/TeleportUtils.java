@@ -9,7 +9,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import me.loving11ish.clans.Clans;
-import me.loving11ish.clans.api.ClanHomeTeleportEvent;
+import me.loving11ish.clans.api.events.ClanHomeTeleportEvent;
 import me.loving11ish.clans.models.Clan;
 
 import java.util.concurrent.TimeUnit;

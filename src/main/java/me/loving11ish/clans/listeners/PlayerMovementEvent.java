@@ -28,8 +28,8 @@ public class PlayerMovementEvent implements Listener {
             return;
         }
         if (event.getFrom().getX() != event.getTo().getX()
-                ||event.getFrom().getY() != event.getTo().getY()
-                ||event.getFrom().getZ() != event.getTo().getZ()){
+                && event.getFrom().getY() != event.getTo().getY()
+                && event.getFrom().getZ() != event.getTo().getZ()){
             if (Clans.getPlugin().teleportQueue.containsKey(uuid)){
                 if (config.getBoolean("general.developer-debug-mode.enabled")){
                     console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aPlayer "  + player.getName() + " has a pending teleport"));

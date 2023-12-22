@@ -1,5 +1,6 @@
 package me.loving11ish.clans.utils;
 
+import me.loving11ish.clans.api.events.ClanChatSpyToggledEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.ConsoleCommandSender;
@@ -7,7 +8,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.geysermc.floodgate.api.player.FloodgatePlayer;
 import me.loving11ish.clans.Clans;
-import me.loving11ish.clans.api.ClanChatSpyToggledEvent;
 import me.loving11ish.clans.models.ClanPlayer;
 
 import java.io.IOException;

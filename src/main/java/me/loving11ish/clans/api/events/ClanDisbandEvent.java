@@ -1,19 +1,21 @@
-package me.loving11ish.clans.api;
+package me.loving11ish.clans.api.events;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class ChestUnlockEvent extends Event {
-
+public class ClanDisbandEvent extends Event {
     private static final HandlerList HANDLERS = new HandlerList();
     private final Player createdBy;
-    private final Location removedLockLocation;
+    private final String clanName;
 
-    public ChestUnlockEvent(Player createdBy, Location removedLockLocation) {
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
+    public ClanDisbandEvent(Player createdBy, String clanName) {
         this.createdBy = createdBy;
-        this.removedLockLocation = removedLockLocation;
+        this.clanName = clanName;
     }
 
     @Override
@@ -25,7 +27,7 @@ public class ChestUnlockEvent extends Event {
         return createdBy;
     }
 
-    public Location getRemovedLockLocation() {
-        return removedLockLocation;
+    public String getClan() {
+        return clanName;
     }
 }

@@ -1,24 +1,24 @@
-package me.loving11ish.clans.api;
+package me.loving11ish.clans.api.events;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import me.loving11ish.clans.models.Clan;
 
-public class ClanEnemyRemoveEvent extends Event {
+public class ClanAllyRemoveEvent extends Event {
     private static final HandlerList HANDLERS = new HandlerList();
     private final Player createdBy;
     private final Clan clan;
-    private final Player exEnemyClanCreatedBy;
-    private final Clan exEnemyClan;
+    private final Player exAllyClanCreatedBy;
+    private final Clan exAllyClan;
 
 
 
-    public ClanEnemyRemoveEvent(Player createdBy, Clan clan, Clan exEnemyClan, Player exEnemyClanCreatedBy) {
+    public ClanAllyRemoveEvent(Player createdBy, Clan clan, Clan exAllyClan, Player exAllyClanCreatedBy) {
         this.createdBy = createdBy;
         this.clan = clan;
-        this.exEnemyClanCreatedBy = exEnemyClanCreatedBy;
-        this.exEnemyClan = exEnemyClan;
+        this.exAllyClanCreatedBy = exAllyClanCreatedBy;
+        this.exAllyClan = exAllyClan;
     }
 
     @Override
@@ -34,12 +34,12 @@ public class ClanEnemyRemoveEvent extends Event {
         return clan;
     }
 
-    public Player getExEnemyClanCreatedBy() {
-        return exEnemyClanCreatedBy;
+    public Player getExAllyClanCreatedBy() {
+        return exAllyClanCreatedBy;
     }
 
-    public Clan getExEnemyClan() {
-        return exEnemyClan;
+    public Clan getExAllyClan() {
+        return exAllyClan;
     }
 
     public static HandlerList getHandlerList() {

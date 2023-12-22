@@ -43,6 +43,8 @@ public final class Clans extends JavaPlugin {
     private final PluginDescriptionFile pluginInfo = getDescription();
     private final String pluginVersion = pluginInfo.getVersion();
 
+    private boolean updateAvailable;
+
     private static Clans plugin;
     private static FoliaLib foliaLib;
     private static FloodgateApi floodgateApi;
@@ -296,10 +298,12 @@ public final class Clans extends JavaPlugin {
                 console.sendMessage(ColorUtils.translateColorCodes(messagesFileManager.getMessagesConfig().getString("no-update-available.1")));
                 console.sendMessage(ColorUtils.translateColorCodes(messagesFileManager.getMessagesConfig().getString("no-update-available.2")));
                 console.sendMessage(ColorUtils.translateColorCodes(messagesFileManager.getMessagesConfig().getString("no-update-available.3")));
+                this.updateAvailable = false;
             }else {
                 console.sendMessage(ColorUtils.translateColorCodes(messagesFileManager.getMessagesConfig().getString("update-available.1")));
                 console.sendMessage(ColorUtils.translateColorCodes(messagesFileManager.getMessagesConfig().getString("update-available.2")));
                 console.sendMessage(ColorUtils.translateColorCodes(messagesFileManager.getMessagesConfig().getString("update-available.3")));
+                this.updateAvailable = true;
             }
         });
 
@@ -466,5 +470,9 @@ public final class Clans extends JavaPlugin {
 
     public static void setOnlineMode(boolean onlineMode) {
         Clans.onlineMode = onlineMode;
+    }
+
+    public boolean isUpdateAvailable() {
+        return updateAvailable;
     }
 }

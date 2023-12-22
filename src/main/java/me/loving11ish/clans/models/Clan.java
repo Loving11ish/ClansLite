@@ -8,6 +8,8 @@ public class Clan {
     private final String clanFinalOwner;
     private String clanFinalName;
     private String clanPrefix;
+    private String clanManager;
+    private ArrayList<String> clanOfficers;
     private ArrayList<String> clanMembers;
     private ArrayList<String> clanAllies;
     private ArrayList<String> clanEnemies;
@@ -26,6 +28,8 @@ public class Clan {
         clanFinalOwner = clanOwner;
         clanFinalName = clanName;
         clanPrefix = clanFinalName;
+        clanManager = null;
+        clanOfficers = new ArrayList<>();
         clanMembers = new ArrayList<>();
         clanAllies = new ArrayList<>();
         clanEnemies = new ArrayList<>();
@@ -53,6 +57,22 @@ public class Clan {
 
     public void setClanPrefix(String newClanPrefix){
         clanPrefix = newClanPrefix;
+    }
+
+    public String getClanManager(){
+        return clanManager;
+    }
+
+    public void setClanManager(String newClanManager){
+        clanManager = newClanManager;
+    }
+
+    public ArrayList<String> getClanOfficers(){
+        return clanOfficers;
+    }
+
+    public void setClanOfficers(ArrayList<String> clanOfficersList){
+        clanOfficers = clanOfficersList;
     }
 
     public ArrayList<String> getClanMembers(){

@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import me.loving11ish.clans.Clans;
-import me.loving11ish.clans.api.ChestLockEvent;
+import me.loving11ish.clans.api.events.ChestLockEvent;
 import me.loving11ish.clans.models.Chest;
 import me.loving11ish.clans.models.Clan;
 import me.loving11ish.clans.utils.ClansStorageUtil;

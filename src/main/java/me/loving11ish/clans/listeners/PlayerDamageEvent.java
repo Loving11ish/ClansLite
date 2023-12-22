@@ -1,5 +1,6 @@
 package me.loving11ish.clans.listeners;
 
+import me.loving11ish.clans.api.events.ClanFriendlyFireAttackEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -9,7 +10,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import me.loving11ish.clans.Clans;
-import me.loving11ish.clans.api.ClanFriendlyFireAttackEvent;
 import me.loving11ish.clans.models.Clan;
 import me.loving11ish.clans.utils.ClansStorageUtil;
 import me.loving11ish.clans.utils.ColorUtils;

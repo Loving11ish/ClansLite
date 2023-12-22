@@ -1,20 +1,22 @@
-package me.loving11ish.clans.api;
+package me.loving11ish.clans.api.events;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import me.loving11ish.clans.models.Clan;
 
-public class ClanHomePreTeleportEvent extends Event implements Cancellable {
+public class ClanHomeCreateEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
     private final Player createdBy;
     private final Clan clan;
+    private final Location homeLocation;
 
-    public ClanHomePreTeleportEvent(Player createdBy, Clan clan) {
+    public ClanHomeCreateEvent(Player createdBy, Clan clan, Location homeLocation) {
         this.createdBy = createdBy;
         this.clan = clan;
+        this.homeLocation = homeLocation;
     }
 
     @Override
@@ -30,13 +32,7 @@ public class ClanHomePreTeleportEvent extends Event implements Cancellable {
         return clan;
     }
 
-    @Override
-    public boolean isCancelled() {
-        return false;
-    }
-
-    @Override
-    public void setCancelled(boolean b) {
-
+    public Location getHomeLocation() {
+        return homeLocation;
     }
 }

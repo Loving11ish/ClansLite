@@ -1,4 +1,4 @@
-package me.loving11ish.clans.api;
+package me.loving11ish.clans.api.events;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

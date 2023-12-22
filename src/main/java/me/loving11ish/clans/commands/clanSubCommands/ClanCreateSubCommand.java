@@ -7,7 +7,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import me.loving11ish.clans.Clans;
-import me.loving11ish.clans.api.ClanCreateEvent;
+import me.loving11ish.clans.api.events.ClanCreateEvent;
 import me.loving11ish.clans.models.Clan;
 import me.loving11ish.clans.utils.ClansStorageUtil;
 import me.loving11ish.clans.utils.ColorUtils;
