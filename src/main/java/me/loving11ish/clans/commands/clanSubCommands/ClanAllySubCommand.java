@@ -40,8 +40,8 @@ public class ClanAllySubCommand {
                                     if (ClansStorageUtil.findClanByOwner(allyClanOwner) != null){
                                         if (ClansStorageUtil.findClanByOwner(player) != ClansStorageUtil.findClanByOwner(allyClanOwner)){
                                             Clan allyClan = ClansStorageUtil.findClanByOwner(allyClanOwner);
-                                            String allyOwnerUUIDString = allyClan.getClanOwner();
-                                            if (ClansStorageUtil.findClanByOwner(player).getClanAllies().size() >= clansConfig.getInt("max-clan-allies")){
+                                            String allyOwnerUUIDString = allyClan.getId();
+                                            if (ClansStorageUtil.findClanByOwner(player).getAllies().size() >= clansConfig.getInt("max-clan-allies")){
                                                 int maxSize = clansConfig.getInt("max-clan-allies");
                                                 player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-ally-max-amount-reached")).replace("%LIMIT%", String.valueOf(maxSize)));
                                                 return true;
@@ -50,7 +50,7 @@ public class ClanAllySubCommand {
                                                 player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("failed-cannot-ally-enemy-clan")));
                                                 return true;
                                             }
-                                            if (clan.getClanAllies().contains(allyOwnerUUIDString)){
+                                            if (clan.getAllies().contains(allyOwnerUUIDString)){
                                                 player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("failed-clan-already-your-ally")));
                                                 return true;
                                             }else {
@@ -59,7 +59,7 @@ public class ClanAllySubCommand {
                                                 if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
                                                     console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanAllyAddEvent"));
                                                 }
-                                                player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("added-clan-to-your-allies").replace(ALLY_CLAN, allyClan.getClanFinalName())));
+                                                player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("added-clan-to-your-allies").replace(ALLY_CLAN, allyClan.getName())));
                                             }
                                             if (allyClanOwner.isOnline()){
                                                 allyClanOwner.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-added-to-other-allies").replace(CLAN_OWNER, player.getName())));
@@ -91,7 +91,7 @@ public class ClanAllySubCommand {
                                 if (allyClanOwner != null){
                                     if (ClansStorageUtil.findClanByOwner(allyClanOwner) != null){
                                         Clan allyClan = ClansStorageUtil.findClanByOwner(allyClanOwner);
-                                        List<String> alliedClans = ClansStorageUtil.findClanByOwner(player).getClanAllies();
+                                        List<String> alliedClans = ClansStorageUtil.findClanByOwner(player).getAllies();
                                         UUID allyClanOwnerUUID = allyClanOwner.getUniqueId();
                                         String allyClanOwnerString = allyClanOwnerUUID.toString();
                                         if (alliedClans.contains(allyClanOwnerString)){
@@ -100,7 +100,7 @@ public class ClanAllySubCommand {
                                                 console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanAllyRemoveEvent"));
                                             }
                                             ClansStorageUtil.removeClanAlly(player, allyClanOwner);
-                                            player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("removed-clan-from-your-allies").replace(ALLY_CLAN, allyClan.getClanFinalName())));
+                                            player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("removed-clan-from-your-allies").replace(ALLY_CLAN, allyClan.getName())));
                                             if (allyClanOwner.isOnline()){
                                                 allyClanOwner.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-removed-from-other-allies").replace(CLAN_OWNER, player.getName())));
                                             }

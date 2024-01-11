@@ -4,26 +4,26 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import me.loving11ish.clans.models.Clan;
-import me.loving11ish.clans.models.ClanPlayer;
+import me.loving11ish.clans.models.ClansLitePlayer;
 
 public class ClanPointsRemovedEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
     private final Player createdBy;
     private final Clan playerClan;
-    private final ClanPlayer clanPlayer;
+    private final ClansLitePlayer clansLitePlayer;
     private final int previousClanPlayerPointBalance;
     private final int newClanPlayerPointBalance;
     private final int withdrawPointValue;
     private final int previousClanPointBalance;
     private final int newClanPointBalance;
 
-    public ClanPointsRemovedEvent(Player createdBy, Clan playerClan, ClanPlayer clanPlayer,
+    public ClanPointsRemovedEvent(Player createdBy, Clan playerClan, ClansLitePlayer clansLitePlayer,
                                   int previousClanPlayerPointBalance, int newClanPlayerPointBalance,
                                   int withdrawPointValue, int previousClanPointBalance, int newClanPointBalance) {
         this.createdBy = createdBy;
         this.playerClan = playerClan;
-        this.clanPlayer = clanPlayer;
+        this.clansLitePlayer = clansLitePlayer;
         this.previousClanPlayerPointBalance = previousClanPlayerPointBalance;
         this.newClanPlayerPointBalance = newClanPlayerPointBalance;
         this.withdrawPointValue = withdrawPointValue;
@@ -44,8 +44,8 @@ public class ClanPointsRemovedEvent extends Event {
         return playerClan;
     }
 
-    public ClanPlayer getClanPlayer() {
-        return clanPlayer;
+    public ClansLitePlayer getClanPlayer() {
+        return clansLitePlayer;
     }
 
     public int getPreviousClanPlayerPointBalance() {

@@ -11,7 +11,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import me.loving11ish.clans.Clans;
 import me.loving11ish.clans.api.events.ChestUnlockEvent;
-import me.loving11ish.clans.models.Chest;
+import me.loving11ish.clans.models.ProtectedChest;
 import me.loving11ish.clans.utils.ClansStorageUtil;
 import me.loving11ish.clans.utils.ColorUtils;
 
@@ -42,7 +42,7 @@ public class ChestUnlockSubCommand {
                     int z = (int) Math.round(location.getZ());
 
                     if (ClansStorageUtil.isChestLocked(location)){
-                        Chest chest = ClansStorageUtil.getChestByLocation(location);
+                        ProtectedChest chest = ClansStorageUtil.getChestByLocation(location);
                         if (ClansStorageUtil.hasAccessToLockedChest(offlinePlayer, chest)){
 
                             TileState tileState = (TileState) block.getState();

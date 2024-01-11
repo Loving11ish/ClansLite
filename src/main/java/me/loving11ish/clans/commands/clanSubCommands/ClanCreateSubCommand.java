@@ -34,7 +34,7 @@ public class ClanCreateSubCommand {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             clans.forEach((clans) ->
-                    clanNamesList.add(clans.getValue().getClanFinalName()));
+                    clanNamesList.add(clans.getValue().getName()));
             if (args.length >= 2) {
                 if (bannedTags.contains(args[1])) {
                     player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-name-is-banned").replace(CLAN_PLACEHOLDER, args[1])));

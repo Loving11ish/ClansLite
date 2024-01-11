@@ -26,7 +26,7 @@ public class ClanListSubCommand {
             } else {
                 clansString.append(ColorUtils.translateColorCodes(messagesConfig.getString("clans-list-header") + "\n"));
                 clans.forEach((clan) ->
-                        clansString.append(ColorUtils.translateColorCodes(clan.getValue().getClanFinalName() + "\n")));
+                        clansString.append(ColorUtils.translateColorCodes(clan.getValue().getName() + "\n")));
                 clansString.append(" ");
                 clansString.append(ColorUtils.translateColorCodes(messagesConfig.getString("clans-list-footer")));
                 player.sendMessage(clansString.toString());

@@ -1,8 +1,8 @@
 package me.loving11ish.clans.utils.databaseutils;
 
-import me.loving11ish.clans.models.Chest;
+import me.loving11ish.clans.models.ProtectedChest;
 import me.loving11ish.clans.models.Clan;
-import me.loving11ish.clans.models.ClanPlayer;
+import me.loving11ish.clans.models.ClansLitePlayer;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -30,13 +30,13 @@ public abstract class StorageUtils {
 
     public abstract Clan findClanByOfflineOwner(OfflinePlayer offlinePlayer);
 
-    public abstract Clan findClanOwnerByClanPlayer(ClanPlayer clanPlayer);
+    public abstract Clan findClanOwnerByClanPlayer(ClansLitePlayer clansLitePlayer);
 
     public abstract Clan findClanByPlayer(Player player);
 
     public abstract Clan findClanByOfflinePlayer(OfflinePlayer player);
 
-    public abstract Clan findClanPlayerByClanPlayer(ClanPlayer clanPlayer);
+    public abstract Clan findClanPlayerByClanPlayer(ClansLitePlayer clansLitePlayer);
 
     public abstract void updatePrefix(Player player, String prefix);
 
@@ -72,7 +72,7 @@ public abstract class StorageUtils {
 
     public abstract void resetPoints(Clan clan);
 
-    public abstract Location getChestLocation(Chest chest);
+    public abstract Location getChestLocation(ProtectedChest chest);
 
     public abstract boolean isChestLocked(Clan clan, Location location);
 
@@ -86,23 +86,23 @@ public abstract class StorageUtils {
 
     public abstract boolean removeProtectedChest(String clanOwnerUUID, Location location, Player player) throws IOException;
 
-    public abstract Set<Map.Entry<String, Chest>> getAllProtectedChestsByClan(Clan clan);
+    public abstract Set<Map.Entry<String, ProtectedChest>> getAllProtectedChestsByClan(Clan clan);
 
     public abstract Location getChestByLocation(Clan clan, Location location);
 
-    public abstract Chest getChestByLocation(Location location);
+    public abstract ProtectedChest getChestByLocation(Location location);
 
     public abstract List<Location> getAllProtectedChestsLocationsByClan(Clan clan);
 
-    public abstract List<String> getPlayersWithChestAccessByChest(Chest chest);
+    public abstract List<String> getPlayersWithChestAccessByChest(ProtectedChest chest);
 
-    public abstract List<OfflinePlayer> getOfflinePlayersWithChestAccessByChest(Chest chest);
+    public abstract List<OfflinePlayer> getOfflinePlayersWithChestAccessByChest(ProtectedChest chest);
 
-    public abstract boolean hasAccessToLockedChest(OfflinePlayer offlinePlayer, Chest chest);
+    public abstract boolean hasAccessToLockedChest(OfflinePlayer offlinePlayer, ProtectedChest chest);
 
     public abstract List<Location> getGlobalLockedChestLocations();
 
-    public abstract List<Chest> getGlobalLockedChests();
+    public abstract List<ProtectedChest> getGlobalLockedChests();
 
     public abstract Set<Map.Entry<UUID, Clan>> getClans();
 

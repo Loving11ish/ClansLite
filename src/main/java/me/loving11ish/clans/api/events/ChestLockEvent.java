@@ -5,7 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import me.loving11ish.clans.models.Chest;
+import me.loving11ish.clans.models.ProtectedChest;
 import me.loving11ish.clans.models.Clan;
 
 public class ChestLockEvent extends Event {
@@ -13,10 +13,10 @@ public class ChestLockEvent extends Event {
     private static final HandlerList HANDLERS = new HandlerList();
     private final Player createdBy;
     private final Clan owningClan;
-    private final Chest chest;
+    private final ProtectedChest chest;
     private final Location chestLocation;
 
-    public ChestLockEvent(Player createdBy, Clan clan, Chest chest) {
+    public ChestLockEvent(Player createdBy, Clan clan, ProtectedChest chest) {
         this.createdBy = createdBy;
         this.owningClan = clan;
         this.chest = chest;
@@ -36,7 +36,7 @@ public class ChestLockEvent extends Event {
         return owningClan;
     }
 
-    public Chest getChest() {
+    public ProtectedChest getChest() {
         return chest;
     }
 

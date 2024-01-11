@@ -1,189 +1,127 @@
 package me.loving11ish.clans.models;
 
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.table.DatabaseTable;
+import com.google.common.collect.ImmutableList;
+import org.bukkit.Location;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
-@DatabaseTable(tableName = "clans")
 public class Clan {
 
-    @DatabaseField(id = true)
-    private String clanFinalOwner;
-    @DatabaseField(canBeNull = false)
-    private String clanFinalName;
-    @DatabaseField
+    private final UUID clanId;
+    private String clanName;
     private String clanPrefix;
-    private ArrayList<String> clanMembers;
-    private ArrayList<String> clanAllies;
-    private ArrayList<String> clanEnemies;
-    @DatabaseField(canBeNull = false)
+    private List<ClanMember> clanMembers;
+    private List<UUID> clanAllies;
+    private List<UUID> clanEnemies;
     private boolean friendlyFire;
-    @DatabaseField
     private int clanPoints;
-    @DatabaseField
-    private String clanHomeWorld;
-    @DatabaseField
-    private double clanHomeX;
-    @DatabaseField
-    private double clanHomeY;
-    @DatabaseField
-    private double clanHomeZ;
-    @DatabaseField
-    private float clanHomeYaw;
-    @DatabaseField
-    private float clanHomePitch;
-    @DatabaseField(canBeNull = false)
+    private Location clanHome;
     private int maxAllowedProtectedChests;
-    private HashMap<String, Chest> protectedChests = new HashMap<>();
+    private List<ProtectedChest> protectedChests = new ArrayList<>();
 
-    public Clan() {
-    }
-
-    public Clan(String clanOwner, String clanName) {
-        clanFinalOwner = clanOwner;
-        clanFinalName = clanName;
-        clanPrefix = clanFinalName;
+    public Clan(UUID clanId, String clanName) {
+        this.clanId = clanId;
+        this.clanName = clanName;
+        clanPrefix = this.clanName;
         clanMembers = new ArrayList<>();
         clanAllies = new ArrayList<>();
         clanEnemies = new ArrayList<>();
         friendlyFire = true;
         clanPoints = 0;
-        clanHomeWorld = null;
+        clanHome = null;
         maxAllowedProtectedChests = 0;
     }
 
-    public String getClanOwner(){
-        return clanFinalOwner;
+    public Clan(UUID clanId, String clanName, String clanPrefix, List<ClanMember> clanMembers, List<UUID> clanAllies,
+                List<UUID> clanEnemies, boolean friendlyFire, int clanPoints, Location clanHome,
+                int maxAllowedProtectedChests, List<ProtectedChest> protectedChests) {
+        this.clanId = clanId;
+        this.clanName = clanName;
+        this.clanPrefix = clanPrefix;
+        this.clanMembers = new ArrayList<>(clanMembers);
+        this.clanAllies = new ArrayList<>(clanAllies);
+        this.clanEnemies = new ArrayList<>(clanEnemies);
+        this.friendlyFire = friendlyFire;
+        this.clanPoints = clanPoints;
+        this.clanHome = clanHome;
+        this.maxAllowedProtectedChests = maxAllowedProtectedChests;
+        this.protectedChests = protectedChests;
     }
 
-    public String getClanFinalName(){
-        return clanFinalName;
+    public UUID getId() {
+        return clanId;
     }
 
-    public void setClanFinalName(String newClanFinalName){
-        clanFinalName = newClanFinalName;
+    public String getName() {
+        return clanName;
     }
 
-    public String getClanPrefix(){
+    public void setName(String newClanFinalName) {
+        clanName = newClanFinalName;
+    }
+
+    public String getPrefix() {
         return clanPrefix;
     }
 
-    public void setClanPrefix(String newClanPrefix){
+    public void setPrefix(String newClanPrefix) {
         clanPrefix = newClanPrefix;
     }
 
-    public ArrayList<String> getClanMembers(){
-        return clanMembers;
+    public ImmutableList<ClanMember> getMembers() {
+        return ImmutableList.copyOf(clanMembers);
     }
 
-    public void setClanMembers(ArrayList<String> clanMembersList){
-        clanMembers = clanMembersList;
-    }
-
-    public void addClanMember(String clanMember){
+    public void addMember(ClanMember clanMember) {
         clanMembers.add(clanMember);
     }
 
-    public Boolean removeClanMember(String clanMember){
+    public boolean removeMember(ClanMember clanMember) {
         return clanMembers.remove(clanMember);
     }
 
-    public ArrayList<String> getClanAllies(){
-        return clanAllies;
+    public ImmutableList<UUID> getAllies() {
+        return ImmutableList.copyOf(clanAllies);
     }
 
-    public void addClanAlly(String ally){
+    public void addAlly(UUID ally) {
         clanAllies.add(ally);
     }
 
-    public void removeClanAlly(String allyUUID){
+    public void removeAlly(UUID allyUUID) {
         clanAllies.remove(allyUUID);
     }
 
-    public void setClanAllies(ArrayList<String> clanAlliesList){
-        clanAllies = clanAlliesList;
+    public ImmutableList<UUID> getEnemies() {
+        return ImmutableList.copyOf(clanEnemies);
     }
 
-    public void addClanEnemy(String enemy){
+    public void addEnemy(UUID enemy) {
         clanEnemies.add(enemy);
     }
 
-    public void removeClanEnemy(String enemyUUID){
+    public void removeEnemy(UUID enemyUUID) {
         clanEnemies.remove(enemyUUID);
     }
 
-    public void setClanEnemies(ArrayList<String> clanEnemiesList){
-        clanEnemies = clanEnemiesList;
-    }
-
-    public ArrayList<String> getClanEnemies(){
-        return clanEnemies;
-    }
-
-    public boolean isFriendlyFireAllowed(){
+    public boolean isFriendlyFire() {
         return friendlyFire;
     }
 
-    public void setFriendlyFireAllowed(boolean friendlyFire){
+    public void setFriendlyFire(boolean friendlyFire) {
         this.friendlyFire = friendlyFire;
     }
 
-    public int getClanPoints() {
+    public int getPoints() {
         return clanPoints;
     }
 
-    public void setClanPoints(int clanPoints) {
+    public void setPoints(int clanPoints) {
         this.clanPoints = clanPoints;
     }
 
-    public String getClanHomeWorld(){
-        return clanHomeWorld;
-    }
-
-    public void setClanHomeWorld(String clanHomeWorld){
-        this.clanHomeWorld = clanHomeWorld;
-    }
-
-    public double getClanHomeX(){
-        return clanHomeX;
-    }
-
-    public void setClanHomeX(double clanHomeX){
-        this.clanHomeX = clanHomeX;
-    }
-
-    public double getClanHomeY(){
-        return clanHomeY;
-    }
-
-    public void setClanHomeY(double clanHomeY){
-        this.clanHomeY = clanHomeY;
-    }
-
-    public double getClanHomeZ(){
-        return clanHomeZ;
-    }
-
-    public void setClanHomeZ(double clanHomeZ){
-        this.clanHomeZ = clanHomeZ;
-    }
-
-    public float getClanHomeYaw(){
-        return clanHomeYaw;
-    }
-
-    public void setClanHomeYaw(float clanHomeYaw){
-        this.clanHomeYaw = clanHomeYaw;
-    }
-
-    public float getClanHomePitch(){
-        return clanHomePitch;
-    }
-
-    public void setClanHomePitch(float clanHomePitch){
-        this.clanHomePitch = clanHomePitch;
+    public Optional<Location> getHome() {
+        return Optional.ofNullable(clanHome);
     }
 
     public int getMaxAllowedProtectedChests() {
@@ -194,11 +132,15 @@ public class Clan {
         this.maxAllowedProtectedChests = maxAllowedProtectedChests;
     }
 
-    public HashMap<String, Chest> getProtectedChests() {
-        return protectedChests;
+    public ImmutableList<ProtectedChest> getProtectedChests() {
+        return ImmutableList.copyOf(protectedChests);
     }
 
-    public void setProtectedChests(HashMap<String, Chest> protectedChests) {
-        this.protectedChests = protectedChests;
+    public void addProtectedChest(ProtectedChest protectedChest) {
+        protectedChests.add(protectedChest);
+    }
+
+    public void removeProtectedChest(ProtectedChest protectedChest) {
+        protectedChests.remove(protectedChest);
     }
 }

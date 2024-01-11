@@ -20,11 +20,11 @@ public class ClanPvpSubCommand {
                 if (ClansStorageUtil.isClanOwner(player)){
                     if (ClansStorageUtil.findClanByOwner(player) != null){
                         Clan clan = ClansStorageUtil.findClanByOwner(player);
-                        if (clan.isFriendlyFireAllowed()){
-                            clan.setFriendlyFireAllowed(false);
+                        if (clan.isFriendlyFire()){
+                            clan.setFriendlyFire(false);
                             player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("disabled-friendly-fire")));
                         }else {
-                            clan.setFriendlyFireAllowed(true);
+                            clan.setFriendlyFire(true);
                             player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("enabled-friendly-fire")));
                         }
                     }else {

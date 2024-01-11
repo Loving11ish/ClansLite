@@ -4,9 +4,9 @@ import me.loving11ish.clans.Clans;
 import me.loving11ish.clans.api.events.ClanDisbandEvent;
 import me.loving11ish.clans.api.events.ClanOfflineDisbandEvent;
 import me.loving11ish.clans.api.events.ClanTransferOwnershipEvent;
-import me.loving11ish.clans.models.Chest;
+import me.loving11ish.clans.models.ProtectedChest;
 import me.loving11ish.clans.models.Clan;
-import me.loving11ish.clans.models.ClanPlayer;
+import me.loving11ish.clans.models.ClansLitePlayer;
 import me.loving11ish.clans.utils.ColorUtils;
 import me.loving11ish.clans.utils.databaseutils.StorageUtils;
 import org.bukkit.Bukkit;
@@ -37,14 +37,14 @@ public class FlatFileClanStorageUtils extends StorageUtils {
     @Override
     public void saveClans() throws IOException {
         for (Map.Entry<UUID, Clan> entry : clansList.entrySet()){
-            clansStorage.set("clans.data." + entry.getKey() + ".clanOwner", entry.getValue().getClanOwner());
-            clansStorage.set("clans.data." + entry.getKey() + ".clanFinalName", entry.getValue().getClanFinalName());
-            clansStorage.set("clans.data." + entry.getKey() + ".clanPrefix", entry.getValue().getClanPrefix());
-            clansStorage.set("clans.data." + entry.getKey() + ".clanMembers", entry.getValue().getClanMembers());
-            clansStorage.set("clans.data." + entry.getKey() + ".clanAllies", entry.getValue().getClanAllies());
+            clansStorage.set("clans.data." + entry.getKey() + ".clanOwner", entry.getValue().getId());
+            clansStorage.set("clans.data." + entry.getKey() + ".clanFinalName", entry.getValue().getName());
+            clansStorage.set("clans.data." + entry.getKey() + ".clanPrefix", entry.getValue().getPrefix());
+            clansStorage.set("clans.data." + entry.getKey() + ".clanMembers", entry.getValue().getMembers());
+            clansStorage.set("clans.data." + entry.getKey() + ".clanAllies", entry.getValue().getAllies());
             clansStorage.set("clans.data." + entry.getKey() + ".clanEnemies", entry.getValue().getClanEnemies());
-            clansStorage.set("clans.data." + entry.getKey() + ".friendlyFire", entry.getValue().isFriendlyFireAllowed());
-            clansStorage.set("clans.data." + entry.getKey() + ".clanPoints", entry.getValue().getClanPoints());
+            clansStorage.set("clans.data." + entry.getKey() + ".friendlyFire", entry.getValue().isFriendlyFire());
+            clansStorage.set("clans.data." + entry.getKey() + ".clanPoints", entry.getValue().getPoints());
             if (entry.getValue().getClanHomeWorld() != null){
                 clansStorage.set("clans.data." + entry.getKey() + ".clanHome.worldName", entry.getValue().getClanHomeWorld());
                 clansStorage.set("clans.data." + entry.getKey() + ".clanHome.x", entry.getValue().getClanHomeX());
@@ -54,9 +54,9 @@ public class FlatFileClanStorageUtils extends StorageUtils {
                 clansStorage.set("clans.data." + entry.getKey() + ".clanHome.pitch", entry.getValue().getClanHomePitch());
             }
             if (entry.getValue().getMaxAllowedProtectedChests() > 0){
-                HashMap<String, Chest> chests = entry.getValue().getProtectedChests();
+                HashMap<String, ProtectedChest> chests = entry.getValue().getProtectedChests();
                 clansStorage.set("clans.data." + entry.getKey() + ".maxAllowedProtectedChests", entry.getValue().getMaxAllowedProtectedChests());
-                for (Map.Entry<String, Chest> chestLocation : chests.entrySet()){
+                for (Map.Entry<String, ProtectedChest> chestLocation : chests.entrySet()){
                     if (chestLocation.getValue().getChestWorldName() == null){
                         console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("chest-location-save-failed-1")
                                 .replace("%CLAN%", chestLocation.getValue().getChestWorldName().toString())));
@@ -80,7 +80,7 @@ public class FlatFileClanStorageUtils extends StorageUtils {
     public void restoreClans() throws IOException {
         clansList.clear();
         clansStorage.getConfigurationSection("clans.data").getKeys(false).forEach(key ->{
-            HashMap<String, Chest> protectedChests = new HashMap<>();
+            HashMap<String, ProtectedChest> protectedChests = new HashMap<>();
             UUID uuid = UUID.fromString(key);
             String clanFinalName = clansStorage.getString("clans.data." + key + ".clanFinalName");
             String clanPrefix = clansStorage.getString("clans.data." + key + ".clanPrefix");
@@ -102,14 +102,14 @@ public class FlatFileClanStorageUtils extends StorageUtils {
 
             Clan clan = new Clan(key, clanFinalName);
             if (!clansStorage.getBoolean("name-strip-colour-complete")||clanFinalName.contains("&")||clanFinalName.contains("#")){
-                clan.setClanFinalName(stripClanNameColorCodes(clan));
+                clan.setName(stripClanNameColorCodes(clan));
             }
-            clan.setClanPrefix(clanPrefix);
+            clan.setPrefix(clanPrefix);
             clan.setClanMembers(clanMembers);
             clan.setClanAllies(clanAllies);
             clan.setClanEnemies(clanEnemies);
-            clan.setFriendlyFireAllowed(friendlyFire);
-            clan.setClanPoints(clanPoints);
+            clan.setFriendlyFire(friendlyFire);
+            clan.setPoints(clanPoints);
             if (clanHomeWorld != null){
                 clan.setClanHomeWorld(clanHomeWorld);
                 clan.setClanHomeX(clanHomeX);
@@ -133,7 +133,7 @@ public class FlatFileClanStorageUtils extends StorageUtils {
                     World world = Bukkit.getWorld(chestWorld);
                     if (world != null){
                         Location location = new Location(world, chestX, chestY, chestZ);
-                        Chest chest = new Chest(clan, location);
+                        ProtectedChest chest = new ProtectedChest(clan, location);
                         chest.setUUID(chestUUID);
                         chest.setChestLocationX(chestX);
                         chest.setChestLocationY(chestY);
@@ -227,10 +227,10 @@ public class FlatFileClanStorageUtils extends StorageUtils {
         String ownerUUID = uuid.toString();
         Clan clan = clansList.get(uuid);
         if (clan != null){
-            if (clan.getClanOwner() == null){
+            if (clan.getId() == null){
                 return false;
             }else {
-                if (clan.getClanOwner().equals(ownerUUID)){
+                if (clan.getId().equals(ownerUUID)){
                     return true;
                 }
             }
@@ -251,8 +251,8 @@ public class FlatFileClanStorageUtils extends StorageUtils {
     }
 
     @Override
-    public Clan findClanOwnerByClanPlayer(ClanPlayer clanPlayer) {
-        UUID uuid = UUID.fromString(clanPlayer.getJavaUUID());
+    public Clan findClanOwnerByClanPlayer(ClansLitePlayer clansLitePlayer) {
+        UUID uuid = UUID.fromString(clansLitePlayer.getJavaUUID());
         return clansList.get(uuid);
     }
 
@@ -262,8 +262,8 @@ public class FlatFileClanStorageUtils extends StorageUtils {
             if (findClanByOwner(player) != null) {
                 return clan;
             }
-            if (clan.getClanMembers() != null) {
-                for (String member : clan.getClanMembers()) {
+            if (clan.getMembers() != null) {
+                for (String member : clan.getMembers()) {
                     if (member.equals(player.getUniqueId().toString())) {
                         return clan;
                     }
@@ -279,8 +279,8 @@ public class FlatFileClanStorageUtils extends StorageUtils {
             if (findClanByOfflineOwner(player) != null){
                 return clan;
             }
-            if (clan.getClanMembers() != null){
-                for (String member : clan.getClanMembers()){
+            if (clan.getMembers() != null){
+                for (String member : clan.getMembers()){
                     if (member.equals(player.getUniqueId().toString())){
                         return clan;
                     }
@@ -291,14 +291,14 @@ public class FlatFileClanStorageUtils extends StorageUtils {
     }
 
     @Override
-    public Clan findClanPlayerByClanPlayer(ClanPlayer clanPlayer) {
+    public Clan findClanPlayerByClanPlayer(ClansLitePlayer clansLitePlayer) {
         for (Clan clan : clansList.values()){
-            if (findClanOwnerByClanPlayer(clanPlayer) != null){
+            if (findClanOwnerByClanPlayer(clansLitePlayer) != null){
                 return clan;
             }
-            if (clan.getClanMembers() != null){
-                for (String member : clan.getClanMembers()){
-                    if (member.equals(clanPlayer.getJavaUUID())){
+            if (clan.getMembers() != null){
+                for (String member : clan.getMembers()){
+                    if (member.equals(clansLitePlayer.getJavaUUID())){
                         return clan;
                     }
                 }
@@ -315,19 +315,19 @@ public class FlatFileClanStorageUtils extends StorageUtils {
             return;
         }
         Clan clan = clansList.get(uuid);
-        clan.setClanPrefix(prefix);
+        clan.setPrefix(prefix);
     }
 
     @Override
     public boolean addClanMember(Clan clan, Player player){
         UUID uuid = player.getUniqueId();
         String memberUUID = uuid.toString();
-        clan.addClanMember(memberUUID);
+        clan.addMember(memberUUID);
         if (clansConfig.getBoolean("protections.chests.enabled")){
-            HashMap<String, Chest> clanChestList = clan.getProtectedChests();
+            HashMap<String, ProtectedChest> clanChestList = clan.getProtectedChests();
             if (!clanChestList.isEmpty()){
-                for (Map.Entry<String, Chest> chestEntry : clanChestList.entrySet()){
-                    Chest chest = chestEntry.getValue();
+                for (Map.Entry<String, ProtectedChest> chestEntry : clanChestList.entrySet()){
+                    ProtectedChest chest = chestEntry.getValue();
                     ArrayList<String> playersWithAccess = chest.getPlayersWithAccess();
                     playersWithAccess.add(memberUUID);
                     chest.setPlayersWithAccess(playersWithAccess);
@@ -342,12 +342,12 @@ public class FlatFileClanStorageUtils extends StorageUtils {
     public boolean removeClanMember(Clan clan, Player player){
         UUID uuid = player.getUniqueId();
         String memberUUID = uuid.toString();
-        clan.removeClanMember(memberUUID);
+        clan.removeMember(memberUUID);
         if (clansConfig.getBoolean("protections.chests.enabled")){
-            HashMap<String, Chest> clanChestList = clan.getProtectedChests();
+            HashMap<String, ProtectedChest> clanChestList = clan.getProtectedChests();
             if (!clanChestList.isEmpty()){
-                for (Map.Entry<String, Chest> chestEntry : clanChestList.entrySet()){
-                    Chest chest = chestEntry.getValue();
+                for (Map.Entry<String, ProtectedChest> chestEntry : clanChestList.entrySet()){
+                    ProtectedChest chest = chestEntry.getValue();
                     ArrayList<String> playersWithAccess = chest.getPlayersWithAccess();
                     playersWithAccess.remove(memberUUID);
                     chest.setPlayersWithAccess(playersWithAccess);
@@ -362,12 +362,12 @@ public class FlatFileClanStorageUtils extends StorageUtils {
     public boolean removeOfflineClanMember(Clan clan, OfflinePlayer offlinePlayer){
         UUID offlineUUID = offlinePlayer.getUniqueId();
         String offlineMemberUUID = offlineUUID.toString();
-        clan.removeClanMember(offlineMemberUUID);
+        clan.removeMember(offlineMemberUUID);
         if (clansConfig.getBoolean("protections.chests.enabled")){
-            HashMap<String, Chest> clanChestList = clan.getProtectedChests();
+            HashMap<String, ProtectedChest> clanChestList = clan.getProtectedChests();
             if (!clanChestList.isEmpty()){
-                for (Map.Entry<String, Chest> chestEntry : clanChestList.entrySet()){
-                    Chest chest = chestEntry.getValue();
+                for (Map.Entry<String, ProtectedChest> chestEntry : clanChestList.entrySet()){
+                    ProtectedChest chest = chestEntry.getValue();
                     ArrayList<String> playersWithAccess = chest.getPlayersWithAccess();
                     playersWithAccess.add(offlineMemberUUID);
                     chest.setPlayersWithAccess(playersWithAccess);
@@ -384,7 +384,7 @@ public class FlatFileClanStorageUtils extends StorageUtils {
         UUID enemyUUID = enemyClanOwner.getUniqueId();
         String enemyOwnerUUID = enemyUUID.toString();
         Clan clan = clansList.get(ownerUUID);
-        clan.addClanEnemy(enemyOwnerUUID);
+        clan.addEnemy(enemyOwnerUUID);
     }
 
     @Override
@@ -393,7 +393,7 @@ public class FlatFileClanStorageUtils extends StorageUtils {
         UUID enemyUUID = enemyClanOwner.getUniqueId();
         String enemyOwnerUUID = enemyUUID.toString();
         Clan clan = clansList.get(ownerUUID);
-        clan.removeClanEnemy(enemyOwnerUUID);
+        clan.removeEnemy(enemyOwnerUUID);
     }
 
     @Override
@@ -402,7 +402,7 @@ public class FlatFileClanStorageUtils extends StorageUtils {
         UUID uuid = allyClanOwner.getUniqueId();
         String allyUUID = uuid.toString();
         Clan clan = clansList.get(ownerUUID);
-        clan.addClanAlly(allyUUID);
+        clan.addAlly(allyUUID);
     }
 
     @Override
@@ -411,7 +411,7 @@ public class FlatFileClanStorageUtils extends StorageUtils {
         UUID uuid = allyClanOwner.getUniqueId();
         String allyUUID = uuid.toString();
         Clan clan = clansList.get(ownerUUID);
-        clan.removeClanAlly(allyUUID);
+        clan.removeAlly(allyUUID);
     }
 
     @Override
@@ -424,7 +424,7 @@ public class FlatFileClanStorageUtils extends StorageUtils {
 
     @Override
     public void deleteHome(Clan clan){
-        String key = clan.getClanOwner();
+        String key = clan.getId();
         clan.setClanHomeWorld(null);
         clansStorage.set("clans.data." + key + ".clanHome", null);
         Clans.getPlugin().clansFileManager.saveClansConfig();
@@ -432,7 +432,7 @@ public class FlatFileClanStorageUtils extends StorageUtils {
 
     @Override
     public String stripClanNameColorCodes(Clan clan){
-        String clanFinalName = clan.getClanFinalName();
+        String clanFinalName = clan.getName();
         if (clansConfig.getBoolean("general.developer-debug-mode.enabled")||!clansStorage.getBoolean("name-strip-colour-complete")
                 ||clanFinalName.contains("&")||clanFinalName.contains("#")){
             console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFound Colour Code To Strip"));
@@ -451,13 +451,13 @@ public class FlatFileClanStorageUtils extends StorageUtils {
                     UUID originalOwnerUUID = originalClanOwner.getUniqueId();
                     UUID newOwnerUUID = newClanOwner.getUniqueId();
 
-                    String clanFinalName = originalClan.getClanFinalName();
-                    String clanPrefix = originalClan.getClanPrefix();
-                    ArrayList<String> clanMembers = new ArrayList<>(originalClan.getClanMembers());
-                    ArrayList<String> clanAllies = new ArrayList<>(originalClan.getClanAllies());
+                    String clanFinalName = originalClan.getName();
+                    String clanPrefix = originalClan.getPrefix();
+                    ArrayList<String> clanMembers = new ArrayList<>(originalClan.getMembers());
+                    ArrayList<String> clanAllies = new ArrayList<>(originalClan.getAllies());
                     ArrayList<String> clanEnemies = new ArrayList<>(originalClan.getClanEnemies());
-                    boolean friendlyFire = originalClan.isFriendlyFireAllowed();
-                    int clanPoints = originalClan.getClanPoints();
+                    boolean friendlyFire = originalClan.isFriendlyFire();
+                    int clanPoints = originalClan.getPoints();
                     String clanHomeWorld = originalClan.getClanHomeWorld();
                     double clanHomeX = originalClan.getClanHomeX();
                     double clanHomeY = originalClan.getClanHomeY();
@@ -465,15 +465,15 @@ public class FlatFileClanStorageUtils extends StorageUtils {
                     float clanHomeYaw = originalClan.getClanHomeYaw();
                     float clanHomePitch = originalClan.getClanHomePitch();
                     int maxAllowedProtectedChests = originalClan.getMaxAllowedProtectedChests();
-                    HashMap<String, Chest> protectedChests = originalClan.getProtectedChests();
+                    HashMap<String, ProtectedChest> protectedChests = originalClan.getProtectedChests();
 
                     Clan newClan = new Clan(newOwnerUUID.toString(), clanFinalName);
-                    newClan.setClanPrefix(clanPrefix);
+                    newClan.setPrefix(clanPrefix);
                     newClan.setClanMembers(clanMembers);
                     newClan.setClanAllies(clanAllies);
                     newClan.setClanEnemies(clanEnemies);
-                    newClan.setFriendlyFireAllowed(friendlyFire);
-                    newClan.setClanPoints(clanPoints);
+                    newClan.setFriendlyFire(friendlyFire);
+                    newClan.setPoints(clanPoints);
                     newClan.setClanHomeWorld(clanHomeWorld);
                     newClan.setClanHomeX(clanHomeX);
                     newClan.setClanHomeY(clanHomeY);
@@ -509,7 +509,7 @@ public class FlatFileClanStorageUtils extends StorageUtils {
 
     @Override
     public boolean hasEnoughPoints(Clan clan, int points){
-        if (clan.getClanPoints() >= points){
+        if (clan.getPoints() >= points){
             return true;
         }
         return false;
@@ -517,16 +517,16 @@ public class FlatFileClanStorageUtils extends StorageUtils {
 
     @Override
     public void addPoints(Clan clan, int points){
-        int currentPointValue = clan.getClanPoints();
-        clan.setClanPoints(currentPointValue + points);
+        int currentPointValue = clan.getPoints();
+        clan.setPoints(currentPointValue + points);
     }
 
     @Override
     public boolean withdrawPoints(Clan clan, int points){
-        int currentPointValue = clan.getClanPoints();
+        int currentPointValue = clan.getPoints();
         if (currentPointValue != 0){
             if (hasEnoughPoints(clan, points)){
-                clan.setClanPoints(currentPointValue - points);
+                clan.setPoints(currentPointValue - points);
                 return true;
             }
             return false;
@@ -536,16 +536,16 @@ public class FlatFileClanStorageUtils extends StorageUtils {
 
     @Override
     public void setPoints(Clan clan, int points){
-        clan.setClanPoints(points);
+        clan.setPoints(points);
     }
 
     @Override
     public void resetPoints(Clan clan){
-        clan.setClanPoints(0);
+        clan.setPoints(0);
     }
 
     @Override
-    public Location getChestLocation(Chest chest){
+    public Location getChestLocation(ProtectedChest chest){
         String worldName = chest.getChestWorldName();
         double chestX = chest.getChestLocationX();
         double chestY = chest.getChestLocationY();
@@ -559,8 +559,8 @@ public class FlatFileClanStorageUtils extends StorageUtils {
 
     @Override
     public boolean isChestLocked(Clan clan, Location location){
-        HashMap<String, Chest> clanChestList = clan.getProtectedChests();
-        for (Map.Entry<String, Chest> chest : clanChestList.entrySet()){
+        HashMap<String, ProtectedChest> clanChestList = clan.getProtectedChests();
+        for (Map.Entry<String, ProtectedChest> chest : clanChestList.entrySet()){
             Location chestLocation = getChestLocation(chest.getValue());
             if (chestLocation != null){
                 if (chestLocation.equals(location)){
@@ -573,8 +573,8 @@ public class FlatFileClanStorageUtils extends StorageUtils {
 
     @Override
     public boolean isChestLocked(Location location){
-        List<Chest> allChests = getGlobalLockedChests();
-        for (Chest chest : allChests){
+        List<ProtectedChest> allChests = getGlobalLockedChests();
+        for (ProtectedChest chest : allChests){
             if (chest != null){
                 String worldName = chest.getChestWorldName();
                 World world = Bukkit.getWorld(worldName);
@@ -589,14 +589,14 @@ public class FlatFileClanStorageUtils extends StorageUtils {
 
     @Override
     public boolean addProtectedChest(Clan clan, Location location, Player player){
-        HashMap<String, Chest> clanChestList = clan.getProtectedChests();
+        HashMap<String, ProtectedChest> clanChestList = clan.getProtectedChests();
         if (isChestLocked(clan, location)){
             player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("failed-chest-already-protected")));
             return false;
         }else {
             UUID newChestUUID = UUID.randomUUID();
             String chestUUID = newChestUUID.toString();
-            Chest chest = new Chest(clan, location);
+            ProtectedChest chest = new ProtectedChest(clan, location);
             clanChestList.put(chestUUID, chest);
             return true;
         }
@@ -606,10 +606,10 @@ public class FlatFileClanStorageUtils extends StorageUtils {
     public boolean removeProtectedChest(String clanOwnerUUID, Location location) throws IOException{
         UUID uuid = UUID.fromString(clanOwnerUUID);
         Clan clan = findClanByOfflineOwner(Bukkit.getOfflinePlayer(uuid));
-        String key = clan.getClanOwner();
-        HashMap<String, Chest> clanChestList = clan.getProtectedChests();
+        String key = clan.getId();
+        HashMap<String, ProtectedChest> clanChestList = clan.getProtectedChests();
         if (isChestLocked(clan, location)){
-            for (Map.Entry<String, Chest> chest : clanChestList.entrySet()){
+            for (Map.Entry<String, ProtectedChest> chest : clanChestList.entrySet()){
                 String worldName = chest.getValue().getChestWorldName();
                 World world = Bukkit.getWorld(worldName);
                 Location chestLocation = new Location(world, chest.getValue().getChestLocationX(), chest.getValue().getChestLocationY(), chest.getValue().getChestLocationZ());
@@ -617,7 +617,7 @@ public class FlatFileClanStorageUtils extends StorageUtils {
                     String chestUUID = chest.getKey();
                     clanChestList.remove(chestUUID);
                     clan.setProtectedChests(clanChestList);
-                    clansList.replace(UUID.fromString(clan.getClanOwner()), clan);
+                    clansList.replace(UUID.fromString(clan.getId()), clan);
                     clansStorage.set("clans.data." + key + ".protectedChests." + chestUUID, null);
                     Clans.getPlugin().clansFileManager.saveClansConfig();
                     return true;
@@ -629,7 +629,7 @@ public class FlatFileClanStorageUtils extends StorageUtils {
 
     @Override
     public boolean removeProtectedChest(Clan clan, Location location, Player player) throws IOException{
-        String key = clan.getClanOwner();
+        String key = clan.getId();
         if (isChestLocked(clan, location)){
             if (removeProtectedChest(key, location)){
                 return true;
@@ -652,14 +652,14 @@ public class FlatFileClanStorageUtils extends StorageUtils {
     }
 
     @Override
-    public Set<Map.Entry<String, Chest>> getAllProtectedChestsByClan(Clan clan){
+    public Set<Map.Entry<String, ProtectedChest>> getAllProtectedChestsByClan(Clan clan){
         return clan.getProtectedChests().entrySet();
     }
 
     @Override
     public Location getChestByLocation(Clan clan, Location location){
-        HashMap<String, Chest> clanChestList = clan.getProtectedChests();
-        for (Map.Entry<String, Chest> chest : clanChestList.entrySet()){
+        HashMap<String, ProtectedChest> clanChestList = clan.getProtectedChests();
+        for (Map.Entry<String, ProtectedChest> chest : clanChestList.entrySet()){
             String worldName = chest.getValue().getChestWorldName();
             World world = Bukkit.getWorld(worldName);
             Location chestLocation = new Location(world, chest.getValue().getChestLocationX(), chest.getValue().getChestLocationY(), chest.getValue().getChestLocationZ());
@@ -671,9 +671,9 @@ public class FlatFileClanStorageUtils extends StorageUtils {
     }
 
     @Override
-    public Chest getChestByLocation(Location location){
-        List<Chest> allChests = getGlobalLockedChests();
-        for (Chest chest : allChests){
+    public ProtectedChest getChestByLocation(Location location){
+        List<ProtectedChest> allChests = getGlobalLockedChests();
+        for (ProtectedChest chest : allChests){
             String worldName = chest.getChestWorldName();
             World world = Bukkit.getWorld(worldName);
             Location chestLocation = new Location(world, chest.getChestLocationX(), chest.getChestLocationY(), chest.getChestLocationZ());
@@ -686,9 +686,9 @@ public class FlatFileClanStorageUtils extends StorageUtils {
 
     @Override
     public List<Location> getAllProtectedChestsLocationsByClan(Clan clan){
-        HashMap<String, Chest> clanChestList = clan.getProtectedChests();
+        HashMap<String, ProtectedChest> clanChestList = clan.getProtectedChests();
         List<Location> allChestLocations = new ArrayList<>();
-        for (Map.Entry<String, Chest> chest : clanChestList.entrySet()){
+        for (Map.Entry<String, ProtectedChest> chest : clanChestList.entrySet()){
             String worldName = chest.getValue().getChestWorldName();
             World world = Bukkit.getWorld(worldName);
             Location chestLocation = new Location(world, chest.getValue().getChestLocationX(), chest.getValue().getChestLocationY(), chest.getValue().getChestLocationZ());
@@ -698,12 +698,12 @@ public class FlatFileClanStorageUtils extends StorageUtils {
     }
 
     @Override
-    public List<String> getPlayersWithChestAccessByChest(Chest chest){
+    public List<String> getPlayersWithChestAccessByChest(ProtectedChest chest){
         return chest.getPlayersWithAccess();
     }
 
     @Override
-    public List<OfflinePlayer> getOfflinePlayersWithChestAccessByChest(Chest chest){
+    public List<OfflinePlayer> getOfflinePlayersWithChestAccessByChest(ProtectedChest chest){
         List<String> playersWithAccess = getPlayersWithChestAccessByChest(chest);
         List<OfflinePlayer> offlinePlayersWithAccess = new ArrayList<>();
         for (String string : playersWithAccess){
@@ -715,15 +715,15 @@ public class FlatFileClanStorageUtils extends StorageUtils {
     }
 
     @Override
-    public boolean hasAccessToLockedChest(OfflinePlayer offlinePlayer, Chest chest){
+    public boolean hasAccessToLockedChest(OfflinePlayer offlinePlayer, ProtectedChest chest){
         return getOfflinePlayersWithChestAccessByChest(chest).contains(offlinePlayer);
     }
 
     @Override
     public List<Location> getGlobalLockedChestLocations(){
-        List<Chest> allLockedChest = getGlobalLockedChests();
+        List<ProtectedChest> allLockedChest = getGlobalLockedChests();
         List<Location> allLockedChestLocations = new ArrayList<>();
-        for (Chest chest : allLockedChest){
+        for (ProtectedChest chest : allLockedChest){
             String worldName = chest.getChestWorldName();
             World world = Bukkit.getWorld(worldName);
             Location location = new Location(world, chest.getChestLocationX(), chest.getChestLocationY(), chest.getChestLocationZ());
@@ -733,10 +733,10 @@ public class FlatFileClanStorageUtils extends StorageUtils {
     }
 
     @Override
-    public List<Chest> getGlobalLockedChests(){
-        List<Chest> allLockedChests = new ArrayList<>();
+    public List<ProtectedChest> getGlobalLockedChests(){
+        List<ProtectedChest> allLockedChests = new ArrayList<>();
         for (Clan clan : clansList.values()){
-            for (Map.Entry<String, Chest> chests : clan.getProtectedChests().entrySet()){
+            for (Map.Entry<String, ProtectedChest> chests : clan.getProtectedChests().entrySet()){
                 allLockedChests.add(chests.getValue());
             }
         }
@@ -760,13 +760,13 @@ public class FlatFileClanStorageUtils extends StorageUtils {
 
     private void fireClanDisbandEvent(Player player) {
         Clan clanByOwner = this.findClanByOwner(player);
-        ClanDisbandEvent clanDisbandEvent = new ClanDisbandEvent(player, clanByOwner.getClanFinalName());
+        ClanDisbandEvent clanDisbandEvent = new ClanDisbandEvent(player, clanByOwner.getName());
         Bukkit.getPluginManager().callEvent(clanDisbandEvent);
     }
 
     private void fireOfflineClanDisbandEvent(OfflinePlayer offlinePlayer){
         Clan clanByOfflineOwner = this.findClanByOfflineOwner(offlinePlayer);
-        ClanOfflineDisbandEvent clanOfflineDisbandEvent = new ClanOfflineDisbandEvent(offlinePlayer, clanByOfflineOwner.getClanFinalName());
+        ClanOfflineDisbandEvent clanOfflineDisbandEvent = new ClanOfflineDisbandEvent(offlinePlayer, clanByOfflineOwner.getName());
         Bukkit.getPluginManager().callEvent(clanOfflineDisbandEvent);
     }
 

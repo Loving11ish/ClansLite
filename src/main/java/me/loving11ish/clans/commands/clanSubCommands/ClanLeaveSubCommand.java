@@ -24,7 +24,7 @@ public class ClanLeaveSubCommand {
             Clan targetClan = ClansStorageUtil.findClanByPlayer(player);
             if (targetClan != null) {
                 if (ClansStorageUtil.removeClanMember(targetClan, player)){
-                    String leaveMessage = ColorUtils.translateColorCodes(messagesConfig.getString("clan-leave-successful")).replace(CLAN_PLACEHOLDER, targetClan.getClanFinalName());
+                    String leaveMessage = ColorUtils.translateColorCodes(messagesConfig.getString("clan-leave-successful")).replace(CLAN_PLACEHOLDER, targetClan.getName());
                     player.sendMessage(leaveMessage);
                 }else {
                     player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-leave-failed")));

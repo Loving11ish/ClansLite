@@ -41,13 +41,13 @@ public class ClanEnemySubCommand {
                                     if (ClansStorageUtil.findClanByOwner(enemyClanOwner) != null){
                                         if (ClansStorageUtil.findClanByOwner(player) != ClansStorageUtil.findClanByOwner(enemyClanOwner)){
                                             Clan enemyClan = ClansStorageUtil.findClanByOwner(enemyClanOwner);
-                                            String enemyOwnerUUIDString = enemyClan.getClanOwner();
+                                            String enemyOwnerUUIDString = enemyClan.getId();
                                             if (ClansStorageUtil.findClanByOwner(player).getClanEnemies().size() >= clansConfig.getInt("max-clan-enemies")){
                                                 int maxSize = clansConfig.getInt("max-clan-enemies");
                                                 player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-enemy-max-amount-reached")).replace("%LIMIT%", String.valueOf(maxSize)));
                                                 return true;
                                             }
-                                            if (clan.getClanAllies().contains(enemyOwnerUUIDString)){
+                                            if (clan.getAllies().contains(enemyOwnerUUIDString)){
                                                 player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("failed-cannot-enemy-allied-clan")));
                                                 return true;
                                             }
@@ -60,11 +60,11 @@ public class ClanEnemySubCommand {
                                                 if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
                                                     console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanEnemyAddEvent"));
                                                 }
-                                                player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("added-clan-to-your-enemies").replace(ENEMY_CLAN, enemyClan.getClanFinalName())));
+                                                player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("added-clan-to-your-enemies").replace(ENEMY_CLAN, enemyClan.getName())));
                                                 String titleMain = ColorUtils.translateColorCodes(messagesConfig.getString("added-enemy-clan-to-your-enemies-title-1").replace(CLAN_OWNER, enemyClanOwner.getName()));
                                                 String titleAux = ColorUtils.translateColorCodes(messagesConfig.getString("added-enemy-clan-to-your-enemies-title-2").replace(CLAN_OWNER, enemyClanOwner.getName()));
                                                 player.sendTitle(titleMain, titleAux, 10, 70, 20);
-                                                ArrayList<String> playerClanMembers = ClansStorageUtil.findClanByOwner(player).getClanMembers();
+                                                ArrayList<String> playerClanMembers = ClansStorageUtil.findClanByOwner(player).getMembers();
                                                 for (String playerClanMember : playerClanMembers){
                                                     if (playerClanMember != null){
                                                         UUID memberUUID = UUID.fromString(playerClanMember);
@@ -80,7 +80,7 @@ public class ClanEnemySubCommand {
                                                 String titleMainEnemy = ColorUtils.translateColorCodes(messagesConfig.getString("clan-added-to-other-enemies-title-1").replace(CLAN_OWNER, player.getName()));
                                                 String titleAuxEnemy = ColorUtils.translateColorCodes(messagesConfig.getString("clan-added-to-other-enemies-title-2").replace(CLAN_OWNER, player.getName()));
                                                 enemyClanOwner.sendTitle(titleMainEnemy, titleAuxEnemy, 10, 70, 20);
-                                                ArrayList<String> enemyClanMembers = enemyClan.getClanMembers();
+                                                ArrayList<String> enemyClanMembers = enemyClan.getMembers();
                                                 for (String enemyClanMember : enemyClanMembers){
                                                     if (enemyClanMember != null) {
                                                         UUID memberUUID = UUID.fromString(enemyClanMember);
@@ -127,11 +127,11 @@ public class ClanEnemySubCommand {
                                                 console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanEnemyRemoveEvent"));
                                             }
                                             ClansStorageUtil.removeClanEnemy(player, enemyClanOwner);
-                                            player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("removed-clan-from-your-enemies").replace(ENEMY_CLAN, enemyClan.getClanFinalName())));
+                                            player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("removed-clan-from-your-enemies").replace(ENEMY_CLAN, enemyClan.getName())));
                                             String titleMain = ColorUtils.translateColorCodes(messagesConfig.getString("removed-enemy-clan-from-your-enemies-title-1").replace(CLAN_OWNER, enemyClanOwner.getName()));
                                             String titleAux = ColorUtils.translateColorCodes(messagesConfig.getString("removed-enemy-clan-from-your-enemies-title-1").replace(CLAN_OWNER, enemyClanOwner.getName()));
                                             player.sendTitle(titleMain, titleAux, 10, 70, 20);
-                                            ArrayList<String> playerClanMembers = ClansStorageUtil.findClanByOwner(player).getClanMembers();
+                                            ArrayList<String> playerClanMembers = ClansStorageUtil.findClanByOwner(player).getMembers();
                                             for (String playerClanMember : playerClanMembers){
                                                 if (playerClanMember != null){
                                                     UUID memberUUID = UUID.fromString(playerClanMember);
@@ -146,7 +146,7 @@ public class ClanEnemySubCommand {
                                                 String titleMainEnemy = ColorUtils.translateColorCodes(messagesConfig.getString("clan-removed-from-other-enemies-title-1").replace(CLAN_OWNER, player.getName()));
                                                 String titleAuxEnemy = ColorUtils.translateColorCodes(messagesConfig.getString("clan-removed-from-other-enemies-title-2").replace(CLAN_OWNER, player.getName()));
                                                 enemyClanOwner.sendTitle(titleMainEnemy, titleAuxEnemy, 10, 70, 20);
-                                                ArrayList<String> enemyClanMembers = enemyClan.getClanMembers();
+                                                ArrayList<String> enemyClanMembers = enemyClan.getMembers();
                                                 for (String enemyClanMember : enemyClanMembers){
                                                     if (enemyClanMember != null) {
                                                         UUID memberUUID = UUID.fromString(enemyClanMember);

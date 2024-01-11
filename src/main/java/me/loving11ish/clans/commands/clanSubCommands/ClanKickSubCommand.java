@@ -35,7 +35,7 @@ public class ClanKickSubCommand {
                                         String playerKickedMessage = ColorUtils.translateColorCodes(messagesConfig.getString("clan-member-kick-successful")).replace(PLAYER_TO_KICK, args[1]);
                                         player.sendMessage(playerKickedMessage);
                                         if (playerToKick.isOnline()) {
-                                            String kickMessage = ColorUtils.translateColorCodes(messagesConfig.getString("clan-kicked-player-message")).replace(CLAN_PLACEHOLDER, targetClan.getClanFinalName());
+                                            String kickMessage = ColorUtils.translateColorCodes(messagesConfig.getString("clan-kicked-player-message")).replace(CLAN_PLACEHOLDER, targetClan.getName());
                                             playerToKick.sendMessage(kickMessage);
                                             return true;
                                         }

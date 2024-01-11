@@ -25,7 +25,7 @@ public class ClanPrefixSubCommand {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             clans.forEach((clans) ->
-                    clansPrefixList.add(clans.getValue().getClanPrefix()));
+                    clansPrefixList.add(clans.getValue().getPrefix()));
             if (args.length == 2) {
                 if (bannedTags.contains(args[1])){
                     player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-prefix-is-banned").replace("%CLANPREFIX%", args[1])));
@@ -43,7 +43,7 @@ public class ClanPrefixSubCommand {
                     if (args[1].length() >= MIN_CHAR_LIMIT && args[1].length() <= MAX_CHAR_LIMIT) {
                         Clan playerClan = ClansStorageUtil.findClanByOwner(player);
                         ClansStorageUtil.updatePrefix(player, args[1]);
-                        String prefixConfirmation = ColorUtils.translateColorCodes(messagesConfig.getString("clan-prefix-change-successful")).replace("%CLANPREFIX%", playerClan.getClanPrefix());
+                        String prefixConfirmation = ColorUtils.translateColorCodes(messagesConfig.getString("clan-prefix-change-successful")).replace("%CLANPREFIX%", playerClan.getPrefix());
                         sender.sendMessage(prefixConfirmation);
                         clansPrefixList.clear();
                         return true;

@@ -6,7 +6,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import me.loving11ish.clans.Clans;
-import me.loving11ish.clans.models.ClanPlayer;
+import me.loving11ish.clans.models.ClansLitePlayer;
 import me.loving11ish.clans.utils.ColorUtils;
 import me.loving11ish.clans.utils.UsermapStorageUtil;
 
@@ -36,9 +36,9 @@ public class ClanPlayerPointsSubCommand {
                     }
                 }
             }else {
-                ClanPlayer clanPlayer = UsermapStorageUtil.getClanPlayerByBukkitPlayer(player);
-                if (clanPlayer != null){
-                    int playerPointValue = clanPlayer.getPointBalance();
+                ClansLitePlayer clansLitePlayer = UsermapStorageUtil.getClanPlayerByBukkitPlayer(player);
+                if (clansLitePlayer != null){
+                    int playerPointValue = clansLitePlayer.getPointBalance();
                     player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("player-points-list-command")
                             .replace(POINT_PLACEHOLDER, String.valueOf(playerPointValue))));
                 }
@@ -58,10 +58,10 @@ public class ClanPlayerPointsSubCommand {
     }
 
     private boolean listAllPoints(CommandSender sender){
-        HashMap<UUID, ClanPlayer> allUsersMap = new HashMap<>(UsermapStorageUtil.getUsermap());
+        HashMap<UUID, ClansLitePlayer> allUsersMap = new HashMap<>(UsermapStorageUtil.getUsermap());
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(ColorUtils.translateColorCodes(messagesConfig.getString("all-points-list-header")));
-        for (Map.Entry<UUID, ClanPlayer> entry : allUsersMap.entrySet()){
+        for (Map.Entry<UUID, ClansLitePlayer> entry : allUsersMap.entrySet()){
             String clanPlayerName = entry.getValue().getLastPlayerName();
             String clanPlayerPointBalance = String.valueOf(entry.getValue().getPointBalance());
             stringBuilder.append(ColorUtils.translateColorCodes(messagesConfig.getString("all-points-list-entry")

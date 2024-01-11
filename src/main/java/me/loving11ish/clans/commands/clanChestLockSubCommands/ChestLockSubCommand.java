@@ -14,7 +14,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import me.loving11ish.clans.Clans;
 import me.loving11ish.clans.api.events.ChestLockEvent;
-import me.loving11ish.clans.models.Chest;
+import me.loving11ish.clans.models.ProtectedChest;
 import me.loving11ish.clans.models.Clan;
 import me.loving11ish.clans.utils.ClansStorageUtil;
 import me.loving11ish.clans.utils.ColorUtils;
@@ -94,8 +94,8 @@ public class ChestLockSubCommand {
                     .replace(Z_PLACEHOLDER, String.valueOf(z))));
             TileState tileState = (TileState) block.getState();
             PersistentDataContainer container = tileState.getPersistentDataContainer();
-            container.set(new NamespacedKey(Clans.getPlugin(), "owningClanName"), PersistentDataType.STRING, clan.getClanFinalName());
-            container.set(new NamespacedKey(Clans.getPlugin(), "owningClanOwnerUUID"), PersistentDataType.STRING, clan.getClanOwner());
+            container.set(new NamespacedKey(Clans.getPlugin(), "owningClanName"), PersistentDataType.STRING, clan.getName());
+            container.set(new NamespacedKey(Clans.getPlugin(), "owningClanOwnerUUID"), PersistentDataType.STRING, clan.getId());
             tileState.update();
             fireChestLockEvent(player, clan, ClansStorageUtil.getChestByLocation(location));
             if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
@@ -104,7 +104,7 @@ public class ChestLockSubCommand {
         }
     }
 
-    private static void fireChestLockEvent(Player player, Clan clan, Chest chest){
+    private static void fireChestLockEvent(Player player, Clan clan, ProtectedChest chest){
         ChestLockEvent chestLockEvent = new ChestLockEvent(player, clan, chest);
         Bukkit.getPluginManager().callEvent(chestLockEvent);
     }

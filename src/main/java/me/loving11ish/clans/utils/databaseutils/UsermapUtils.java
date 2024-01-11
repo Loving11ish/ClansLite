@@ -1,6 +1,6 @@
 package me.loving11ish.clans.utils.databaseutils;
 
-import me.loving11ish.clans.models.ClanPlayer;
+import me.loving11ish.clans.models.ClansLitePlayer;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
@@ -22,9 +22,9 @@ public abstract class UsermapUtils {
 
     public abstract boolean isUserExisting(Player player);
 
-    public abstract ClanPlayer getClanPlayerByBukkitPlayer(Player player);
+    public abstract ClansLitePlayer getClanPlayerByBukkitPlayer(Player player);
 
-    public abstract ClanPlayer getClanPlayerByBukkitOfflinePlayer(OfflinePlayer offlinePlayer);
+    public abstract ClansLitePlayer getClanPlayerByBukkitOfflinePlayer(OfflinePlayer offlinePlayer);
 
     public abstract Player getBukkitPlayerByName(String name);
 
@@ -60,5 +60,5 @@ public abstract class UsermapUtils {
 
     public abstract List<String> getAllPlayerPointsValues();
 
-    public abstract Map<UUID, ClanPlayer> getUsermap();
+    public abstract Map<UUID, ClansLitePlayer> getUsermap();
 }

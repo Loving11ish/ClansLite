@@ -34,7 +34,7 @@ public class ClanTransferOwnerSubCommand {
                                         player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-ownership-transfer-successful")
                                                 .replace(PLAYER_PLACEHOLDER, newClanOwner.getName())));
                                         newClanOwner.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-ownership-transfer-new-owner")
-                                                .replace(OLD_OWNER_PLACEHOLDER, player.getName()).replace(NEW_CLAN_NAME, newClan.getClanFinalName())));
+                                                .replace(OLD_OWNER_PLACEHOLDER, player.getName()).replace(NEW_CLAN_NAME, newClan.getName())));
                                         return true;
                                     }
                                 }catch (IOException e) {

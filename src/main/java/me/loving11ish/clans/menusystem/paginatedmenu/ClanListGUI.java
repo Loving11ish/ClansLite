@@ -62,7 +62,7 @@ public class ClanListGUI extends PaginatedMenu {
                 return;
             }
             if (onlineClanPlayer != null){
-                UUID ownerUUID = UUID.fromString(onlineClanPlayer.getClanOwner());
+                UUID ownerUUID = UUID.fromString(onlineClanPlayer.getId());
                 if (ownerUUID.equals(target)){
                     player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-invite-failed-own-clan")));
                     return;
@@ -127,7 +127,7 @@ public class ClanListGUI extends PaginatedMenu {
                             if (clans.get(index) != null) {
 
                                 //Create an item from our collection and place it into the inventory
-                                String clanOwnerUUIDString = clans.get(i).getClanOwner();
+                                String clanOwnerUUIDString = clans.get(i).getId();
                                 UUID ownerUUID = UUID.fromString(clanOwnerUUIDString);
                                 OfflinePlayer clanOwnerPlayer = UsermapStorageUtil.getBukkitOfflinePlayerByUUID(ownerUUID);
                                 if (clanOwnerPlayer == null){
@@ -148,7 +148,7 @@ public class ClanListGUI extends PaginatedMenu {
 
                                 ItemMeta meta = playerHead.getItemMeta();
                                 if (guiConfig.getBoolean("clan-list.icons.icon-display-name.use-clan-name")){
-                                    String displayName = ColorUtils.translateColorCodes(clan.getClanFinalName());
+                                    String displayName = ColorUtils.translateColorCodes(clan.getName());
                                     meta.setDisplayName(displayName);
                                 }else {
                                     meta.setDisplayName(" ");
@@ -156,11 +156,11 @@ public class ClanListGUI extends PaginatedMenu {
 
 
                                 ArrayList<String> lore = new ArrayList<>();
-                                ArrayList<String> clanMembersList = clan.getClanMembers();
-                                ArrayList<String> clanAlliesList = clan.getClanAllies();
+                                ArrayList<String> clanMembersList = clan.getMembers();
+                                ArrayList<String> clanAlliesList = clan.getAllies();
                                 ArrayList<String> clanEnemiesList = clan.getClanEnemies();
                                 lore.add(ColorUtils.translateColorCodes(guiConfig.getString("clan-list.icons.lore.header")));
-                                lore.add(ColorUtils.translateColorCodes(guiConfig.getString("clan-list.icons.lore.prefix") + clan.getClanPrefix()));
+                                lore.add(ColorUtils.translateColorCodes(guiConfig.getString("clan-list.icons.lore.prefix") + clan.getPrefix()));
                                 if (clanOwnerPlayer.isOnline()){
                                     lore.add(ColorUtils.translateColorCodes(guiConfig.getString("clan-list.icons.lore.owner-online") + clanOwnerPlayer.getName()));
                                 }else {
@@ -207,7 +207,7 @@ public class ClanListGUI extends PaginatedMenu {
                                 lore.add(ColorUtils.translateColorCodes(guiConfig.getString("clan-list.icons.lore.footer-2")));
 
                                 meta.setLore(lore);
-                                meta.getPersistentDataContainer().set(new NamespacedKey(Clans.getPlugin(), "uuid"), PersistentDataType.STRING, clan.getClanOwner());
+                                meta.getPersistentDataContainer().set(new NamespacedKey(Clans.getPlugin(), "uuid"), PersistentDataType.STRING, clan.getId());
 
                                 playerHead.setItemMeta(meta);
 
@@ -232,7 +232,7 @@ public class ClanListGUI extends PaginatedMenu {
                     if (clans.get(index) != null) {
 
                         //Create an item from our collection and place it into the inventory
-                        String clanOwnerUUIDString = clans.get(i).getClanOwner();
+                        String clanOwnerUUIDString = clans.get(i).getId();
                         UUID ownerUUID = UUID.fromString(clanOwnerUUIDString);
                         OfflinePlayer clanOwnerPlayer = UsermapStorageUtil.getBukkitOfflinePlayerByUUID(ownerUUID);
                         if (clanOwnerPlayer == null){
@@ -252,15 +252,15 @@ public class ClanListGUI extends PaginatedMenu {
                         }
 
                         ItemMeta meta = playerHead.getItemMeta();
-                        String displayName = ColorUtils.translateColorCodes(clan.getClanFinalName());
+                        String displayName = ColorUtils.translateColorCodes(clan.getName());
                         meta.setDisplayName(displayName);
 
                         ArrayList<String> lore = new ArrayList<>();
-                        ArrayList<String> clanMembersList = clan.getClanMembers();
-                        ArrayList<String> clanAlliesList = clan.getClanAllies();
+                        ArrayList<String> clanMembersList = clan.getMembers();
+                        ArrayList<String> clanAlliesList = clan.getAllies();
                         ArrayList<String> clanEnemiesList = clan.getClanEnemies();
                         lore.add(ColorUtils.translateColorCodes(guiConfig.getString("clan-list.icons.lore.header")));
-                        lore.add(ColorUtils.translateColorCodes(guiConfig.getString("clan-list.icons.lore.prefix") + clan.getClanPrefix()));
+                        lore.add(ColorUtils.translateColorCodes(guiConfig.getString("clan-list.icons.lore.prefix") + clan.getPrefix()));
                         if (clanOwnerPlayer.isOnline()){
                             lore.add(ColorUtils.translateColorCodes(guiConfig.getString("clan-list.icons.lore.owner-online") + clanOwnerPlayer.getName()));
                         }else {
@@ -307,7 +307,7 @@ public class ClanListGUI extends PaginatedMenu {
                         lore.add(ColorUtils.translateColorCodes(guiConfig.getString("clan-list.icons.lore.footer-2")));
 
                         meta.setLore(lore);
-                        meta.getPersistentDataContainer().set(new NamespacedKey(Clans.getPlugin(), "uuid"), PersistentDataType.STRING, clan.getClanOwner());
+                        meta.getPersistentDataContainer().set(new NamespacedKey(Clans.getPlugin(), "uuid"), PersistentDataType.STRING, clan.getId());
 
                         playerHead.setItemMeta(meta);
 

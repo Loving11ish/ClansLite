@@ -60,7 +60,7 @@ public class PlayerKillEvent implements Listener {
                         Clan killerClanOwner = ClansStorageUtil.findClanByOwner(killer);
                         Clan victimClanOwner = ClansStorageUtil.findClanByOwner(victim);
                         if (killerClanOwner != null||victimClanOwner != null){
-                            if (killerClanOwner.getClanEnemies().contains(victimClanOwner.getClanOwner())||victimClanOwner.getClanEnemies().contains(killerClanOwner.getClanOwner())) {
+                            if (killerClanOwner.getClanEnemies().contains(victimClanOwner.getId())||victimClanOwner.getClanEnemies().contains(killerClanOwner.getId())) {
                                 killer.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("player-points-killer-enemy-received-success")
                                         .replace("%PLAYER%", victim.getName()).replace("%ENEMYPOINTVALUE%", enemyPointValue.toString())));
                                 if (clansConfig.getBoolean("points.player-points.take-points-from-victim")) {
@@ -106,7 +106,7 @@ public class PlayerKillEvent implements Listener {
                             Clan victimClan = ClansStorageUtil.findClanByPlayer(victim);
                             if (killerClan != null||victimClan != null){
                                 if (killerClan.getClanEnemies() != null && !killerClan.getClanEnemies().isEmpty() || victimClan.getClanEnemies() != null && !victimClan.getClanEnemies().isEmpty()){
-                                    if (killerClan.getClanEnemies().contains(victimClan.getClanOwner()) || victimClan.getClanEnemies().contains(killerClan.getClanOwner())) {
+                                    if (killerClan.getClanEnemies().contains(victimClan.getId()) || victimClan.getClanEnemies().contains(killerClan.getId())) {
                                         killer.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("player-points-killer-enemy-received-success")
                                                 .replace("%PLAYER%", victim.getName()).replace("%ENEMYPOINTVALUE%", enemyPointValue.toString())));
                                         if (clansConfig.getBoolean("points.player-points.take-points-from-victim")) {

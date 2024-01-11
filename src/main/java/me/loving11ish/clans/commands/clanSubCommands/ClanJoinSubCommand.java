@@ -38,27 +38,27 @@ public class ClanJoinSubCommand {
                 if (clan != null) {
                     if (ClansStorageUtil.addClanMember(clan, player)) {
                         ClanInviteUtil.removeInvite(inviterUUIDString.get());
-                        String joinMessage = ColorUtils.translateColorCodes(messagesConfig.getString("clan-join-successful")).replace(CLAN_PLACEHOLDER, clan.getClanFinalName());
+                        String joinMessage = ColorUtils.translateColorCodes(messagesConfig.getString("clan-join-successful")).replace(CLAN_PLACEHOLDER, clan.getName());
                         player.sendMessage(joinMessage);
                         if (clansConfig.getBoolean("clan-join.announce-to-all")){
                             if (clansConfig.getBoolean("clan-join.send-as-title")){
                                 for (Player onlinePlayers : Clans.connectedPlayers.keySet()){
                                     onlinePlayers.sendTitle(ColorUtils.translateColorCodes(messagesConfig.getString("clan-join-broadcast-title-1")
                                                     .replace(PLAYER_PLACEHOLDER, player.getName())
-                                                    .replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clan.getClanFinalName()))),
+                                                    .replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clan.getName()))),
                                             ColorUtils.translateColorCodes(messagesConfig.getString("clan-join-broadcast-title-2")
                                                     .replace(PLAYER_PLACEHOLDER, player.getName())
-                                                    .replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clan.getClanFinalName()))),
+                                                    .replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clan.getName()))),
                                             30, 30, 30);
                                 }
                             }else {
                                 Bukkit.broadcastMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-join-broadcast-chat")
                                         .replace(PLAYER_PLACEHOLDER, player.getName())
-                                        .replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clan.getClanFinalName()))));
+                                        .replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clan.getName()))));
                             }
                         }
                     }else {
-                        String failureMessage = ColorUtils.translateColorCodes(messagesConfig.getString("clan-join-failed")).replace(CLAN_PLACEHOLDER, clan.getClanFinalName());
+                        String failureMessage = ColorUtils.translateColorCodes(messagesConfig.getString("clan-join-failed")).replace(CLAN_PLACEHOLDER, clan.getName());
                         player.sendMessage(failureMessage);
                     }
                 }else {

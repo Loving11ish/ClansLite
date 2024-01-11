@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import org.geysermc.floodgate.api.player.FloodgatePlayer;
 import me.loving11ish.clans.Clans;
 import me.loving11ish.clans.api.events.ClanChatSpyToggledEvent;
-import me.loving11ish.clans.models.ClanPlayer;
+import me.loving11ish.clans.models.ClansLitePlayer;
 
 import java.io.IOException;
 import java.util.*;
@@ -17,7 +17,7 @@ public class UsermapStorageUtil {
 
     private static ConsoleCommandSender console = Bukkit.getConsoleSender();
 
-    private static Map<UUID, ClanPlayer> usermap = new HashMap<>();
+    private static Map<UUID, ClansLitePlayer> usermap = new HashMap<>();
 
     private static FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     private static FileConfiguration usermapConfig = Clans.getPlugin().usermapFileManager.getUsermapConfig();
@@ -26,11 +26,11 @@ public class UsermapStorageUtil {
     private static final String PLAYER_PLACEHOLDER = "%PLAYER%";
 
     public static void saveUsermap() throws IOException {
-        for (Map.Entry<UUID, ClanPlayer> entry : usermap.entrySet()){
+        for (Map.Entry<UUID, ClansLitePlayer> entry : usermap.entrySet()){
             usermapConfig.set("users.data." + entry.getKey() + ".javaUUID", entry.getValue().getJavaUUID());
             usermapConfig.set("users.data." + entry.getKey() + ".lastPlayerName", entry.getValue().getLastPlayerName());
             usermapConfig.set("users.data." + entry.getKey() + ".pointBalance", entry.getValue().getPointBalance());
-            usermapConfig.set("users.data." + entry.getKey() + ".canChatSpy", entry.getValue().getCanChatSpy());
+            usermapConfig.set("users.data." + entry.getKey() + ".canChatSpy", entry.getValue().getWantsChatSpy());
             usermapConfig.set("users.data." + entry.getKey() + ".isBedrockPlayer", entry.getValue().isBedrockPlayer());
             if (entry.getValue().isBedrockPlayer()){
                 usermapConfig.set("users.data." + entry.getKey() + ".bedrockUUID", entry.getValue().getBedrockUUID());
@@ -51,14 +51,14 @@ public class UsermapStorageUtil {
             boolean isBedrockPlayer = usermapConfig.getBoolean("users.data." + key + ".isBedrockPlayer");
             String bedrockUUID = usermapConfig.getString("users.data." + key + ".bedrockUUID");
 
-            ClanPlayer clanPlayer = new ClanPlayer(javaUUID, lastPlayerName);
+            ClansLitePlayer clansLitePlayer = new ClansLitePlayer(javaUUID, lastPlayerName);
 
-            clanPlayer.setPointBalance(pointBalance);
-            clanPlayer.setCanChatSpy(canChatSpy);
-            clanPlayer.setBedrockPlayer(isBedrockPlayer);
-            clanPlayer.setBedrockUUID(bedrockUUID);
+            clansLitePlayer.setPointBalance(pointBalance);
+            clansLitePlayer.setWantsChatSpy(canChatSpy);
+            clansLitePlayer.setBedrockPlayer(isBedrockPlayer);
+            clansLitePlayer.setBedrockUUID(bedrockUUID);
 
-            usermap.put(uuid, clanPlayer);
+            usermap.put(uuid, clansLitePlayer);
         });
     }
 
@@ -66,8 +66,8 @@ public class UsermapStorageUtil {
         UUID uuid = player.getUniqueId();
         String javaUUID = uuid.toString();
         String lastPlayerName = player.getName();
-        ClanPlayer clanPlayer = new ClanPlayer(javaUUID, lastPlayerName);
-        usermap.put(uuid, clanPlayer);
+        ClansLitePlayer clansLitePlayer = new ClansLitePlayer(javaUUID, lastPlayerName);
+        usermap.put(uuid, clansLitePlayer);
     }
 
     public static void addBedrockPlayerToUsermap(Player player){
@@ -77,10 +77,10 @@ public class UsermapStorageUtil {
             UUID bedrockPlayerUUID = floodgatePlayer.getJavaUniqueId();
             String javaUUID = floodgatePlayer.getJavaUniqueId().toString();
             String lastPlayerName = floodgatePlayer.getUsername();
-            ClanPlayer clanPlayer = new ClanPlayer(javaUUID, lastPlayerName);
-            clanPlayer.setBedrockPlayer(true);
-            clanPlayer.setBedrockUUID(floodgatePlayer.getCorrectUniqueId().toString());
-            usermap.put(bedrockPlayerUUID, clanPlayer);
+            ClansLitePlayer clansLitePlayer = new ClansLitePlayer(javaUUID, lastPlayerName);
+            clansLitePlayer.setBedrockPlayer(true);
+            clansLitePlayer.setBedrockUUID(floodgatePlayer.getCorrectUniqueId().toString());
+            usermap.put(bedrockPlayerUUID, clansLitePlayer);
         }
 
     }
@@ -93,11 +93,11 @@ public class UsermapStorageUtil {
         return false;
     }
 
-    public static ClanPlayer getClanPlayerByBukkitPlayer(Player player){
+    public static ClansLitePlayer getClanPlayerByBukkitPlayer(Player player){
         UUID uuid = player.getUniqueId();
         if (usermap.containsKey(uuid)){
-            ClanPlayer clanPlayer = usermap.get(uuid);
-            return clanPlayer;
+            ClansLitePlayer clansLitePlayer = usermap.get(uuid);
+            return clansLitePlayer;
         }else {
             console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-player-not-found-1")
                     .replace(PLAYER_PLACEHOLDER, player.getName())));
@@ -107,11 +107,11 @@ public class UsermapStorageUtil {
         return null;
     }
 
-    public static ClanPlayer getClanPlayerByBukkitOfflinePlayer(OfflinePlayer offlinePlayer){
+    public static ClansLitePlayer getClanPlayerByBukkitOfflinePlayer(OfflinePlayer offlinePlayer){
         UUID uuid = offlinePlayer.getUniqueId();
         if (usermap.containsKey(uuid)){
-            ClanPlayer clanPlayer = usermap.get(uuid);
-            return clanPlayer;
+            ClansLitePlayer clansLitePlayer = usermap.get(uuid);
+            return clansLitePlayer;
         }else {
             console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-player-not-found-1")
                     .replace(PLAYER_PLACEHOLDER, offlinePlayer.getName())));
@@ -122,9 +122,9 @@ public class UsermapStorageUtil {
     }
 
     public static Player getBukkitPlayerByName(String name){
-        for (ClanPlayer clanPlayer : usermap.values()){
-            if (clanPlayer.getLastPlayerName().equalsIgnoreCase(name)){
-                return Bukkit.getPlayer(clanPlayer.getLastPlayerName());
+        for (ClansLitePlayer clansLitePlayer : usermap.values()){
+            if (clansLitePlayer.getLastPlayerName().equalsIgnoreCase(name)){
+                return Bukkit.getPlayer(clansLitePlayer.getLastPlayerName());
             }else {
                 console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-player-not-found-1")
                         .replace(PLAYER_PLACEHOLDER, name)));
@@ -137,18 +137,18 @@ public class UsermapStorageUtil {
 
     public static Player getBukkitPlayerByUUID(UUID uuid){
         String uuidString = uuid.toString();
-        for (ClanPlayer clanPlayer : usermap.values()){
-            if (clanPlayer.getJavaUUID().equalsIgnoreCase(uuidString)){
-                return Bukkit.getPlayer(clanPlayer.getJavaUUID());
+        for (ClansLitePlayer clansLitePlayer : usermap.values()){
+            if (clansLitePlayer.getJavaUUID().equalsIgnoreCase(uuidString)){
+                return Bukkit.getPlayer(clansLitePlayer.getJavaUUID());
             }
         }
         return null;
     }
 
     public static OfflinePlayer getBukkitOfflinePlayerByName(String name){
-        for (ClanPlayer clanPlayer : usermap.values()){
-            if (clanPlayer.getLastPlayerName().equalsIgnoreCase(name)){
-                return Bukkit.getOfflinePlayer(UUID.fromString(clanPlayer.getJavaUUID()));
+        for (ClansLitePlayer clansLitePlayer : usermap.values()){
+            if (clansLitePlayer.getLastPlayerName().equalsIgnoreCase(name)){
+                return Bukkit.getOfflinePlayer(UUID.fromString(clansLitePlayer.getJavaUUID()));
             }else {
                 console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-player-not-found-1")
                         .replace(PLAYER_PLACEHOLDER, name)));
@@ -161,17 +161,17 @@ public class UsermapStorageUtil {
 
     public static OfflinePlayer getBukkitOfflinePlayerByUUID(UUID uuid){
         String uuidString = uuid.toString();
-        for (ClanPlayer clanPlayer : usermap.values()){
-            if (clanPlayer.getJavaUUID().equalsIgnoreCase(uuidString)){
-                return Bukkit.getOfflinePlayer(UUID.fromString(clanPlayer.getJavaUUID()));
+        for (ClansLitePlayer clansLitePlayer : usermap.values()){
+            if (clansLitePlayer.getJavaUUID().equalsIgnoreCase(uuidString)){
+                return Bukkit.getOfflinePlayer(UUID.fromString(clansLitePlayer.getJavaUUID()));
             }
         }
         return null;
     }
 
     public static boolean hasPlayerNameChanged(Player player){
-        for (ClanPlayer clanPlayer : usermap.values()){
-            if (!player.getName().equals(clanPlayer.getLastPlayerName())){
+        for (ClansLitePlayer clansLitePlayer : usermap.values()){
+            if (!player.getName().equals(clansLitePlayer.getLastPlayerName())){
                 return true;
             }
         }
@@ -180,10 +180,10 @@ public class UsermapStorageUtil {
 
     public static boolean hasBedrockPlayerJavaUUIDChanged(Player player){
         UUID uuid = player.getUniqueId();
-        for (ClanPlayer clanPlayer : usermap.values()){
+        for (ClansLitePlayer clansLitePlayer : usermap.values()){
             if (Clans.getFloodgateApi() != null){
                 FloodgatePlayer floodgatePlayer = Clans.getFloodgateApi().getPlayer(uuid);
-                if (!(floodgatePlayer.getJavaUniqueId().toString().equals(clanPlayer.getBedrockUUID()))){
+                if (!(floodgatePlayer.getJavaUniqueId().toString().equals(clansLitePlayer.getBedrockUUID()))){
                     return true;
                 }
             }
@@ -194,36 +194,36 @@ public class UsermapStorageUtil {
     public static void updatePlayerName(Player player){
         UUID uuid = player.getUniqueId();
         String newPlayerName = player.getName();
-        ClanPlayer clanPlayer = usermap.get(uuid);
-        clanPlayer.setLastPlayerName(newPlayerName);
-        usermap.replace(uuid, clanPlayer);
+        ClansLitePlayer clansLitePlayer = usermap.get(uuid);
+        clansLitePlayer.setLastPlayerName(newPlayerName);
+        usermap.replace(uuid, clansLitePlayer);
     }
 
     public static void updateBedrockPlayerJavaUUID(Player player){
         UUID uuid = player.getUniqueId();
-        ClanPlayer clanPlayer = usermap.get(uuid);
+        ClansLitePlayer clansLitePlayer = usermap.get(uuid);
         if (Clans.getFloodgateApi() != null){
             FloodgatePlayer floodgatePlayer = Clans.getFloodgateApi().getPlayer(uuid);
             String newJavaUUID = floodgatePlayer.getJavaUniqueId().toString();
-            clanPlayer.setJavaUUID(newJavaUUID);
-            usermap.replace(uuid, clanPlayer);
+            clansLitePlayer.setJavaUUID(newJavaUUID);
+            usermap.replace(uuid, clansLitePlayer);
         }
 
     }
 
     public static boolean toggleChatSpy(Player player){
         UUID uuid = player.getUniqueId();
-        ClanPlayer clanPlayer = usermap.get(uuid);
-        if (!clanPlayer.getCanChatSpy()){
-            clanPlayer.setCanChatSpy(true);
-            fireClanChatSpyToggledEvent(player, clanPlayer ,true);
+        ClansLitePlayer clansLitePlayer = usermap.get(uuid);
+        if (!clansLitePlayer.getWantsChatSpy()){
+            clansLitePlayer.setWantsChatSpy(true);
+            fireClanChatSpyToggledEvent(player, clansLitePlayer,true);
             if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
                 console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanChatSpyToggledEvent"));
             }
             return true;
         }else {
-            clanPlayer.setCanChatSpy(false);
-            fireClanChatSpyToggledEvent(player, clanPlayer ,false);
+            clansLitePlayer.setWantsChatSpy(false);
+            fireClanChatSpyToggledEvent(player, clansLitePlayer,false);
             if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
                 console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanChatSpyToggledEvent"));
             }
@@ -233,8 +233,8 @@ public class UsermapStorageUtil {
 
     public static boolean hasEnoughPoints(Player player, int points){
         UUID uuid = player.getUniqueId();
-        ClanPlayer clanPlayer = usermap.get(uuid);
-        if (clanPlayer.getPointBalance() >= points){
+        ClansLitePlayer clansLitePlayer = usermap.get(uuid);
+        if (clansLitePlayer.getPointBalance() >= points){
             return true;
         }
         return false;
@@ -242,39 +242,39 @@ public class UsermapStorageUtil {
 
     public static int getPointBalanceByBukkitPlayer(Player player){
         UUID uuid = player.getUniqueId();
-        ClanPlayer clanPlayer = usermap.get(uuid);
-        return clanPlayer.getPointBalance();
+        ClansLitePlayer clansLitePlayer = usermap.get(uuid);
+        return clansLitePlayer.getPointBalance();
     }
 
     public static int getPointBalanceByBukkitOfflinePlayer(OfflinePlayer offlinePlayer){
         UUID uuid = offlinePlayer.getUniqueId();
-        ClanPlayer clanPlayer = usermap.get(uuid);
-        return clanPlayer.getPointBalance();
+        ClansLitePlayer clansLitePlayer = usermap.get(uuid);
+        return clansLitePlayer.getPointBalance();
     }
 
     public static void addPointsToOnlinePlayer(Player player, int value){
         UUID uuid = player.getUniqueId();
-        ClanPlayer clanPlayer = usermap.get(uuid);
-        int currentPointBalance = clanPlayer.getPointBalance();
-        clanPlayer.setPointBalance(currentPointBalance + value);
-        usermap.replace(uuid, clanPlayer);
+        ClansLitePlayer clansLitePlayer = usermap.get(uuid);
+        int currentPointBalance = clansLitePlayer.getPointBalance();
+        clansLitePlayer.setPointBalance(currentPointBalance + value);
+        usermap.replace(uuid, clansLitePlayer);
     }
 
     public static void addPointsToOfflinePlayer(OfflinePlayer offlinePlayer, int value){
         UUID uuid = offlinePlayer.getUniqueId();
-        ClanPlayer clanPlayer = usermap.get(uuid);
-        int currentPointBalance = clanPlayer.getPointBalance();
-        clanPlayer.setPointBalance(currentPointBalance + value);
-        usermap.replace(uuid, clanPlayer);
+        ClansLitePlayer clansLitePlayer = usermap.get(uuid);
+        int currentPointBalance = clansLitePlayer.getPointBalance();
+        clansLitePlayer.setPointBalance(currentPointBalance + value);
+        usermap.replace(uuid, clansLitePlayer);
     }
 
     public static boolean withdrawPoints(Player player, int points){
         UUID uuid = player.getUniqueId();
-        ClanPlayer clanPlayer = usermap.get(uuid);
-        int currentPointValue = clanPlayer.getPointBalance();
+        ClansLitePlayer clansLitePlayer = usermap.get(uuid);
+        int currentPointValue = clansLitePlayer.getPointBalance();
         if (currentPointValue != 0){
             if (hasEnoughPoints(player, points)){
-                clanPlayer.setPointBalance(currentPointValue - points);
+                clansLitePlayer.setPointBalance(currentPointValue - points);
                 return true;
             }
             return false;
@@ -284,16 +284,16 @@ public class UsermapStorageUtil {
 
     public static void resetOnlinePlayerPointBalance(Player player){
         UUID uuid = player.getUniqueId();
-        ClanPlayer clanPlayer = usermap.get(uuid);
-        clanPlayer.setPointBalance(0);
-        usermap.replace(uuid, clanPlayer);
+        ClansLitePlayer clansLitePlayer = usermap.get(uuid);
+        clansLitePlayer.setPointBalance(0);
+        usermap.replace(uuid, clansLitePlayer);
     }
 
     public static void resetOfflinePlayerPointBalance(OfflinePlayer offlinePlayer){
         UUID uuid = offlinePlayer.getUniqueId();
-        ClanPlayer clanPlayer = usermap.get(uuid);
-        clanPlayer.setPointBalance(0);
-        usermap.replace(uuid, clanPlayer);
+        ClansLitePlayer clansLitePlayer = usermap.get(uuid);
+        clansLitePlayer.setPointBalance(0);
+        usermap.replace(uuid, clansLitePlayer);
     }
 
     public static Set<UUID> getRawUsermapList(){
@@ -302,19 +302,19 @@ public class UsermapStorageUtil {
 
     public static List<String> getAllPlayerPointsValues(){
         List<String> pointValues = new ArrayList<>();
-        for (ClanPlayer clanPlayer : usermap.values()){
-            String value = String.valueOf(clanPlayer.getPointBalance());
+        for (ClansLitePlayer clansLitePlayer : usermap.values()){
+            String value = String.valueOf(clansLitePlayer.getPointBalance());
             pointValues.add(value);
         }
         return pointValues;
     }
 
-    public static Map<UUID, ClanPlayer> getUsermap() {
+    public static Map<UUID, ClansLitePlayer> getUsermap() {
         return usermap;
     }
 
-    private static void fireClanChatSpyToggledEvent(Player player, ClanPlayer clanPlayer, boolean chatSpyToggledState) {
-        ClanChatSpyToggledEvent clanChatSpyToggledEvent = new ClanChatSpyToggledEvent(player, clanPlayer, chatSpyToggledState);
+    private static void fireClanChatSpyToggledEvent(Player player, ClansLitePlayer clansLitePlayer, boolean chatSpyToggledState) {
+        ClanChatSpyToggledEvent clanChatSpyToggledEvent = new ClanChatSpyToggledEvent(player, clansLitePlayer, chatSpyToggledState);
         Bukkit.getPluginManager().callEvent(clanChatSpyToggledEvent);
     }
 }

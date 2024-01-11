@@ -9,8 +9,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import me.loving11ish.clans.Clans;
-import me.loving11ish.clans.models.Chest;
-import me.loving11ish.clans.models.ClanPlayer;
+import me.loving11ish.clans.models.ProtectedChest;
+import me.loving11ish.clans.models.ClansLitePlayer;
 import me.loving11ish.clans.utils.ClansStorageUtil;
 import me.loving11ish.clans.utils.ColorUtils;
 import me.loving11ish.clans.utils.UsermapStorageUtil;
@@ -33,16 +33,16 @@ public class ChestAccessListSubCommand {
                 if (block.getType().equals(Material.CHEST)){
                     Location location = block.getLocation();
                     if (ClansStorageUtil.isChestLocked(location)){
-                        Chest chest = ClansStorageUtil.getChestByLocation(location);
+                        ProtectedChest chest = ClansStorageUtil.getChestByLocation(location);
                         if (chest != null){
                             if (ClansStorageUtil.hasAccessToLockedChest(offlinePlayer, chest)){
                                 List<OfflinePlayer> offlinePlayersWithAccess = ClansStorageUtil.getOfflinePlayersWithChestAccessByChest(chest);
                                 StringBuilder stringBuilder = new StringBuilder();
                                 stringBuilder.append(messagesConfig.getString("players-with-access-list.header"));
                                 for (OfflinePlayer offlinePlayerWithAccess : offlinePlayersWithAccess){
-                                    ClanPlayer clanPlayer = UsermapStorageUtil.getClanPlayerByBukkitOfflinePlayer(offlinePlayerWithAccess);
-                                    if (clanPlayer != null){
-                                        String playerName = clanPlayer.getLastPlayerName();
+                                    ClansLitePlayer clansLitePlayer = UsermapStorageUtil.getClanPlayerByBukkitOfflinePlayer(offlinePlayerWithAccess);
+                                    if (clansLitePlayer != null){
+                                        String playerName = clansLitePlayer.getLastPlayerName();
                                         stringBuilder.append(messagesConfig.getString("players-with-access-list.player-entry")
                                                 .replace(PLAYER_PLACEHOLDER, playerName));
                                     }

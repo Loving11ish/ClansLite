@@ -32,18 +32,18 @@ public class ClanInfoSubCommand {
             Clan clanByOwner = ClansStorageUtil.findClanByOwner(player);
             Clan clanByPlayer = ClansStorageUtil.findClanByPlayer(player);
             if (clanByOwner != null) {
-                ArrayList<String> clanMembers = clanByOwner.getClanMembers();
-                ArrayList<String> clanAllies = clanByOwner.getClanAllies();
+                ArrayList<String> clanMembers = clanByOwner.getMembers();
+                ArrayList<String> clanAllies = clanByOwner.getAllies();
                 ArrayList<String> clanEnemies = clanByOwner.getClanEnemies();
                 StringBuilder clanInfo = new StringBuilder(ColorUtils.translateColorCodes(messagesConfig.getString("clan-info-header"))
-                        .replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByOwner.getClanFinalName()))
-                        .replace("%CLANPREFIX%", ColorUtils.translateColorCodes(clanByOwner.getClanPrefix())));
-                UUID clanOwnerUUID = UUID.fromString(clanByOwner.getClanOwner());
+                        .replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByOwner.getName()))
+                        .replace("%CLANPREFIX%", ColorUtils.translateColorCodes(clanByOwner.getPrefix())));
+                UUID clanOwnerUUID = UUID.fromString(clanByOwner.getId());
                 Player clanOwner = Bukkit.getPlayer(clanOwnerUUID);
                 if (clanOwner != null) {
                     clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-info-owner-online")).replace(OWNER, clanOwner.getName()));
                 }else {
-                    UUID uuid = UUID.fromString(clanByOwner.getClanOwner());
+                    UUID uuid = UUID.fromString(clanByOwner.getId());
                     String offlineOwner = Bukkit.getOfflinePlayer(uuid).getName();
                     clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-info-owner-offline")).replace(OWNER, offlineOwner));
                 }
@@ -75,7 +75,7 @@ public class ClanInfoSubCommand {
                             if (allyOwner != null){
                                 Clan allyClan = ClansStorageUtil.findClanByOwner(allyOwner);
                                 if (allyClan != null){
-                                    String clanAllyName = allyClan.getClanFinalName();
+                                    String clanAllyName = allyClan.getName();
                                     clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-ally-members").replace(ALLY_CLAN, clanAllyName)));
                                 }
                             }else {
@@ -83,7 +83,7 @@ public class ClanInfoSubCommand {
                                 OfflinePlayer offlineOwnerPlayer = Bukkit.getOfflinePlayer(uuid);
                                 Clan offlineAllyClan = ClansStorageUtil.findClanByOfflineOwner(offlineOwnerPlayer);
                                 if (offlineAllyClan != null){
-                                    String offlineAllyName = offlineAllyClan.getClanFinalName();
+                                    String offlineAllyName = offlineAllyClan.getName();
                                     if (offlineAllyName != null){
                                         clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-ally-members").replace(ALLY_CLAN, offlineAllyName)));
                                     }else {
@@ -103,7 +103,7 @@ public class ClanInfoSubCommand {
                             if (enemyOwner != null){
                                 Clan enemyClan = ClansStorageUtil.findClanByOwner(enemyOwner);
                                 if (enemyClan != null){
-                                    String clanEnemyName = enemyClan.getClanFinalName();
+                                    String clanEnemyName = enemyClan.getName();
                                     clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-enemy-members").replace(ENEMY_CLAN, clanEnemyName)));
                                 }
                             }else {
@@ -111,7 +111,7 @@ public class ClanInfoSubCommand {
                                 OfflinePlayer offlineOwnerPlayer = Bukkit.getOfflinePlayer(uuid);
                                 Clan offlineEnemyClan = ClansStorageUtil.findClanByOfflineOwner(offlineOwnerPlayer);
                                 if (offlineEnemyClan != null){
-                                    String offlineEnemyName = offlineEnemyClan.getClanFinalName();
+                                    String offlineEnemyName = offlineEnemyClan.getName();
                                     if (offlineEnemyName != null){
                                         clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-enemy-members").replace(ENEMY_CLAN, offlineEnemyName)));
                                     }else {
@@ -123,7 +123,7 @@ public class ClanInfoSubCommand {
                     }
                 }
                 clanInfo.append(" ");
-                if (clanByOwner.isFriendlyFireAllowed()){
+                if (clanByOwner.isFriendlyFire()){
                     clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-pvp-status-enabled")));
                 }else {
                     clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-pvp-status-disabled")));
@@ -134,7 +134,7 @@ public class ClanInfoSubCommand {
                     clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-home-set-false")));
                 }
                 clanInfo.append(" ");
-                clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-points-value").replace(POINTS_PLACEHOLDER, String.valueOf(clanByOwner.getClanPoints()))));
+                clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-points-value").replace(POINTS_PLACEHOLDER, String.valueOf(clanByOwner.getPoints()))));
                 clanInfo.append(" ");
                 if (clansConfig.getBoolean("protections.chests.enabled")){
                     clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-chest-amount").replace(CHEST_PLACEHOLDER, String.valueOf(clanByOwner.getProtectedChests().size()))));
@@ -146,18 +146,18 @@ public class ClanInfoSubCommand {
                 player.sendMessage(clanInfo.toString());
 
             }else if (clanByPlayer != null){
-                ArrayList<String> clanMembers = clanByPlayer.getClanMembers();
-                ArrayList<String> clanAllies = clanByPlayer.getClanAllies();
+                ArrayList<String> clanMembers = clanByPlayer.getMembers();
+                ArrayList<String> clanAllies = clanByPlayer.getAllies();
                 ArrayList<String> clanEnemies = clanByPlayer.getClanEnemies();
                 StringBuilder clanInfo = new StringBuilder(ColorUtils.translateColorCodes(messagesConfig.getString("clan-info-header"))
-                        .replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByPlayer.getClanFinalName()))
-                        .replace("%CLANPREFIX%", ColorUtils.translateColorCodes(clanByPlayer.getClanPrefix())));
-                UUID clanOwnerUUID = UUID.fromString(clanByPlayer.getClanOwner());
+                        .replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByPlayer.getName()))
+                        .replace("%CLANPREFIX%", ColorUtils.translateColorCodes(clanByPlayer.getPrefix())));
+                UUID clanOwnerUUID = UUID.fromString(clanByPlayer.getId());
                 Player clanOwner = Bukkit.getPlayer(clanOwnerUUID);
                 if (clanOwner != null) {
                     clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-info-owner-online")).replace(OWNER, clanOwner.getName()));
                 } else {
-                    UUID uuid = UUID.fromString(clanByPlayer.getClanOwner());
+                    UUID uuid = UUID.fromString(clanByPlayer.getId());
                     String offlineOwner = Bukkit.getOfflinePlayer(uuid).getName();
                     clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-info-owner-offline")).replace(OWNER, offlineOwner));
                 }
@@ -189,7 +189,7 @@ public class ClanInfoSubCommand {
                             if (allyOwner != null){
                                 Clan allyClan = ClansStorageUtil.findClanByOwner(allyOwner);
                                 if (allyClan != null){
-                                    String clanAllyName = allyClan.getClanFinalName();
+                                    String clanAllyName = allyClan.getName();
                                     clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-ally-members").replace(ALLY_CLAN, clanAllyName)));
                                 }
                             }else {
@@ -197,7 +197,7 @@ public class ClanInfoSubCommand {
                                 OfflinePlayer offlineOwnerPlayer = Bukkit.getOfflinePlayer(uuid);
                                 Clan offlineAllyClan = ClansStorageUtil.findClanByOfflineOwner(offlineOwnerPlayer);
                                 if (offlineAllyClan != null){
-                                    String offlineAllyName = offlineAllyClan.getClanFinalName();
+                                    String offlineAllyName = offlineAllyClan.getName();
                                     if (offlineAllyName != null){
                                         clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-ally-members").replace(ALLY_CLAN, offlineAllyName)));
                                     }else {
@@ -217,7 +217,7 @@ public class ClanInfoSubCommand {
                             if (enemyOwner != null){
                                 Clan enemyClan = ClansStorageUtil.findClanByOwner(enemyOwner);
                                 if (enemyClan != null){
-                                    String clanEnemyName = enemyClan.getClanFinalName();
+                                    String clanEnemyName = enemyClan.getName();
                                     clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-enemy-members").replace(ENEMY_CLAN, clanEnemyName)));
                                 }
                             }else {
@@ -225,7 +225,7 @@ public class ClanInfoSubCommand {
                                 OfflinePlayer offlineOwnerPlayer = Bukkit.getOfflinePlayer(uuid);
                                 Clan offlineEnemyClan = ClansStorageUtil.findClanByOfflineOwner(offlineOwnerPlayer);
                                 if (offlineEnemyClan != null){
-                                    String offlineEnemyName = offlineEnemyClan.getClanFinalName();
+                                    String offlineEnemyName = offlineEnemyClan.getName();
                                     if (offlineEnemyName != null){
                                         clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-enemy-members").replace(ENEMY_CLAN, offlineEnemyName)));
                                     }else {
@@ -237,7 +237,7 @@ public class ClanInfoSubCommand {
                     }
                 }
                 clanInfo.append(" ");
-                if (clanByPlayer.isFriendlyFireAllowed()){
+                if (clanByPlayer.isFriendlyFire()){
                     clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-pvp-status-enabled")));
                 }else {
                     clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-pvp-status-disabled")));
@@ -248,7 +248,7 @@ public class ClanInfoSubCommand {
                     clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-home-set-false")));
                 }
                 clanInfo.append(" ");
-                clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-points-value").replace(POINTS_PLACEHOLDER, String.valueOf(clanByPlayer.getClanPoints()))));
+                clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-points-value").replace(POINTS_PLACEHOLDER, String.valueOf(clanByPlayer.getPoints()))));
                 clanInfo.append(" ");
                 if (clansConfig.getBoolean("protections.chests.enabled")){
                     clanInfo.append(ColorUtils.translateColorCodes(messagesConfig.getString("clan-chest-amount").replace(CHEST_PLACEHOLDER, String.valueOf(clanByPlayer.getProtectedChests().size()))));
