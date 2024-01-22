@@ -1,4 +1,4 @@
-package me.loving11ish.clans.api;
+package me.loving11ish.clans.api.events;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -6,17 +6,20 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import me.loving11ish.clans.models.Clan;
 
-public class ClanHomeCreateEvent extends Event {
+public class AsyncClanHomeTeleportEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
     private final Player createdBy;
     private final Clan clan;
     private final Location homeLocation;
+    private final Location tpFromLocation;
 
-    public ClanHomeCreateEvent(Player createdBy, Clan clan, Location homeLocation) {
+    public AsyncClanHomeTeleportEvent(boolean isAsync, Player createdBy, Clan clan, Location homeLocation, Location tpFromLocation) {
+        super(isAsync);
         this.createdBy = createdBy;
         this.clan = clan;
         this.homeLocation = homeLocation;
+        this.tpFromLocation = tpFromLocation;
     }
 
     @Override
@@ -34,5 +37,9 @@ public class ClanHomeCreateEvent extends Event {
 
     public Location getHomeLocation() {
         return homeLocation;
+    }
+
+    public Location getTpFromLocation() {
+        return tpFromLocation;
     }
 }

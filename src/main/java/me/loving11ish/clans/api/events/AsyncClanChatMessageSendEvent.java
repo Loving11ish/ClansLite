@@ -1,4 +1,4 @@
-package me.loving11ish.clans.api;
+package me.loving11ish.clans.api.events;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -7,7 +7,7 @@ import me.loving11ish.clans.models.Clan;
 
 import java.util.ArrayList;
 
-public class ClanChatMessageSendEvent extends Event {
+public class AsyncClanChatMessageSendEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
     private final Player createdBy;
@@ -16,7 +16,8 @@ public class ClanChatMessageSendEvent extends Event {
     private final String message;
     private final ArrayList<String> recipients;
 
-    public ClanChatMessageSendEvent(Player createdBy, Clan clan, String prefix, String message, ArrayList<String> recipients){
+    public AsyncClanChatMessageSendEvent(boolean isAsync, Player createdBy, Clan clan, String prefix, String message, ArrayList<String> recipients) {
+        super(isAsync);
         this.createdBy = createdBy;
         this.clan = clan;
         this.prefix = prefix;
@@ -26,10 +27,6 @@ public class ClanChatMessageSendEvent extends Event {
 
     @Override
     public HandlerList getHandlers() {
-        return HANDLERS;
-    }
-
-    public static HandlerList getHandlerList() {
         return HANDLERS;
     }
 

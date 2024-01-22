@@ -9,7 +9,7 @@ import me.loving11ish.clans.models.Clan;
 import me.loving11ish.clans.models.ClanPlayer;
 import me.loving11ish.clans.utils.ClansStorageUtil;
 import me.loving11ish.clans.utils.ColorUtils;
-import me.loving11ish.clans.utils.UsermapStorageUtil;
+import me.loving11ish.clans.utils.UserMapStorageUtil;
 
 public class PlaceholderAPIClanExpansion extends PlaceholderExpansion {
 
@@ -38,7 +38,7 @@ public class PlaceholderAPIClanExpansion extends PlaceholderExpansion {
         FileConfiguration configFile = Clans.getPlugin().getConfig();
         Clan clanOwner = ClansStorageUtil.findClanByOfflineOwner(player);
         Clan clanMember = ClansStorageUtil.findClanByOfflinePlayer(player);
-        ClanPlayer clanPlayer = UsermapStorageUtil.getClanPlayerByBukkitOfflinePlayer(player);
+        ClanPlayer clanPlayer = UserMapStorageUtil.getClanPlayerByBukkitOfflinePlayer(player);
 
         if (params.equalsIgnoreCase("pluginVersion")) {
             //%clansLite_pluginVersion%

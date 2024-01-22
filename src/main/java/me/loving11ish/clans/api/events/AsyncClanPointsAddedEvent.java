@@ -1,4 +1,4 @@
-package me.loving11ish.clans.api;
+package me.loving11ish.clans.api.events;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -6,7 +6,7 @@ import org.bukkit.event.HandlerList;
 import me.loving11ish.clans.models.Clan;
 import me.loving11ish.clans.models.ClanPlayer;
 
-public class ClanPointsRemovedEvent extends Event {
+public class AsyncClanPointsAddedEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
     private final Player createdBy;
@@ -14,19 +14,18 @@ public class ClanPointsRemovedEvent extends Event {
     private final ClanPlayer clanPlayer;
     private final int previousClanPlayerPointBalance;
     private final int newClanPlayerPointBalance;
-    private final int withdrawPointValue;
+    private final int depositPointValue;
     private final int previousClanPointBalance;
     private final int newClanPointBalance;
 
-    public ClanPointsRemovedEvent(Player createdBy, Clan playerClan, ClanPlayer clanPlayer,
-                                  int previousClanPlayerPointBalance, int newClanPlayerPointBalance,
-                                  int withdrawPointValue, int previousClanPointBalance, int newClanPointBalance) {
+    public AsyncClanPointsAddedEvent(boolean isAsync, Player createdBy, Clan playerClan, ClanPlayer clanPlayer, int previousClanPlayerPointBalance, int newClanPlayerPointBalance, int depositPointValue, int previousClanPointBalance, int newClanPointBalance) {
+        super(isAsync);
         this.createdBy = createdBy;
         this.playerClan = playerClan;
         this.clanPlayer = clanPlayer;
         this.previousClanPlayerPointBalance = previousClanPlayerPointBalance;
         this.newClanPlayerPointBalance = newClanPlayerPointBalance;
-        this.withdrawPointValue = withdrawPointValue;
+        this.depositPointValue = depositPointValue;
         this.previousClanPointBalance = previousClanPointBalance;
         this.newClanPointBalance = newClanPointBalance;
     }
@@ -56,8 +55,8 @@ public class ClanPointsRemovedEvent extends Event {
         return newClanPlayerPointBalance;
     }
 
-    public int getWithdrawPointValue() {
-        return withdrawPointValue;
+    public int getDepositPointValue() {
+        return depositPointValue;
     }
 
     public int getPreviousClanPointBalance() {

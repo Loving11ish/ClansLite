@@ -1,8 +1,7 @@
 package me.loving11ish.clans.listeners;
 
 import com.tcoded.folialib.wrapper.task.WrappedTask;
-import org.bukkit.Bukkit;
-import org.bukkit.command.ConsoleCommandSender;
+import me.loving11ish.clans.utils.MessageUtils;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,10 +15,7 @@ import me.loving11ish.clans.utils.ColorUtils;
 
 public class MenuEvent implements Listener {
 
-    private final ConsoleCommandSender console = Bukkit.getConsoleSender();
-
     private final FileConfiguration guiConfig = Clans.getPlugin().clanGUIFileManager.getClanGUIConfig();
-    private final FileConfiguration clansConfig = Clans.getPlugin().getConfig();
 
     @EventHandler
     public void onMenuClick(InventoryClickEvent event){
@@ -43,9 +39,7 @@ public class MenuEvent implements Listener {
                 WrappedTask wrappedTask = ClanListGUI.autoGUIRefreshTask;
                 if (!wrappedTask.isCancelled()){
                     wrappedTask.cancel();
-                    if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
-                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aAuto refresh task cancelled"));
-                    }
+                    MessageUtils.sendDebugConsole("Auto refresh task cancelled");
                 }
             }
         }

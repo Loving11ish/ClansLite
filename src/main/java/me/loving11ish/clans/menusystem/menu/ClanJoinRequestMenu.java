@@ -1,5 +1,6 @@
 package me.loving11ish.clans.menusystem.menu;
 
+import me.loving11ish.clans.utils.MessageUtils;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -17,45 +18,46 @@ public class ClanJoinRequestMenu extends Menu {
     private final FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
     private final FileConfiguration guiConfig = Clans.getPlugin().clanGUIFileManager.getClanGUIConfig();
 
-    public ClanJoinRequestMenu(PlayerMenuUtility playerMenuUtility){
+    public ClanJoinRequestMenu(PlayerMenuUtility playerMenuUtility) {
         super(playerMenuUtility);
     }
 
     @Override
-    public String getMenuName(){
+    public String getMenuName() {
         return ColorUtils.translateColorCodes(guiConfig.getString("clan-join.name"));
     }
 
     @Override
-    public int getSlots(){
+    public int getSlots() {
         return 9;
     }
 
     @Override
-    public void handleMenu(InventoryClickEvent event){
+    public void handleMenu(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
 
-        if (event.getCurrentItem().getType().equals(Material.LIME_STAINED_GLASS_PANE)){
+        if (event.getCurrentItem().getType().equals(Material.LIME_STAINED_GLASS_PANE)) {
             Player targetClanOwner = playerMenuUtility.getOfflineClanOwner().getPlayer();
-            if (targetClanOwner != null){
-                targetClanOwner.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-invite-request")
-                        .replace("%PLAYER%", player.getName())));
-                player.closeInventory();
-                player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-invite-sent-successfully")
-                        .replace("%CLANOWNER%", targetClanOwner.getName())));
-            }else {
-                player.closeInventory();
-                player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-invite-request-failed")));
-            }
-        }
 
-        else if (event.getCurrentItem().getType().equals(Material.RED_STAINED_GLASS_PANE)){
+            if (targetClanOwner != null) {
+                MessageUtils.sendPlayer(targetClanOwner, messagesConfig.getString("clan-invite-request")
+                        .replace("%PLAYER%", player.getName()));
+                player.closeInventory();
+                MessageUtils.sendPlayer(player, messagesConfig.getString("clan-invite-sent-successfully")
+                        .replace("%CLANOWNER%", targetClanOwner.getName()));
+
+            } else {
+                player.closeInventory();
+                MessageUtils.sendPlayer(player, messagesConfig.getString("clan-invite-request-failed"));
+            }
+
+        } else if (event.getCurrentItem().getType().equals(Material.RED_STAINED_GLASS_PANE)) {
             new ClanListGUI(Clans.getPlayerMenuUtility(player)).open();
         }
     }
 
     @Override
-    public void setMenuItems(){
+    public void setMenuItems() {
 
         ItemStack sendJoinRequestItem = new ItemStack(Material.LIME_STAINED_GLASS_PANE, 1);
         ItemMeta sendMeta = sendJoinRequestItem.getItemMeta();

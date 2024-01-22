@@ -1,38 +1,29 @@
 package me.loving11ish.clans.listeners;
 
-import org.bukkit.Bukkit;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
+import me.loving11ish.clans.utils.MessageUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import me.loving11ish.clans.Clans;
-import me.loving11ish.clans.utils.ColorUtils;
-import me.loving11ish.clans.utils.UsermapStorageUtil;
+import me.loving11ish.clans.utils.UserMapStorageUtil;
 
 import java.util.UUID;
 
 public class PlayerConnectionEvent implements Listener {
 
-    private final ConsoleCommandSender console = Bukkit.getConsoleSender();
-
-    private final FileConfiguration clansConfig = Clans.getPlugin().getConfig();
-
     @EventHandler (priority = EventPriority.HIGH)
     public void onPlayerJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
         Clans.connectedPlayers.put(player, player.getName());
-        if (!(UsermapStorageUtil.isUserExisting(player))){
-            UsermapStorageUtil.addToUsermap(player);
+        if (!(UserMapStorageUtil.isUserExisting(player))){
+            UserMapStorageUtil.addToUserMap(player);
             return;
         }
-        if (UsermapStorageUtil.hasPlayerNameChanged(player)){
-            UsermapStorageUtil.updatePlayerName(player);
-            if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
-                console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aUpdated player name"));
-            }
+        if (UserMapStorageUtil.hasPlayerNameChanged(player)){
+            UserMapStorageUtil.updatePlayerName(player);
+            MessageUtils.sendDebugConsole("Updated player name");
         }
     }
 
@@ -42,26 +33,20 @@ public class PlayerConnectionEvent implements Listener {
         UUID uuid = player.getUniqueId();
         if (Clans.getFloodgateApi() != null){
             if (Clans.getFloodgateApi().isFloodgatePlayer(uuid)){
-                if (!(UsermapStorageUtil.isUserExisting(player))){
-                    UsermapStorageUtil.addBedrockPlayerToUsermap(player);
+                if (!(UserMapStorageUtil.isUserExisting(player))){
+                    UserMapStorageUtil.addBedrockPlayerToUserMap(player);
                     return;
                 }
-                if (UsermapStorageUtil.hasPlayerNameChanged(player)){
-                    UsermapStorageUtil.updatePlayerName(player);
-                    if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
-                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aUpdated bedrock player name"));
-                    }
+                if (UserMapStorageUtil.hasPlayerNameChanged(player)){
+                    UserMapStorageUtil.updatePlayerName(player);
+                    MessageUtils.sendDebugConsole("Updated bedrock player name");
                 }
-                if (UsermapStorageUtil.hasBedrockPlayerJavaUUIDChanged(player)){
-                    UsermapStorageUtil.updateBedrockPlayerJavaUUID(player);
-                    if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
-                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aUpdated bedrock player Java UUID"));
-                    }
+                if (UserMapStorageUtil.hasBedrockPlayerJavaUUIDChanged(player)){
+                    UserMapStorageUtil.updateBedrockPlayerJavaUUID(player);
+                    MessageUtils.sendDebugConsole("Updated bedrock player Java UUID");
                 }
                 Clans.bedrockPlayers.put(player, Clans.getFloodgateApi().getPlayer(uuid).getJavaUniqueId().toString());
-                if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
-                    console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aAdded bedrock player to connected bedrock players hashmap"));
-                }
+                MessageUtils.sendDebugConsole("Added bedrock player to connected bedrock players hashmap");
             }
         }
     }

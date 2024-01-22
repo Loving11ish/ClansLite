@@ -1,12 +1,12 @@
 package me.loving11ish.clans.updatesystem;
 
+import me.loving11ish.clans.Clans;
+import me.loving11ish.clans.utils.MessageUtils;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import me.loving11ish.clans.Clans;
-import me.loving11ish.clans.utils.ColorUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,13 +27,13 @@ public class JoinEvent implements Listener {
                     new UpdateChecker(97163).getVersion(version -> {
                         try {
                             if (!(Clans.getPlugin().getDescription().getVersion().equalsIgnoreCase(version))) {
-                                player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("update-available.1")));
-                                player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("update-available.2")));
-                                player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("update-available.3")));
+                                MessageUtils.sendPlayer(player, messagesConfig.getString("update-available.1"));
+                                MessageUtils.sendPlayer(player, messagesConfig.getString("update-available.2"));
+                                MessageUtils.sendPlayer(player, messagesConfig.getString("update-available.3"));
                                 notifiedPlayerUUID.add(player.getUniqueId());
                             }
                         }catch (NullPointerException e){
-                            player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("Update-check-failure")));
+                            MessageUtils.sendPlayer(player, messagesConfig.getString("Update-check-failure"));
                         }
                     });
                 }

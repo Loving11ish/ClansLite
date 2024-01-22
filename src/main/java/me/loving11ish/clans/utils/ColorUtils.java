@@ -11,18 +11,18 @@ public class ColorUtils {
      * @return Returns a string of text with color/effects applied
      */
 
-    public static String translateColorCodes(String text){
+    public static String translateColorCodes(String text) {
         String[] texts = text.split(String.format(WITH_DELIMITER, "&"));
         StringBuilder finalText = new StringBuilder();
-        for (int i = 0; i < texts.length; i++){
-            if (texts[i].equalsIgnoreCase("&")){
+        for (int i = 0; i < texts.length; i++) {
+            if (texts[i].equalsIgnoreCase("&")) {
                 i++;
-                if (texts[i].charAt(0) == '#'){
+                if (texts[i].charAt(0) == '#') {
                     finalText.append(net.md_5.bungee.api.ChatColor.of(texts[i].substring(0, 7)) + texts[i].substring(7));
-                }else{
+                } else {
                     finalText.append(ChatColor.translateAlternateColorCodes('&', "&" + texts[i]));
                 }
-            }else{
+            } else {
                 finalText.append(texts[i]);
             }
         }

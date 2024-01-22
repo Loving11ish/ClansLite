@@ -6,7 +6,7 @@
 
     <groupId>me.loving11ish</groupId>
     <artifactId>ClansLite</artifactId>
-    <version>1.4.3</version>
+    <version>1.4.4-ALPHA-01</version>
     <packaging>jar</packaging>
 
     <name>ClansLite</name>
@@ -92,11 +92,6 @@
             <id>papermc</id>
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
-        <!-- PlugMan -->
-        <repository>
-            <id>PlugMan</id>
-            <url>https://raw.githubusercontent.com/TheBlackEntity/PlugMan/repository/</url>
-        </repository>
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
@@ -140,12 +135,6 @@
             <artifactId>paperlib</artifactId>
             <version>1.0.8</version>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.rylinaux</groupId>
-            <artifactId>PlugMan</artifactId>
-            <version>2.3.3</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.lightlibs</groupId>

@@ -1,18 +1,19 @@
-package me.loving11ish.clans.api;
+package me.loving11ish.clans.api.events;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import me.loving11ish.clans.models.ClanPlayer;
 
-public class ClanChatSpyToggledEvent extends Event {
+public class AsyncClanChatSpyToggledEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
     private final Player createdBy;
     private final ClanPlayer clanPlayer;
     private final boolean clanChatSpyState;
 
-    public ClanChatSpyToggledEvent(Player createdBy, ClanPlayer clanPlayer, boolean clanChatSpyState) {
+    public AsyncClanChatSpyToggledEvent(boolean isAsync, Player createdBy, ClanPlayer clanPlayer, boolean clanChatSpyState) {
+        super(isAsync);
         this.createdBy = createdBy;
         this.clanPlayer = clanPlayer;
         this.clanChatSpyState = clanChatSpyState;
@@ -20,10 +21,6 @@ public class ClanChatSpyToggledEvent extends Event {
 
     @Override
     public HandlerList getHandlers() {
-        return HANDLERS;
-    }
-
-    public static HandlerList getHandlerList() {
         return HANDLERS;
     }
 

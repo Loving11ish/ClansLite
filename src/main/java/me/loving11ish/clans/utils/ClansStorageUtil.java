@@ -1,5 +1,9 @@
 package me.loving11ish.clans.utils;
 
+import com.tcoded.folialib.FoliaLib;
+import me.loving11ish.clans.api.events.AsyncClanDisbandEvent;
+import me.loving11ish.clans.api.events.AsyncClanOfflineDisbandEvent;
+import me.loving11ish.clans.api.events.AsyncClanTransferOwnershipEvent;
 import me.loving11ish.clans.models.ClanPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -10,9 +14,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import me.loving11ish.clans.Clans;
-import me.loving11ish.clans.api.ClanDisbandEvent;
-import me.loving11ish.clans.api.ClanOfflineDisbandEvent;
-import me.loving11ish.clans.api.ClanTransferOwnershipEvent;
 import me.loving11ish.clans.models.Chest;
 import me.loving11ish.clans.models.Clan;
 
@@ -23,17 +24,18 @@ import java.util.regex.Pattern;
 public class ClansStorageUtil {
 
     private static final ConsoleCommandSender console = Bukkit.getConsoleSender();
+    private static final FoliaLib foliaLib = Clans.getFoliaLib();
 
     private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + String.valueOf('&') + "[0-9A-FK-OR]");
 
-    private static Map<UUID, Clan> clansList = new HashMap<>();
+    private static final Map<UUID, Clan> clansList = new HashMap<>();
 
     private static final FileConfiguration clansStorage = Clans.getPlugin().clansFileManager.getClansConfig();
     private static final FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
     private static final FileConfiguration clansConfig = Clans.getPlugin().getConfig();
 
     public static void saveClans() throws IOException {
-        for (Map.Entry<UUID, Clan> entry : clansList.entrySet()){
+        for (Map.Entry<UUID, Clan> entry : clansList.entrySet()) {
             clansStorage.set("clans.data." + entry.getKey() + ".clanOwner", entry.getValue().getClanOwner());
             clansStorage.set("clans.data." + entry.getKey() + ".clanFinalName", entry.getValue().getClanFinalName());
             clansStorage.set("clans.data." + entry.getKey() + ".clanPrefix", entry.getValue().getClanPrefix());
@@ -42,7 +44,7 @@ public class ClansStorageUtil {
             clansStorage.set("clans.data." + entry.getKey() + ".clanEnemies", entry.getValue().getClanEnemies());
             clansStorage.set("clans.data." + entry.getKey() + ".friendlyFire", entry.getValue().isFriendlyFireAllowed());
             clansStorage.set("clans.data." + entry.getKey() + ".clanPoints", entry.getValue().getClanPoints());
-            if (entry.getValue().getClanHomeWorld() != null){
+            if (entry.getValue().getClanHomeWorld() != null) {
                 clansStorage.set("clans.data." + entry.getKey() + ".clanHome.worldName", entry.getValue().getClanHomeWorld());
                 clansStorage.set("clans.data." + entry.getKey() + ".clanHome.x", entry.getValue().getClanHomeX());
                 clansStorage.set("clans.data." + entry.getKey() + ".clanHome.y", entry.getValue().getClanHomeY());
@@ -50,15 +52,15 @@ public class ClansStorageUtil {
                 clansStorage.set("clans.data." + entry.getKey() + ".clanHome.yaw", entry.getValue().getClanHomeYaw());
                 clansStorage.set("clans.data." + entry.getKey() + ".clanHome.pitch", entry.getValue().getClanHomePitch());
             }
-            if (entry.getValue().getMaxAllowedProtectedChests() > 0){
+            if (entry.getValue().getMaxAllowedProtectedChests() > 0) {
                 HashMap<String, Chest> chests = entry.getValue().getProtectedChests();
                 clansStorage.set("clans.data." + entry.getKey() + ".maxAllowedProtectedChests", entry.getValue().getMaxAllowedProtectedChests());
-                for (Map.Entry<String, Chest> chestLocation : chests.entrySet()){
-                    if (chestLocation.getValue().getChestWorldName() == null){
-                        console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("chest-location-save-failed-1")
-                                .replace("%CLAN%", chestLocation.getValue().getChestWorldName().toString())));
-                        console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("chest-location-save-failed-2")
-                                .replace("%CLAN%", chestLocation.getValue().getChestWorldName().toString())));
+                for (Map.Entry<String, Chest> chestLocation : chests.entrySet()) {
+                    if (chestLocation.getValue().getChestWorldName() == null) {
+                        MessageUtils.sendConsole("warning", messagesConfig.getString("chest-location-save-failed-1")
+                                .replace("%CLAN%", chestLocation.getValue().getChestWorldName().toString()));
+                        MessageUtils.sendConsole("warning", messagesConfig.getString("chest-location-save-failed-2")
+                                .replace("%CLAN%", chestLocation.getValue().getChestWorldName().toString()));
                         continue;
                     }
                     clansStorage.set("clans.data." + entry.getKey() + ".protectedChests." + chestLocation.getKey() + ".chestUUID", chestLocation.getKey());
@@ -75,7 +77,7 @@ public class ClansStorageUtil {
 
     public static void restoreClans() throws IOException {
         clansList.clear();
-        clansStorage.getConfigurationSection("clans.data").getKeys(false).forEach(key ->{
+        clansStorage.getConfigurationSection("clans.data").getKeys(false).forEach(key -> {
             HashMap<String, Chest> protectedChests = new HashMap<>();
             UUID uuid = UUID.fromString(key);
             String clanFinalName = clansStorage.getString("clans.data." + key + ".clanFinalName");
@@ -97,7 +99,7 @@ public class ClansStorageUtil {
             int maxAllowedProtectedChests = clansStorage.getInt("clans.data." + key + ".maxAllowedProtectedChests");
 
             Clan clan = new Clan(key, clanFinalName);
-            if (!clansStorage.getBoolean("name-strip-colour-complete")||clanFinalName.contains("&")||clanFinalName.contains("#")){
+            if (!clansStorage.getBoolean("name-strip-colour-complete") || clanFinalName.contains("&") || clanFinalName.contains("#")) {
                 clan.setClanFinalName(stripClanNameColorCodes(clan));
             }
             clan.setClanPrefix(clanPrefix);
@@ -106,7 +108,7 @@ public class ClansStorageUtil {
             clan.setClanEnemies(clanEnemies);
             clan.setFriendlyFireAllowed(friendlyFire);
             clan.setClanPoints(clanPoints);
-            if (clanHomeWorld != null){
+            if (clanHomeWorld != null) {
                 clan.setClanHomeWorld(clanHomeWorld);
                 clan.setClanHomeX(clanHomeX);
                 clan.setClanHomeY(clanHomeY);
@@ -117,7 +119,7 @@ public class ClansStorageUtil {
             clan.setMaxAllowedProtectedChests(maxAllowedProtectedChests);
 
             ConfigurationSection chestSection = clansStorage.getConfigurationSection("clans.data." + key + ".protectedChests");
-            if (chestSection != null){
+            if (chestSection != null) {
                 clansStorage.getConfigurationSection("clans.data." + key + ".protectedChests").getKeys(false).forEach(configChest -> {
                     String chestUUID = clansStorage.getString("clans.data." + key + ".protectedChests." + configChest + ".chestUUID");
                     String chestWorld = clansStorage.getString("clans.data." + key + ".protectedChests." + configChest + ".chestWorld");
@@ -127,7 +129,7 @@ public class ClansStorageUtil {
                     List<String> playersWithAccessConfigSection = clansStorage.getStringList("clans.data." + key + ".protectedChests." + configChest + ".playersWithAccess");
                     ArrayList<String> playersWithAccess = new ArrayList<>(playersWithAccessConfigSection);
                     World world = Bukkit.getWorld(chestWorld);
-                    if (world != null){
+                    if (world != null) {
                         Location location = new Location(world, chestX, chestY, chestZ);
                         Chest chest = new Chest(clan, location);
                         chest.setUUID(chestUUID);
@@ -136,9 +138,9 @@ public class ClansStorageUtil {
                         chest.setChestLocationZ(chestZ);
                         chest.setPlayersWithAccess(playersWithAccess);
                         protectedChests.put(chestUUID, chest);
-                    }else {
-                        console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("chest-location-load-failed")
-                                .replace("%WORLD%", chestWorld).replace("%CLAN%", clanFinalName)));
+                    } else {
+                        MessageUtils.sendConsole("warning", messagesConfig.getString("chest-location-load-failed")
+                                .replace("%WORLD%", chestWorld).replace("%CLAN%", clanFinalName));
                     }
                 });
             }
@@ -147,12 +149,12 @@ public class ClansStorageUtil {
 
             clansList.put(uuid, clan);
         });
-        if (!clansStorage.getBoolean("name-strip-colour-complete")){
+        if (!clansStorage.getBoolean("name-strip-colour-complete")) {
             clansStorage.set("name-strip-colour-complete", true);
         }
     }
 
-    public static Clan createClan(Player player, String clanName){
+    public static Clan createClan(Player player, String clanName) {
         UUID ownerUUID = player.getUniqueId();
         String ownerUUIDString = player.getUniqueId().toString();
         Clan newClan = new Clan(ownerUUIDString, clanName);
@@ -161,30 +163,32 @@ public class ClansStorageUtil {
         return newClan;
     }
 
-    public static boolean isClanExisting(Player player){
+    public static boolean isClanExisting(Player player) {
         UUID uuid = player.getUniqueId();
-        if (clansList.containsKey(uuid)){
+        if (clansList.containsKey(uuid)) {
             return true;
         }
         return false;
     }
 
-    public static boolean deleteClan(Player player) throws IOException{
+    public static boolean deleteClan(Player player) throws IOException {
         UUID uuid = player.getUniqueId();
         String key = uuid.toString();
-        if (findClanByOwner(player) != null){
-            if (isClanOwner(player)){
-                if (clansList.containsKey(uuid)){
-                    fireClanDisbandEvent(player);
-                    if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
-                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanDisbandEvent"));
-                    }
+        if (findClanByOwner(player) != null) {
+            if (isClanOwner(player)) {
+                if (clansList.containsKey(uuid)) {
+
+                    foliaLib.getImpl().runAsync((task) -> {
+                        fireAsyncClanDisbandEvent(player);
+                        MessageUtils.sendDebugConsole("Fired AsyncClanDisbandEvent");
+                    });
+
                     clansList.remove(uuid);
                     clansStorage.set("clans.data." + key, null);
                     Clans.getPlugin().clansFileManager.saveClansConfig();
                     return true;
-                }else {
-                    player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clans-update-error-1")));
+                } else {
+                    MessageUtils.sendPlayer(player, messagesConfig.getString("clans-update-error-1"));
                     return false;
                 }
             }
@@ -192,36 +196,38 @@ public class ClansStorageUtil {
         return false;
     }
 
-    public static boolean deleteOfflineClan(OfflinePlayer offlinePlayer) throws IOException{
+    public static boolean deleteOfflineClan(OfflinePlayer offlinePlayer) throws IOException {
         UUID uuid = offlinePlayer.getUniqueId();
         String key = uuid.toString();
-        if (findClanByOfflineOwner(offlinePlayer) != null){
-            if (clansList.containsKey(uuid)){
-                fireOfflineClanDisbandEvent(offlinePlayer);
-                if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
-                    console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired OfflineClanDisbandEvent"));
-                }
+        if (findClanByOfflineOwner(offlinePlayer) != null) {
+            if (clansList.containsKey(uuid)) {
+
+                foliaLib.getImpl().runAsync((task) -> {
+                    fireAsyncOfflineClanDisbandEvent(offlinePlayer);
+                    MessageUtils.sendDebugConsole("Fired AsyncOfflineClanDisbandEvent");
+                });
+
                 clansList.remove(uuid);
                 clansStorage.set("clans.data." + key, null);
                 Clans.getPlugin().clansFileManager.saveClansConfig();
                 return true;
-            }else {
-                console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clans-update-error-1")));
+            } else {
+                MessageUtils.sendConsole(messagesConfig.getString("clans-update-error-1"));
                 return false;
             }
         }
         return false;
     }
 
-    public static boolean isClanOwner(Player player){
+    public static boolean isClanOwner(Player player) {
         UUID uuid = player.getUniqueId();
         String ownerUUID = uuid.toString();
         Clan clan = clansList.get(uuid);
-        if (clan != null){
-            if (clan.getClanOwner() == null){
+        if (clan != null) {
+            if (clan.getClanOwner() == null) {
                 return false;
-            }else {
-                if (clan.getClanOwner().equals(ownerUUID)){
+            } else {
+                if (clan.getClanOwner().equals(ownerUUID)) {
                     return true;
                 }
             }
@@ -229,23 +235,23 @@ public class ClansStorageUtil {
         return false;
     }
 
-    public static Clan findClanByOwner(Player player){
+    public static Clan findClanByOwner(Player player) {
         UUID uuid = player.getUniqueId();
         return clansList.get(uuid);
     }
 
-    public static Clan findClanByOfflineOwner(OfflinePlayer offlinePlayer){
+    public static Clan findClanByOfflineOwner(OfflinePlayer offlinePlayer) {
         UUID uuid = offlinePlayer.getUniqueId();
         return clansList.get(uuid);
     }
 
-    public static Clan findClanOwnerByClanPlayer(ClanPlayer clanPlayer){
+    public static Clan findClanOwnerByClanPlayer(ClanPlayer clanPlayer) {
         UUID uuid = UUID.fromString(clanPlayer.getJavaUUID());
         return clansList.get(uuid);
     }
 
-    public static Clan findClanByPlayer(Player player){
-        for (Clan clan : clansList.values()){
+    public static Clan findClanByPlayer(Player player) {
+        for (Clan clan : clansList.values()) {
             if (findClanByOwner(player) != null) {
                 return clan;
             }
@@ -260,14 +266,14 @@ public class ClansStorageUtil {
         return null;
     }
 
-    public static Clan findClanByOfflinePlayer(OfflinePlayer player){
-        for (Clan clan : clansList.values()){
-            if (findClanByOfflineOwner(player) != null){
+    public static Clan findClanByOfflinePlayer(OfflinePlayer player) {
+        for (Clan clan : clansList.values()) {
+            if (findClanByOfflineOwner(player) != null) {
                 return clan;
             }
-            if (clan.getClanMembers() != null){
-                for (String member : clan.getClanMembers()){
-                    if (member.equals(player.getUniqueId().toString())){
+            if (clan.getClanMembers() != null) {
+                for (String member : clan.getClanMembers()) {
+                    if (member.equals(player.getUniqueId().toString())) {
                         return clan;
                     }
                 }
@@ -276,14 +282,14 @@ public class ClansStorageUtil {
         return null;
     }
 
-    public static Clan findClanPlayerByClanPlayer(ClanPlayer clanPlayer){
-        for (Clan clan : clansList.values()){
-            if (findClanOwnerByClanPlayer(clanPlayer) != null){
+    public static Clan findClanPlayerByClanPlayer(ClanPlayer clanPlayer) {
+        for (Clan clan : clansList.values()) {
+            if (findClanOwnerByClanPlayer(clanPlayer) != null) {
                 return clan;
             }
-            if (clan.getClanMembers() != null){
-                for (String member : clan.getClanMembers()){
-                    if (member.equals(clanPlayer.getJavaUUID())){
+            if (clan.getClanMembers() != null) {
+                for (String member : clan.getClanMembers()) {
+                    if (member.equals(clanPlayer.getJavaUUID())) {
                         return clan;
                     }
                 }
@@ -292,24 +298,24 @@ public class ClansStorageUtil {
         return null;
     }
 
-    public static void updatePrefix(Player player, String prefix){
+    public static void updatePrefix(Player player, String prefix) {
         UUID uuid = player.getUniqueId();
-        if (!isClanOwner(player)){
-            player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-must-be-owner")));
+        if (!isClanOwner(player)) {
+            MessageUtils.sendPlayer(player, messagesConfig.getString("clan-must-be-owner"));
             return;
         }
         Clan clan = clansList.get(uuid);
         clan.setClanPrefix(prefix);
     }
 
-    public static boolean addClanMember(Clan clan, Player player){
+    public static boolean addClanMember(Clan clan, Player player) {
         UUID uuid = player.getUniqueId();
         String memberUUID = uuid.toString();
         clan.addClanMember(memberUUID);
-        if (clansConfig.getBoolean("protections.chests.enabled")){
+        if (clansConfig.getBoolean("protections.chests.enabled")) {
             HashMap<String, Chest> clanChestList = clan.getProtectedChests();
-            if (!clanChestList.isEmpty()){
-                for (Map.Entry<String, Chest> chestEntry : clanChestList.entrySet()){
+            if (!clanChestList.isEmpty()) {
+                for (Map.Entry<String, Chest> chestEntry : clanChestList.entrySet()) {
                     Chest chest = chestEntry.getValue();
                     ArrayList<String> playersWithAccess = chest.getPlayersWithAccess();
                     playersWithAccess.add(memberUUID);
@@ -321,14 +327,14 @@ public class ClansStorageUtil {
         return true;
     }
 
-    public static boolean removeClanMember(Clan clan, Player player){
+    public static boolean removeClanMember(Clan clan, Player player) {
         UUID uuid = player.getUniqueId();
         String memberUUID = uuid.toString();
         clan.removeClanMember(memberUUID);
-        if (clansConfig.getBoolean("protections.chests.enabled")){
+        if (clansConfig.getBoolean("protections.chests.enabled")) {
             HashMap<String, Chest> clanChestList = clan.getProtectedChests();
-            if (!clanChestList.isEmpty()){
-                for (Map.Entry<String, Chest> chestEntry : clanChestList.entrySet()){
+            if (!clanChestList.isEmpty()) {
+                for (Map.Entry<String, Chest> chestEntry : clanChestList.entrySet()) {
                     Chest chest = chestEntry.getValue();
                     ArrayList<String> playersWithAccess = chest.getPlayersWithAccess();
                     playersWithAccess.remove(memberUUID);
@@ -340,14 +346,14 @@ public class ClansStorageUtil {
         return true;
     }
 
-    public static boolean removeOfflineClanMember(Clan clan, OfflinePlayer offlinePlayer){
+    public static boolean removeOfflineClanMember(Clan clan, OfflinePlayer offlinePlayer) {
         UUID offlineUUID = offlinePlayer.getUniqueId();
         String offlineMemberUUID = offlineUUID.toString();
         clan.removeClanMember(offlineMemberUUID);
-        if (clansConfig.getBoolean("protections.chests.enabled")){
+        if (clansConfig.getBoolean("protections.chests.enabled")) {
             HashMap<String, Chest> clanChestList = clan.getProtectedChests();
-            if (!clanChestList.isEmpty()){
-                for (Map.Entry<String, Chest> chestEntry : clanChestList.entrySet()){
+            if (!clanChestList.isEmpty()) {
+                for (Map.Entry<String, Chest> chestEntry : clanChestList.entrySet()) {
                     Chest chest = chestEntry.getValue();
                     ArrayList<String> playersWithAccess = chest.getPlayersWithAccess();
                     playersWithAccess.add(offlineMemberUUID);
@@ -359,7 +365,7 @@ public class ClansStorageUtil {
         return true;
     }
 
-    public static void addClanEnemy(Player clanOwner, Player enemyClanOwner){
+    public static void addClanEnemy(Player clanOwner, Player enemyClanOwner) {
         UUID ownerUUID = clanOwner.getUniqueId();
         UUID enemyUUID = enemyClanOwner.getUniqueId();
         String enemyOwnerUUID = enemyUUID.toString();
@@ -367,7 +373,7 @@ public class ClansStorageUtil {
         clan.addClanEnemy(enemyOwnerUUID);
     }
 
-    public static void removeClanEnemy(Player clanOwner, Player enemyClanOwner){
+    public static void removeClanEnemy(Player clanOwner, Player enemyClanOwner) {
         UUID ownerUUID = clanOwner.getUniqueId();
         UUID enemyUUID = enemyClanOwner.getUniqueId();
         String enemyOwnerUUID = enemyUUID.toString();
@@ -375,7 +381,7 @@ public class ClansStorageUtil {
         clan.removeClanEnemy(enemyOwnerUUID);
     }
 
-    public static void addClanAlly(Player clanOwner, Player allyClanOwner){
+    public static void addClanAlly(Player clanOwner, Player allyClanOwner) {
         UUID ownerUUID = clanOwner.getUniqueId();
         UUID uuid = allyClanOwner.getUniqueId();
         String allyUUID = uuid.toString();
@@ -383,7 +389,7 @@ public class ClansStorageUtil {
         clan.addClanAlly(allyUUID);
     }
 
-    public static void removeClanAlly(Player clanOwner, Player allyClanOwner){
+    public static void removeClanAlly(Player clanOwner, Player allyClanOwner) {
         UUID ownerUUID = clanOwner.getUniqueId();
         UUID uuid = allyClanOwner.getUniqueId();
         String allyUUID = uuid.toString();
@@ -391,35 +397,35 @@ public class ClansStorageUtil {
         clan.removeClanAlly(allyUUID);
     }
 
-    public static boolean isHomeSet(Clan clan){
-        if (clan.getClanHomeWorld() != null){
+    public static boolean isHomeSet(Clan clan) {
+        if (clan.getClanHomeWorld() != null) {
             return true;
         }
         return false;
     }
 
-    public static void deleteHome(Clan clan){
+    public static void deleteHome(Clan clan) {
         String key = clan.getClanOwner();
         clan.setClanHomeWorld(null);
         clansStorage.set("clans.data." + key + ".clanHome", null);
         Clans.getPlugin().clansFileManager.saveClansConfig();
     }
 
-    public static String stripClanNameColorCodes(Clan clan){
+    public static String stripClanNameColorCodes(Clan clan) {
         String clanFinalName = clan.getClanFinalName();
-        if (clansConfig.getBoolean("general.developer-debug-mode.enabled")||!clansStorage.getBoolean("name-strip-colour-complete")
-                ||clanFinalName.contains("&")||clanFinalName.contains("#")){
-            console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFound Colour Code To Strip"));
-            console.sendMessage(ColorUtils.translateColorCodes("&aOriginal Name: ") + clanFinalName);
-            console.sendMessage(ColorUtils.translateColorCodes("&aNew Name: ") + (clanFinalName == null?null:STRIP_COLOR_PATTERN.matcher(clanFinalName).replaceAll("")));
+        if (Clans.getPlugin().isDebugMode() || !clansStorage.getBoolean("name-strip-colour-complete")
+                || clanFinalName.contains("&") || clanFinalName.contains("#")) {
+            MessageUtils.sendConsole("Found Colour Code To Strip");
+            MessageUtils.sendConsole("Original Name: " + clanFinalName);
+            MessageUtils.sendConsole("New Name: " + (clanFinalName == null ? null : STRIP_COLOR_PATTERN.matcher(clanFinalName).replaceAll("")));
         }
-        return clanFinalName == null?null:STRIP_COLOR_PATTERN.matcher(clanFinalName).replaceAll("");
+        return clanFinalName == null ? null : STRIP_COLOR_PATTERN.matcher(clanFinalName).replaceAll("");
     }
 
-    public static Clan transferClanOwner(Clan originalClan, Player originalClanOwner, Player newClanOwner) throws IOException{
-        if (findClanByOwner(originalClanOwner) != null){
-            if (isClanOwner(originalClanOwner)){
-                if (!isClanOwner(newClanOwner) && findClanByPlayer(newClanOwner) == null){
+    public static Clan transferClanOwner(Clan originalClan, Player originalClanOwner, Player newClanOwner) throws IOException {
+        if (findClanByOwner(originalClanOwner) != null) {
+            if (isClanOwner(originalClanOwner)) {
+                if (!isClanOwner(newClanOwner) && findClanByPlayer(newClanOwner) == null) {
                     String originalOwnerKey = originalClanOwner.getUniqueId().toString();
                     UUID originalOwnerUUID = originalClanOwner.getUniqueId();
                     UUID newOwnerUUID = newClanOwner.getUniqueId();
@@ -458,44 +464,46 @@ public class ClansStorageUtil {
 
                     clansList.put(newOwnerUUID, newClan);
 
-                    if (clansList.containsKey(originalOwnerUUID)){
-                        fireClanTransferOwnershipEvent(originalClanOwner, newClanOwner, newClan);
-                        if (clansConfig.getBoolean("general.developer-debug-mode.enabled")){
-                            console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanTransferOwnershipEvent"));
-                        }
+                    if (clansList.containsKey(originalOwnerUUID)) {
+
+                        foliaLib.getImpl().runAsync((task) -> {
+                           fireAsyncClanTransferOwnershipEvent(originalClanOwner, newClanOwner, newClan);
+                           MessageUtils.sendDebugConsole("Fired AsyncClanTransferOwnershipEvent");
+                        });
+
                         clansList.remove(originalOwnerUUID);
                         clansStorage.set("clans.data." + originalOwnerKey, null);
                         Clans.getPlugin().clansFileManager.saveClansConfig();
-                    }else {
-                        originalClanOwner.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clans-update-error-1")));
+                    } else {
+                        MessageUtils.sendPlayer(originalClanOwner, messagesConfig.getString("clans-update-error-1"));
                     }
                     return newClan;
-                }else {
-                    originalClanOwner.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-ownership-transfer-failed-target-in-clan")));
+                } else {
+                    MessageUtils.sendPlayer(originalClanOwner, messagesConfig.getString("clan-ownership-transfer-failed-target-in-clan"));
                 }
-            }else {
-                originalClanOwner.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-must-be-owner")));
+            } else {
+                MessageUtils.sendPlayer(originalClanOwner, messagesConfig.getString("clan-must-be-owner"));
             }
         }
         return null;
     }
 
-    public static boolean hasEnoughPoints(Clan clan, int points){
-        if (clan.getClanPoints() >= points){
+    public static boolean hasEnoughPoints(Clan clan, int points) {
+        if (clan.getClanPoints() >= points) {
             return true;
         }
         return false;
     }
 
-    public static void addPoints(Clan clan, int points){
-       int currentPointValue = clan.getClanPoints();
-       clan.setClanPoints(currentPointValue + points);
+    public static void addPoints(Clan clan, int points) {
+        int currentPointValue = clan.getClanPoints();
+        clan.setClanPoints(currentPointValue + points);
     }
 
-    public static boolean withdrawPoints(Clan clan, int points){
+    public static boolean withdrawPoints(Clan clan, int points) {
         int currentPointValue = clan.getClanPoints();
-        if (currentPointValue != 0){
-            if (hasEnoughPoints(clan, points)){
+        if (currentPointValue != 0) {
+            if (hasEnoughPoints(clan, points)) {
                 clan.setClanPoints(currentPointValue - points);
                 return true;
             }
@@ -504,32 +512,32 @@ public class ClansStorageUtil {
         return false;
     }
 
-    public static void setPoints(Clan clan, int points){
+    public static void setPoints(Clan clan, int points) {
         clan.setClanPoints(points);
     }
 
-    public static void resetPoints(Clan clan){
+    public static void resetPoints(Clan clan) {
         clan.setClanPoints(0);
     }
 
-    public static Location getChestLocation(Chest chest){
+    public static Location getChestLocation(Chest chest) {
         String worldName = chest.getChestWorldName();
         double chestX = chest.getChestLocationX();
         double chestY = chest.getChestLocationY();
         double chestZ = chest.getChestLocationZ();
         World world = Bukkit.getWorld(worldName);
-        if (world != null){
+        if (world != null) {
             return new Location(world, chestX, chestY, chestZ);
         }
         return null;
     }
 
-    public static boolean isChestLocked(Clan clan, Location location){
+    public static boolean isChestLocked(Clan clan, Location location) {
         HashMap<String, Chest> clanChestList = clan.getProtectedChests();
-        for (Map.Entry<String, Chest> chest : clanChestList.entrySet()){
+        for (Map.Entry<String, Chest> chest : clanChestList.entrySet()) {
             Location chestLocation = getChestLocation(chest.getValue());
-            if (chestLocation != null){
-                if (chestLocation.equals(location)){
+            if (chestLocation != null) {
+                if (chestLocation.equals(location)) {
                     return true;
                 }
             }
@@ -537,14 +545,14 @@ public class ClansStorageUtil {
         return false;
     }
 
-    public static boolean isChestLocked(Location location){
+    public static boolean isChestLocked(Location location) {
         List<Chest> allChests = getGlobalLockedChests();
-        for (Chest chest : allChests){
-            if (chest != null){
+        for (Chest chest : allChests) {
+            if (chest != null) {
                 String worldName = chest.getChestWorldName();
                 World world = Bukkit.getWorld(worldName);
                 Location chestLocation = new Location(world, chest.getChestLocationX(), chest.getChestLocationY(), chest.getChestLocationZ());
-                if (chestLocation.equals(location)){
+                if (chestLocation.equals(location)) {
                     return true;
                 }
             }
@@ -552,12 +560,12 @@ public class ClansStorageUtil {
         return false;
     }
 
-    public static boolean addProtectedChest(Clan clan, Location location, Player player){
+    public static boolean addProtectedChest(Clan clan, Location location, Player player) {
         HashMap<String, Chest> clanChestList = clan.getProtectedChests();
-        if (isChestLocked(clan, location)){
-            player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("failed-chest-already-protected")));
+        if (isChestLocked(clan, location)) {
+            MessageUtils.sendPlayer(player, messagesConfig.getString("failed-chest-already-protected"));
             return false;
-        }else {
+        } else {
             UUID newChestUUID = UUID.randomUUID();
             String chestUUID = newChestUUID.toString();
             Chest chest = new Chest(clan, location);
@@ -566,17 +574,17 @@ public class ClansStorageUtil {
         }
     }
 
-    public static boolean removeProtectedChest(String clanOwnerUUID, Location location) throws IOException{
+    public static boolean removeProtectedChest(String clanOwnerUUID, Location location) throws IOException {
         UUID uuid = UUID.fromString(clanOwnerUUID);
         Clan clan = findClanByOfflineOwner(Bukkit.getOfflinePlayer(uuid));
         String key = clan.getClanOwner();
         HashMap<String, Chest> clanChestList = clan.getProtectedChests();
-        if (isChestLocked(clan, location)){
-            for (Map.Entry<String, Chest> chest : clanChestList.entrySet()){
+        if (isChestLocked(clan, location)) {
+            for (Map.Entry<String, Chest> chest : clanChestList.entrySet()) {
                 String worldName = chest.getValue().getChestWorldName();
                 World world = Bukkit.getWorld(worldName);
                 Location chestLocation = new Location(world, chest.getValue().getChestLocationX(), chest.getValue().getChestLocationY(), chest.getValue().getChestLocationZ());
-                if (chestLocation.equals(getChestByLocation(clan, location))){
+                if (chestLocation.equals(getChestByLocation(clan, location))) {
                     String chestUUID = chest.getKey();
                     clanChestList.remove(chestUUID);
                     clan.setProtectedChests(clanChestList);
@@ -590,62 +598,62 @@ public class ClansStorageUtil {
         return false;
     }
 
-    public static boolean removeProtectedChest(Clan clan, Location location, Player player) throws IOException{
+    public static boolean removeProtectedChest(Clan clan, Location location, Player player) throws IOException {
         String key = clan.getClanOwner();
-        if (isChestLocked(clan, location)){
-            if (removeProtectedChest(key, location)){
+        if (isChestLocked(clan, location)) {
+            if (removeProtectedChest(key, location)) {
                 return true;
             }
-        }else {
-            player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("failed-chest-not-protected")));
+        } else {
+            MessageUtils.sendPlayer(player, messagesConfig.getString("failed-chest-not-protected"));
             return false;
         }
         return false;
     }
 
-    public static boolean removeProtectedChest(String clanOwnerUUID, Location location, Player player) throws IOException{
+    public static boolean removeProtectedChest(String clanOwnerUUID, Location location, Player player) throws IOException {
         UUID uuid = UUID.fromString(clanOwnerUUID);
         Clan clan = findClanByOfflineOwner(Bukkit.getOfflinePlayer(uuid));
-        if (removeProtectedChest(clan, location, player)){
+        if (removeProtectedChest(clan, location, player)) {
             return true;
         }
         return false;
     }
 
-    public static Set<Map.Entry<String, Chest>> getAllProtectedChestsByClan(Clan clan){
+    public static Set<Map.Entry<String, Chest>> getAllProtectedChestsByClan(Clan clan) {
         return clan.getProtectedChests().entrySet();
     }
 
-    public static Location getChestByLocation(Clan clan, Location location){
+    public static Location getChestByLocation(Clan clan, Location location) {
         HashMap<String, Chest> clanChestList = clan.getProtectedChests();
-        for (Map.Entry<String, Chest> chest : clanChestList.entrySet()){
+        for (Map.Entry<String, Chest> chest : clanChestList.entrySet()) {
             String worldName = chest.getValue().getChestWorldName();
             World world = Bukkit.getWorld(worldName);
             Location chestLocation = new Location(world, chest.getValue().getChestLocationX(), chest.getValue().getChestLocationY(), chest.getValue().getChestLocationZ());
-            if (chestLocation.equals(location)){
+            if (chestLocation.equals(location)) {
                 return chestLocation;
             }
         }
         return null;
     }
 
-    public static Chest getChestByLocation(Location location){
+    public static Chest getChestByLocation(Location location) {
         List<Chest> allChests = getGlobalLockedChests();
-        for (Chest chest : allChests){
+        for (Chest chest : allChests) {
             String worldName = chest.getChestWorldName();
             World world = Bukkit.getWorld(worldName);
             Location chestLocation = new Location(world, chest.getChestLocationX(), chest.getChestLocationY(), chest.getChestLocationZ());
-            if (location.equals(chestLocation)){
+            if (location.equals(chestLocation)) {
                 return chest;
             }
         }
         return null;
     }
 
-    public static List<Location> getAllProtectedChestsLocationsByClan(Clan clan){
+    public static List<Location> getAllProtectedChestsLocationsByClan(Clan clan) {
         HashMap<String, Chest> clanChestList = clan.getProtectedChests();
         List<Location> allChestLocations = new ArrayList<>();
-        for (Map.Entry<String, Chest> chest : clanChestList.entrySet()){
+        for (Map.Entry<String, Chest> chest : clanChestList.entrySet()) {
             String worldName = chest.getValue().getChestWorldName();
             World world = Bukkit.getWorld(worldName);
             Location chestLocation = new Location(world, chest.getValue().getChestLocationX(), chest.getValue().getChestLocationY(), chest.getValue().getChestLocationZ());
@@ -654,14 +662,14 @@ public class ClansStorageUtil {
         return allChestLocations;
     }
 
-    public static List<String> getPlayersWithChestAccessByChest(Chest chest){
+    public static List<String> getPlayersWithChestAccessByChest(Chest chest) {
         return chest.getPlayersWithAccess();
     }
 
-    public static List<OfflinePlayer> getOfflinePlayersWithChestAccessByChest(Chest chest){
+    public static List<OfflinePlayer> getOfflinePlayersWithChestAccessByChest(Chest chest) {
         List<String> playersWithAccess = getPlayersWithChestAccessByChest(chest);
         List<OfflinePlayer> offlinePlayersWithAccess = new ArrayList<>();
-        for (String string : playersWithAccess){
+        for (String string : playersWithAccess) {
             UUID uuid = UUID.fromString(string);
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
             offlinePlayersWithAccess.add(offlinePlayer);
@@ -669,14 +677,14 @@ public class ClansStorageUtil {
         return offlinePlayersWithAccess;
     }
 
-    public static boolean hasAccessToLockedChest(OfflinePlayer offlinePlayer, Chest chest){
+    public static boolean hasAccessToLockedChest(OfflinePlayer offlinePlayer, Chest chest) {
         return getOfflinePlayersWithChestAccessByChest(chest).contains(offlinePlayer);
     }
 
-    public static List<Location> getGlobalLockedChestLocations(){
+    public static List<Location> getGlobalLockedChestLocations() {
         List<Chest> allLockedChest = getGlobalLockedChests();
         List<Location> allLockedChestLocations = new ArrayList<>();
-        for (Chest chest : allLockedChest){
+        for (Chest chest : allLockedChest) {
             String worldName = chest.getChestWorldName();
             World world = Bukkit.getWorld(worldName);
             Location location = new Location(world, chest.getChestLocationX(), chest.getChestLocationY(), chest.getChestLocationZ());
@@ -685,42 +693,42 @@ public class ClansStorageUtil {
         return allLockedChestLocations;
     }
 
-    public static List<Chest> getGlobalLockedChests(){
+    public static List<Chest> getGlobalLockedChests() {
         List<Chest> allLockedChests = new ArrayList<>();
-        for (Clan clan : clansList.values()){
-            for (Map.Entry<String, Chest> chests : clan.getProtectedChests().entrySet()){
+        for (Clan clan : clansList.values()) {
+            for (Map.Entry<String, Chest> chests : clan.getProtectedChests().entrySet()) {
                 allLockedChests.add(chests.getValue());
             }
         }
         return allLockedChests;
     }
 
-    public static Set<Map.Entry<UUID, Clan>> getClans(){
+    public static Set<Map.Entry<UUID, Clan>> getClans() {
         return clansList.entrySet();
     }
 
-    public static Set<UUID> getRawClansList(){
+    public static Set<UUID> getRawClansList() {
         return clansList.keySet();
     }
 
-    public static Collection<Clan> getClanList(){
+    public static Collection<Clan> getClanList() {
         return clansList.values();
     }
 
-    private static void fireClanDisbandEvent(Player player) {
+    private static void fireAsyncClanDisbandEvent(Player player) {
         Clan clanByOwner = ClansStorageUtil.findClanByOwner(player);
-        ClanDisbandEvent clanDisbandEvent = new ClanDisbandEvent(player, clanByOwner.getClanFinalName());
-        Bukkit.getPluginManager().callEvent(clanDisbandEvent);
+        AsyncClanDisbandEvent asyncClanDisbandEvent = new AsyncClanDisbandEvent(true, player, clanByOwner.getClanFinalName());
+        Bukkit.getPluginManager().callEvent(asyncClanDisbandEvent);
     }
 
-    private static void fireOfflineClanDisbandEvent(OfflinePlayer offlinePlayer){
+    private static void fireAsyncOfflineClanDisbandEvent(OfflinePlayer offlinePlayer) {
         Clan clanByOfflineOwner = ClansStorageUtil.findClanByOfflineOwner(offlinePlayer);
-        ClanOfflineDisbandEvent clanOfflineDisbandEvent = new ClanOfflineDisbandEvent(offlinePlayer, clanByOfflineOwner.getClanFinalName());
-        Bukkit.getPluginManager().callEvent(clanOfflineDisbandEvent);
+        AsyncClanOfflineDisbandEvent asyncClanOfflineDisbandEvent = new AsyncClanOfflineDisbandEvent(true, offlinePlayer, clanByOfflineOwner.getClanFinalName());
+        Bukkit.getPluginManager().callEvent(asyncClanOfflineDisbandEvent);
     }
 
-    private static void fireClanTransferOwnershipEvent(Player originalClanOwner, Player newClanOwner, Clan newClan){
-        ClanTransferOwnershipEvent clanTransferOwnershipEvent = new ClanTransferOwnershipEvent(originalClanOwner, originalClanOwner, newClanOwner, newClan);
-        Bukkit.getPluginManager().callEvent(clanTransferOwnershipEvent);
+    private static void fireAsyncClanTransferOwnershipEvent(Player originalClanOwner, Player newClanOwner, Clan newClan) {
+        AsyncClanTransferOwnershipEvent asyncClanTransferOwnershipEvent = new AsyncClanTransferOwnershipEvent(true, originalClanOwner, originalClanOwner, newClanOwner, newClan);
+        Bukkit.getPluginManager().callEvent(asyncClanTransferOwnershipEvent);
     }
 }

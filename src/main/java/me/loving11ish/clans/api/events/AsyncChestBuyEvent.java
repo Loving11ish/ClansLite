@@ -1,11 +1,11 @@
-package me.loving11ish.clans.api;
+package me.loving11ish.clans.api.events;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import me.loving11ish.clans.models.Clan;
 
-public class ChestBuyEvent extends Event {
+public class AsyncChestBuyEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
     private final Player createdBy;
@@ -13,7 +13,8 @@ public class ChestBuyEvent extends Event {
     private final int oldClanMaxAllowedChests;
     private final int newChestCount;
 
-    public ChestBuyEvent(Player createdBy, Clan owningClan, int oldClanMaxAllowedChests, int newChestCount) {
+    public AsyncChestBuyEvent(boolean isAsync, Player createdBy, Clan owningClan, int oldClanMaxAllowedChests, int newChestCount) {
+        super(isAsync);
         this.createdBy = createdBy;
         this.owningClan = owningClan;
         this.oldClanMaxAllowedChests = oldClanMaxAllowedChests;

@@ -1,19 +1,20 @@
 package me.loving11ish.clans.commands;
 
+import com.tcoded.folialib.FoliaLib;
+import me.loving11ish.clans.api.events.AsyncClanChatMessageSendEvent;
+import me.loving11ish.clans.utils.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import me.loving11ish.clans.Clans;
-import me.loving11ish.clans.api.ClanChatMessageSendEvent;
 import me.loving11ish.clans.models.Clan;
 import me.loving11ish.clans.models.ClanPlayer;
 import me.loving11ish.clans.utils.ClansStorageUtil;
 import me.loving11ish.clans.utils.ColorUtils;
-import me.loving11ish.clans.utils.UsermapStorageUtil;
+import me.loving11ish.clans.utils.UserMapStorageUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +23,7 @@ import java.util.UUID;
 
 public class ClanChatCommand implements CommandExecutor {
 
-    private final ConsoleCommandSender console = Bukkit.getConsoleSender();
+    private final FoliaLib foliaLib = Clans.getFoliaLib();
 
     private final FileConfiguration clansConfig = Clans.getPlugin().getConfig();
     private final FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
@@ -34,11 +35,11 @@ public class ClanChatCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (sender instanceof Player){
+        if (sender instanceof Player) {
             Player player = (Player) sender;
             UUID uuid = player.getUniqueId();
-            if (!(clansConfig.getBoolean("clan-chat.enabled"))){
-                player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("function-disabled")));
+            if (!(clansConfig.getBoolean("clan-chat.enabled"))) {
+                MessageUtils.sendPlayer(player, messagesConfig.getString("function-disabled"));
                 return true;
             }
 
@@ -46,11 +47,11 @@ public class ClanChatCommand implements CommandExecutor {
                 player.sendMessage(ColorUtils.translateColorCodes(sendUsage()));
                 return true;
 
-            }else {
+            } else {
                 ArrayList<Player> onlinePlayers = new ArrayList<>(Bukkit.getServer().getOnlinePlayers());
                 ArrayList<Player> playersWithSpyPerms = new ArrayList<>();
                 for (Player p : onlinePlayers) {
-                    ClanPlayer clanPlayer = UsermapStorageUtil.getClanPlayerByBukkitPlayer(p);
+                    ClanPlayer clanPlayer = UserMapStorageUtil.getClanPlayerByBukkitPlayer(p);
                     if (clanPlayer.getCanChatSpy() && p.hasPermission("clanslite.chat.spy")) {
                         playersWithSpyPerms.add(p);
                     }
@@ -75,32 +76,39 @@ public class ClanChatCommand implements CommandExecutor {
 
                                 //If player still has time left on cool down
                                 Long timeLeft = (chatCoolDownTimer.get(uuid) - System.currentTimeMillis()) / 1000;
-                                player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("home-cool-down-timer-wait")
-                                        .replace(TIME_LEFT, timeLeft.toString())));
+                                MessageUtils.sendPlayer(player, messagesConfig.getString("home-cool-down-timer-wait")
+                                        .replace(TIME_LEFT, timeLeft.toString()));
                             } else {
 
                                 //Add player to cool down and run message
                                 chatCoolDownTimer.put(uuid, System.currentTimeMillis() + (clansConfig.getLong("clan-chat.cool-down.time") * 1000));
                                 if (clanByMember != null) {
                                     ArrayList<String> playerClanMembers = clanByMember.getClanMembers();
-                                    fireClanChatMessageSendEvent(player, clanByMember, clansConfig.getString("clan-chat.chat-prefix"), messageString.toString(), playerClanMembers);
-                                    if (clansConfig.getBoolean("general.developer-debug-mode.enabled")) {
-                                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanChatMessageSendEvent"));
-                                    }
+
+                                    foliaLib.getImpl().runAsync((task) -> {
+                                        fireAsyncClanChatMessageSendEvent(player, clanByMember, clansConfig.getString("clan-chat.chat-prefix"), messageString.toString(), playerClanMembers);
+                                        MessageUtils.sendDebugConsole("Fired AsyncClanChatMessageSendEvent");
+                                    });
+
                                     for (String playerClanMember : playerClanMembers) {
                                         if (playerClanMember != null) {
+
                                             UUID memberUUID = UUID.fromString(playerClanMember);
                                             UUID ownerUUID = UUID.fromString(clanByMember.getClanOwner());
                                             Player playerClanPlayer = Bukkit.getPlayer(memberUUID);
                                             Player playerClanOwner = Bukkit.getPlayer(ownerUUID);
+
                                             if (playerClanPlayer != null) {
+
                                                 if (playerClanOwner != null) {
-                                                    playerClanOwner.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByMember.getClanPrefix())));
+                                                    MessageUtils.sendPlayer(playerClanOwner, ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, clanByMember.getClanPrefix()));
                                                 }
-                                                playerClanPlayer.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByMember.getClanPrefix())));
+
+                                                MessageUtils.sendPlayer(playerClanPlayer, messageString.toString().replace(CLAN_PLACEHOLDER, clanByMember.getClanPrefix()));
+
                                                 if (clansConfig.getBoolean("clan-chat.chat-spy.enabled")) {
                                                     for (Player p : playersWithSpyPerms) {
-                                                        p.sendMessage(ColorUtils.translateColorCodes(chatSpyPrefix + " " + messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByMember.getClanPrefix())));
+                                                        MessageUtils.sendPlayer(p, chatSpyPrefix + " " + messageString.toString().replace(CLAN_PLACEHOLDER, clanByMember.getClanPrefix()));
                                                     }
                                                 }
                                                 return true;
@@ -108,31 +116,37 @@ public class ClanChatCommand implements CommandExecutor {
                                         }
                                     }
                                 }
+
                                 if (clanByOwner != null) {
                                     ArrayList<String> ownerClanMembers = clanByOwner.getClanMembers();
-                                    fireClanChatMessageSendEvent(player, clanByOwner, clansConfig.getString("clan-chat.chat-prefix"), messageString.toString(), ownerClanMembers);
-                                    if (clansConfig.getBoolean("general.developer-debug-mode.enabled")) {
-                                        console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanChatMessageSendEvent"));
-                                    }
+
+                                    foliaLib.getImpl().runAsync((task) -> {
+                                        fireAsyncClanChatMessageSendEvent(player, clanByOwner, clansConfig.getString("clan-chat.chat-prefix"), messageString.toString(), ownerClanMembers);
+                                        MessageUtils.sendDebugConsole("Fired AsyncClanChatMessageSendEvent");
+                                    });
+
                                     for (String ownerClanMember : ownerClanMembers) {
                                         if (ownerClanMember != null) {
                                             UUID memberUUID = UUID.fromString(ownerClanMember);
                                             Player ownerClanPlayer = Bukkit.getPlayer(memberUUID);
+
                                             if (ownerClanPlayer != null) {
-                                                ownerClanPlayer.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByOwner.getClanPrefix())));
-                                                player.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByOwner.getClanPrefix())));
+
+                                                MessageUtils.sendPlayer(ownerClanPlayer, messageString.toString().replace(CLAN_PLACEHOLDER, clanByOwner.getClanPrefix()));
+                                                MessageUtils.sendPlayer(player, messageString.toString().replace(CLAN_PLACEHOLDER, clanByOwner.getClanPrefix()));
+
                                                 if (clansConfig.getBoolean("clan-chat.chat-spy.enabled")) {
                                                     for (Player p : playersWithSpyPerms) {
-                                                        p.sendMessage(ColorUtils.translateColorCodes(chatSpyPrefix + " " + messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByOwner.getClanPrefix())));
+                                                        MessageUtils.sendPlayer(p, chatSpyPrefix + " " + messageString.toString().replace(CLAN_PLACEHOLDER, clanByOwner.getClanPrefix()));
                                                     }
                                                 }
                                                 return true;
                                             }
                                         }
                                     }
-                                    player.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByOwner.getClanPrefix())));
+                                    MessageUtils.sendPlayer(player, messageString.toString().replace(CLAN_PLACEHOLDER, clanByOwner.getClanPrefix()));
                                 } else {
-                                    player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("failed-must-be-in-clan")));
+                                    MessageUtils.sendPlayer(player, messagesConfig.getString("failed-must-be-in-clan"));
                                 }
                             }
                         } else {
@@ -140,24 +154,31 @@ public class ClanChatCommand implements CommandExecutor {
                             //If player has cool down bypass
                             if (clanByMember != null) {
                                 ArrayList<String> playerClanMembers = clanByMember.getClanMembers();
-                                fireClanChatMessageSendEvent(player, clanByMember, clansConfig.getString("clan-chat.chat-prefix"), messageString.toString(), playerClanMembers);
-                                if (clansConfig.getBoolean("general.developer-debug-mode.enabled")) {
-                                    console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanChatMessageSendEvent"));
-                                }
+
+                                foliaLib.getImpl().runAsync((task) -> {
+                                    fireAsyncClanChatMessageSendEvent(player, clanByMember, clansConfig.getString("clan-chat.chat-prefix"), messageString.toString(), playerClanMembers);
+                                    MessageUtils.sendDebugConsole("Fired AsyncClanChatMessageSendEvent");
+                                });
+
                                 for (String playerClanMember : playerClanMembers) {
                                     if (playerClanMember != null) {
+
                                         UUID memberUUID = UUID.fromString(playerClanMember);
                                         UUID ownerUUID = UUID.fromString(clanByMember.getClanOwner());
                                         Player playerClanPlayer = Bukkit.getPlayer(memberUUID);
                                         Player playerClanOwner = Bukkit.getPlayer(ownerUUID);
+
                                         if (playerClanPlayer != null) {
+
                                             if (playerClanOwner != null) {
-                                                playerClanOwner.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByMember.getClanPrefix())));
+                                                MessageUtils.sendPlayer(playerClanOwner, messageString.toString().replace(CLAN_PLACEHOLDER, clanByMember.getClanPrefix()));
                                             }
-                                            playerClanPlayer.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByMember.getClanPrefix())));
+
+                                            MessageUtils.sendPlayer(playerClanPlayer, messageString.toString().replace(CLAN_PLACEHOLDER, clanByMember.getClanPrefix()));
+
                                             if (clansConfig.getBoolean("clan-chat.chat-spy.enabled")) {
                                                 for (Player p : playersWithSpyPerms) {
-                                                    p.sendMessage(ColorUtils.translateColorCodes(chatSpyPrefix + " " + messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByMember.getClanPrefix())));
+                                                    MessageUtils.sendPlayer(p, chatSpyPrefix + " " + messageString.toString().replace(CLAN_PLACEHOLDER, clanByMember.getClanPrefix()));
                                                 }
                                             }
                                             return true;
@@ -165,31 +186,37 @@ public class ClanChatCommand implements CommandExecutor {
                                     }
                                 }
                             }
+
                             if (clanByOwner != null) {
                                 ArrayList<String> ownerClanMembers = clanByOwner.getClanMembers();
-                                fireClanChatMessageSendEvent(player, clanByOwner, clansConfig.getString("clan-chat.chat-prefix"), messageString.toString(), ownerClanMembers);
-                                if (clansConfig.getBoolean("general.developer-debug-mode.enabled")) {
-                                    console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanChatMessageSendEvent"));
-                                }
+
+                                foliaLib.getImpl().runAsync((task) -> {
+                                    fireAsyncClanChatMessageSendEvent(player, clanByOwner, clansConfig.getString("clan-chat.chat-prefix"), messageString.toString(), ownerClanMembers);
+                                    MessageUtils.sendDebugConsole("Fired AsyncClanChatMessageSendEvent");
+                                });
+
                                 for (String ownerClanMember : ownerClanMembers) {
                                     if (ownerClanMember != null) {
                                         UUID memberUUID = UUID.fromString(ownerClanMember);
                                         Player ownerClanPlayer = Bukkit.getPlayer(memberUUID);
+
                                         if (ownerClanPlayer != null) {
-                                            ownerClanPlayer.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByOwner.getClanPrefix())));
-                                            player.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByOwner.getClanPrefix())));
+
+                                            MessageUtils.sendPlayer(ownerClanPlayer, messageString.toString().replace(CLAN_PLACEHOLDER, clanByOwner.getClanPrefix()));
+                                            MessageUtils.sendPlayer(player, messageString.toString().replace(CLAN_PLACEHOLDER, clanByOwner.getClanPrefix()));
+
                                             if (clansConfig.getBoolean("clan-chat.chat-spy.enabled")) {
                                                 for (Player p : playersWithSpyPerms) {
-                                                    p.sendMessage(ColorUtils.translateColorCodes(chatSpyPrefix + " " + messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByOwner.getClanPrefix())));
+                                                    MessageUtils.sendPlayer(p, chatSpyPrefix + " " + messageString.toString().replace(CLAN_PLACEHOLDER, clanByOwner.getClanPrefix()));
                                                 }
                                             }
                                             return true;
                                         }
                                     }
                                 }
-                                player.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByOwner.getClanPrefix())));
+                                MessageUtils.sendPlayer(player, messageString.toString().replace(CLAN_PLACEHOLDER, clanByOwner.getClanPrefix()));
                             } else {
-                                player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("failed-must-be-in-clan")));
+                                MessageUtils.sendPlayer(player, messagesConfig.getString("failed-must-be-in-clan"));
                             }
                         }
                     } else {
@@ -198,24 +225,31 @@ public class ClanChatCommand implements CommandExecutor {
                         chatCoolDownTimer.put(uuid, System.currentTimeMillis() + (clansConfig.getLong("clan-chat.cool-down.time") * 1000));
                         if (clanByMember != null) {
                             ArrayList<String> playerClanMembers = clanByMember.getClanMembers();
-                            fireClanChatMessageSendEvent(player, clanByMember, clansConfig.getString("clan-chat.chat-prefix"), messageString.toString(), playerClanMembers);
-                            if (clansConfig.getBoolean("general.developer-debug-mode.enabled")) {
-                                console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanChatMessageSendEvent"));
-                            }
+
+                            foliaLib.getImpl().runAsync((task) -> {
+                                fireAsyncClanChatMessageSendEvent(player, clanByMember, clansConfig.getString("clan-chat.chat-prefix"), messageString.toString(), playerClanMembers);
+                                MessageUtils.sendDebugConsole("Fired AsyncClanChatMessageSendEvent");
+                            });
+
                             for (String playerClanMember : playerClanMembers) {
                                 if (playerClanMember != null) {
+
                                     UUID memberUUID = UUID.fromString(playerClanMember);
                                     UUID ownerUUID = UUID.fromString(clanByMember.getClanOwner());
                                     Player playerClanPlayer = Bukkit.getPlayer(memberUUID);
                                     Player playerClanOwner = Bukkit.getPlayer(ownerUUID);
+
                                     if (playerClanPlayer != null) {
+
                                         if (playerClanOwner != null) {
-                                            playerClanOwner.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByMember.getClanPrefix())));
+                                            MessageUtils.sendPlayer(playerClanOwner, messageString.toString().replace(CLAN_PLACEHOLDER, clanByMember.getClanPrefix()));
                                         }
-                                        playerClanPlayer.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByMember.getClanPrefix())));
+
+                                        MessageUtils.sendPlayer(playerClanPlayer, messageString.toString().replace(CLAN_PLACEHOLDER, clanByMember.getClanPrefix()));
+
                                         if (clansConfig.getBoolean("clan-chat.chat-spy.enabled")) {
                                             for (Player p : playersWithSpyPerms) {
-                                                p.sendMessage(ColorUtils.translateColorCodes(chatSpyPrefix + " " + messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByMember.getClanPrefix())));
+                                                MessageUtils.sendPlayer(p, chatSpyPrefix + " " + messageString.toString().replace(CLAN_PLACEHOLDER, clanByMember.getClanPrefix()));
                                             }
                                         }
                                         return true;
@@ -223,31 +257,37 @@ public class ClanChatCommand implements CommandExecutor {
                                 }
                             }
                         }
+
                         if (clanByOwner != null) {
                             ArrayList<String> ownerClanMembers = clanByOwner.getClanMembers();
-                            fireClanChatMessageSendEvent(player, clanByOwner, clansConfig.getString("clan-chat.chat-prefix"), messageString.toString(), ownerClanMembers);
-                            if (clansConfig.getBoolean("general.developer-debug-mode.enabled")) {
-                                console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanChatMessageSendEvent"));
-                            }
+
+                            foliaLib.getImpl().runAsync((task) -> {
+                                fireAsyncClanChatMessageSendEvent(player, clanByOwner, clansConfig.getString("clan-chat.chat-prefix"), messageString.toString(), ownerClanMembers);
+                                MessageUtils.sendDebugConsole("Fired AsyncClanChatMessageSendEvent");
+                            });
+
                             for (String ownerClanMember : ownerClanMembers) {
                                 if (ownerClanMember != null) {
                                     UUID memberUUID = UUID.fromString(ownerClanMember);
                                     Player ownerClanPlayer = Bukkit.getPlayer(memberUUID);
+
                                     if (ownerClanPlayer != null) {
-                                        ownerClanPlayer.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByOwner.getClanPrefix())));
-                                        player.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByOwner.getClanPrefix())));
+
+                                        MessageUtils.sendPlayer(ownerClanPlayer, messageString.toString().replace(CLAN_PLACEHOLDER, clanByOwner.getClanPrefix()));
+                                        MessageUtils.sendPlayer(player, messageString.toString().replace(CLAN_PLACEHOLDER, clanByOwner.getClanPrefix()));
+
                                         if (clansConfig.getBoolean("clan-chat.chat-spy.enabled")) {
                                             for (Player p : playersWithSpyPerms) {
-                                                p.sendMessage(ColorUtils.translateColorCodes(chatSpyPrefix + " " + messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByOwner.getClanPrefix())));
+                                                MessageUtils.sendPlayer(p, chatSpyPrefix + " " + messageString.toString().replace(CLAN_PLACEHOLDER, clanByOwner.getClanPrefix()));
                                             }
                                         }
                                         return true;
                                     }
                                 }
                             }
-                            player.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByOwner.getClanPrefix())));
+                            MessageUtils.sendPlayer(player, messageString.toString().replace(CLAN_PLACEHOLDER, clanByOwner.getClanPrefix()));
                         } else {
-                            player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("failed-must-be-in-clan")));
+                            MessageUtils.sendPlayer(player, messagesConfig.getString("failed-must-be-in-clan"));
                         }
                     }
                 } else {
@@ -255,24 +295,31 @@ public class ClanChatCommand implements CommandExecutor {
                     //If cool down disabled
                     if (clanByMember != null) {
                         ArrayList<String> playerClanMembers = clanByMember.getClanMembers();
-                        fireClanChatMessageSendEvent(player, clanByMember, clansConfig.getString("clan-chat.chat-prefix"), messageString.toString(), playerClanMembers);
-                        if (clansConfig.getBoolean("general.developer-debug-mode.enabled")) {
-                            console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanChatMessageSendEvent"));
-                        }
+
+                        foliaLib.getImpl().runAsync((task) -> {
+                            fireAsyncClanChatMessageSendEvent(player, clanByMember, clansConfig.getString("clan-chat.chat-prefix"), messageString.toString(), playerClanMembers);
+                            MessageUtils.sendDebugConsole("Fired AsyncClanChatMessageSendEvent");
+                        });
+
                         for (String playerClanMember : playerClanMembers) {
                             if (playerClanMember != null) {
+
                                 UUID memberUUID = UUID.fromString(playerClanMember);
                                 UUID ownerUUID = UUID.fromString(clanByMember.getClanOwner());
                                 Player playerClanPlayer = Bukkit.getPlayer(memberUUID);
                                 Player playerClanOwner = Bukkit.getPlayer(ownerUUID);
+
                                 if (playerClanPlayer != null) {
+
                                     if (playerClanOwner != null) {
-                                        playerClanOwner.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByMember.getClanPrefix())));
+                                        MessageUtils.sendPlayer(playerClanOwner, messageString.toString().replace(CLAN_PLACEHOLDER, clanByMember.getClanPrefix()));
                                     }
-                                    playerClanPlayer.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByMember.getClanPrefix())));
+
+                                    MessageUtils.sendPlayer(playerClanPlayer, messageString.toString().replace(CLAN_PLACEHOLDER, clanByMember.getClanPrefix()));
+
                                     if (clansConfig.getBoolean("clan-chat.chat-spy.enabled")) {
                                         for (Player p : playersWithSpyPerms) {
-                                            p.sendMessage(ColorUtils.translateColorCodes(chatSpyPrefix + " " + messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByMember.getClanPrefix())));
+                                            MessageUtils.sendPlayer(p, chatSpyPrefix + " " + messageString.toString().replace(CLAN_PLACEHOLDER, clanByMember.getClanPrefix()));
                                         }
                                     }
                                     return true;
@@ -280,49 +327,55 @@ public class ClanChatCommand implements CommandExecutor {
                             }
                         }
                     }
+
                     if (clanByOwner != null) {
                         ArrayList<String> ownerClanMembers = clanByOwner.getClanMembers();
-                        fireClanChatMessageSendEvent(player, clanByOwner, clansConfig.getString("clan-chat.chat-prefix"), messageString.toString(), ownerClanMembers);
-                        if (clansConfig.getBoolean("general.developer-debug-mode.enabled")) {
-                            console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug: &aFired ClanChatMessageSendEvent"));
-                        }
+
+                        foliaLib.getImpl().runAsync((task) -> {
+                            fireAsyncClanChatMessageSendEvent(player, clanByOwner, clansConfig.getString("clan-chat.chat-prefix"), messageString.toString(), ownerClanMembers);
+                            MessageUtils.sendDebugConsole("Fired AsyncClanChatMessageSendEvent");
+                        });
+
                         for (String ownerClanMember : ownerClanMembers) {
                             if (ownerClanMember != null) {
                                 UUID memberUUID = UUID.fromString(ownerClanMember);
                                 Player ownerClanPlayer = Bukkit.getPlayer(memberUUID);
+
                                 if (ownerClanPlayer != null) {
-                                    ownerClanPlayer.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByOwner.getClanPrefix())));
-                                    player.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByOwner.getClanPrefix())));
+
+                                    MessageUtils.sendPlayer(ownerClanPlayer, messageString.toString().replace(CLAN_PLACEHOLDER, clanByOwner.getClanPrefix()));
+                                    MessageUtils.sendPlayer(player, messageString.toString().replace(CLAN_PLACEHOLDER, clanByOwner.getClanPrefix()));
+
                                     if (clansConfig.getBoolean("clan-chat.chat-spy.enabled")) {
                                         for (Player p : playersWithSpyPerms) {
-                                            p.sendMessage(ColorUtils.translateColorCodes(chatSpyPrefix + " " + messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByOwner.getClanPrefix())));
+                                            MessageUtils.sendPlayer(p, chatSpyPrefix + " " + messageString.toString().replace(CLAN_PLACEHOLDER, clanByOwner.getClanPrefix()));
                                         }
                                     }
                                     return true;
                                 }
                             }
                         }
-                        player.sendMessage(ColorUtils.translateColorCodes(messageString.toString()).replace(CLAN_PLACEHOLDER, ColorUtils.translateColorCodes(clanByOwner.getClanPrefix())));
+                        MessageUtils.sendPlayer(player, messageString.toString().replace(CLAN_PLACEHOLDER, clanByOwner.getClanPrefix()));
                     } else {
-                        player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("failed-must-be-in-clan")));
+                        MessageUtils.sendPlayer(player, messagesConfig.getString("failed-must-be-in-clan"));
                     }
                 }
             }
-        }else {
-            console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("player-only-command")));
+        } else {
+            MessageUtils.sendConsole(messagesConfig.getString("player-only-command"));
         }
         return true;
     }
 
-    private static void fireClanChatMessageSendEvent(Player player, Clan clan, String prefix, String message, ArrayList<String> recipients) {
-        ClanChatMessageSendEvent clanChatMessageSendEvent = new ClanChatMessageSendEvent(player, clan, prefix, message, recipients);
-        Bukkit.getPluginManager().callEvent(clanChatMessageSendEvent);
+    private static void fireAsyncClanChatMessageSendEvent(Player player, Clan clan, String prefix, String message, ArrayList<String> recipients) {
+        AsyncClanChatMessageSendEvent asyncClanChatMessageSendEvent = new AsyncClanChatMessageSendEvent(true, player, clan, prefix, message, recipients);
+        Bukkit.getPluginManager().callEvent(asyncClanChatMessageSendEvent);
     }
 
     private String sendUsage() {
         StringBuilder stringBuilder = new StringBuilder();
         List<String> configStringList = messagesConfig.getStringList("clan-chat-command-incorrect-usage");
-        for (String string : configStringList){
+        for (String string : configStringList) {
             stringBuilder.append(string);
         }
         return stringBuilder.toString();

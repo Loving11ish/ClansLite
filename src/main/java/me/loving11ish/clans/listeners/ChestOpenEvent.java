@@ -1,5 +1,6 @@
 package me.loving11ish.clans.listeners;
 
+import me.loving11ish.clans.utils.MessageUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
@@ -14,7 +15,6 @@ import org.bukkit.persistence.PersistentDataType;
 import me.loving11ish.clans.Clans;
 import me.loving11ish.clans.models.Chest;
 import me.loving11ish.clans.utils.ClansStorageUtil;
-import me.loving11ish.clans.utils.ColorUtils;
 
 public class ChestOpenEvent implements Listener {
 
@@ -23,17 +23,17 @@ public class ChestOpenEvent implements Listener {
     private static final String CLAN_PLACEHOLDER = "%CLAN%";
 
     @EventHandler
-    public void onChestOpen(PlayerInteractEvent event){
-        if (!Clans.isChestsEnabled()){
+    public void onChestOpen(PlayerInteractEvent event) {
+        if (!Clans.getPlugin().isChestsEnabled()) {
             return;
         }
-        if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)){
+        if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             Block block = event.getClickedBlock();
-            if (block != null){
-                if (block.getType().equals(Material.CHEST)){
+            if (block != null) {
+                if (block.getType().equals(Material.CHEST)) {
                     Location chestLocation = block.getLocation();
 
-                    if (!ClansStorageUtil.isChestLocked(chestLocation)){
+                    if (!ClansStorageUtil.isChestLocked(chestLocation)) {
                         return;
                     }
 
@@ -50,11 +50,12 @@ public class ChestOpenEvent implements Listener {
                             if (!(player.hasPermission("clanslite.bypass.chests") || player.hasPermission("clanslite.bypass.*")
                                     || player.hasPermission("clanslite.bypass") || player.hasPermission("clanslite.*") || player.isOp())) {
                                 event.setCancelled(true);
+
                                 if (owningClanName != null) {
-                                    player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("chest-owned-by-another-clan")
-                                            .replace(CLAN_PLACEHOLDER, owningClanName)));
-                                }else {
-                                    player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("chest-owned-by-another-clan-name-unknown")));
+                                    MessageUtils.sendPlayer(player, messagesConfig.getString("chest-owned-by-another-clan")
+                                            .replace(CLAN_PLACEHOLDER, owningClanName));
+                                } else {
+                                    MessageUtils.sendPlayer(player, messagesConfig.getString("chest-owned-by-another-clan-name-unknown"));
                                 }
                             }
                         }

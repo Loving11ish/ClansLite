@@ -1,22 +1,20 @@
-package me.loving11ish.clans.api;
+package me.loving11ish.clans.api.events;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import me.loving11ish.clans.models.Clan;
 
-public class ClanTransferOwnershipEvent extends Event {
+public class AsyncClanTransferOwnershipEvent extends Event {
+
     private static final HandlerList HANDLERS = new HandlerList();
     private final Player createdBy;
     private final Player originalClanOwner;
     private final Player newClanOwner;
     private final Clan newClan;
 
-    public static HandlerList getHandlerList() {
-        return HANDLERS;
-    }
-
-    public ClanTransferOwnershipEvent(Player createdBy, Player originalClanOwner, Player newClanOwner, Clan newClan) {
+    public AsyncClanTransferOwnershipEvent(boolean isAsync, Player createdBy, Player originalClanOwner, Player newClanOwner, Clan newClan) {
+        super(isAsync);
         this.createdBy = createdBy;
         this.originalClanOwner = originalClanOwner;
         this.newClanOwner = newClanOwner;

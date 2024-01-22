@@ -1,6 +1,5 @@
-package me.loving11ish.clans.api;
+package me.loving11ish.clans.api.events;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -8,7 +7,7 @@ import org.bukkit.event.HandlerList;
 import me.loving11ish.clans.models.Chest;
 import me.loving11ish.clans.models.Clan;
 
-public class ChestLockEvent extends Event {
+public class AsyncChestLockEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
     private final Player createdBy;
@@ -16,11 +15,12 @@ public class ChestLockEvent extends Event {
     private final Chest chest;
     private final Location chestLocation;
 
-    public ChestLockEvent(Player createdBy, Clan clan, Chest chest) {
+    public AsyncChestLockEvent(boolean isAsync, Player createdBy, Clan owningClan, Chest chest, Location chestLocation) {
+        super(isAsync);
         this.createdBy = createdBy;
-        this.owningClan = clan;
+        this.owningClan = owningClan;
         this.chest = chest;
-        this.chestLocation = new Location(Bukkit.getWorld(chest.getChestWorldName()), chest.getChestLocationX(), chest.getChestLocationY(), chest.getChestLocationZ());
+        this.chestLocation = chestLocation;
     }
 
     @Override

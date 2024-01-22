@@ -1,24 +1,24 @@
-package me.loving11ish.clans.api;
+package me.loving11ish.clans.api.events;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import me.loving11ish.clans.models.Clan;
 
-public class ClanEnemyAddEvent extends Event {
+public class AsyncClanAllyAddEvent extends Event {
+
     private static final HandlerList HANDLERS = new HandlerList();
     private final Player createdBy;
     private final Clan clan;
-    private final Player enemyClanCreatedBy;
-    private final Clan enemyClan;
+    private final Player allyClanCreatedBy;
+    private final Clan allyClan;
 
-
-
-    public ClanEnemyAddEvent(Player createdBy, Clan clan, Clan enemyClan, Player enemyClanCreatedBy) {
+    public AsyncClanAllyAddEvent(boolean isAsync, Player createdBy, Clan clan, Player allyClanCreatedBy, Clan allyClan) {
+        super(isAsync);
         this.createdBy = createdBy;
         this.clan = clan;
-        this.enemyClanCreatedBy = enemyClanCreatedBy;
-        this.enemyClan = enemyClan;
+        this.allyClanCreatedBy = allyClanCreatedBy;
+        this.allyClan = allyClan;
     }
 
     @Override
@@ -34,17 +34,15 @@ public class ClanEnemyAddEvent extends Event {
         return clan;
     }
 
-    public Player getEnemyClanCreatedBy() {
-        return enemyClanCreatedBy;
+    public Player getAllyClanCreatedBy() {
+        return allyClanCreatedBy;
     }
 
-    public Clan getEnemyClan() {
-        return enemyClan;
+    public Clan getAllyClan() {
+        return allyClan;
     }
 
     public static HandlerList getHandlerList() {
         return HANDLERS;
     }
-
-
 }

@@ -1,6 +1,7 @@
 package me.loving11ish.clans.commands;
 
 import com.tcoded.folialib.FoliaLib;
+import me.loving11ish.clans.utils.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -11,8 +12,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import me.loving11ish.clans.Clans;
 import me.loving11ish.clans.utils.ClansStorageUtil;
-import me.loving11ish.clans.utils.ColorUtils;
-import me.loving11ish.clans.utils.UsermapStorageUtil;
+import me.loving11ish.clans.utils.UserMapStorageUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,11 +21,9 @@ import java.util.concurrent.TimeUnit;
 
 public class ClanAdmin implements CommandExecutor {
 
-    private final ConsoleCommandSender console = Bukkit.getConsoleSender();
-
     private final FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
 
-    private ArrayList<Player> onlinePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
+    private final ArrayList<Player> onlinePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
     private static final String PLAYER_TO_KICK = "%KICKEDPLAYER%";
 
     @Override
@@ -34,30 +32,30 @@ public class ClanAdmin implements CommandExecutor {
             Player player = (Player) sender;
             if (args.length > 0) {
                 if (args[0].equalsIgnoreCase("save")) {
-                    player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("saving-clans-start")));
+                    MessageUtils.sendPlayer(player, messagesConfig.getString("saving-clans-start"));
                     try {
-                        if (!ClansStorageUtil.getRawClansList().isEmpty()){
+                        if (!ClansStorageUtil.getRawClansList().isEmpty()) {
                             ClansStorageUtil.saveClans();
-                        }else {
-                            player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("save-failed-no-clans")));
+                        } else {
+                            MessageUtils.sendPlayer(player, messagesConfig.getString("save-failed-no-clans"));
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
-                        player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clans-save-error-1")));
-                        player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clans-save-error-2")));
+                        MessageUtils.sendPlayer(player, messagesConfig.getString("clans-save-error-1"));
+                        MessageUtils.sendPlayer(player, messagesConfig.getString("clans-save-error-2"));
                     }
-                    player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("save-completed")));
+                    MessageUtils.sendPlayer(player, messagesConfig.getString("save-completed"));
                 }
 
 //----------------------------------------------------------------------------------------------------------------------
                 if (args[0].equalsIgnoreCase("reload")) {
-                    player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("plugin-reload-begin")));
-                    for (Player p : onlinePlayers){
-                        if (p.getName().equalsIgnoreCase(player.getName())){
+                    MessageUtils.sendPlayer(player, messagesConfig.getString("plugin-reload-begin"));
+                    for (Player p : onlinePlayers) {
+                        if (p.getName().equalsIgnoreCase(player.getName())) {
                             continue;
                         }
-                        if (!onlinePlayers.isEmpty()){
-                            p.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("plugin-reload-broadcast-start")));
+                        if (!onlinePlayers.isEmpty()) {
+                            MessageUtils.sendPlayer(p, messagesConfig.getString("plugin-reload-broadcast-start"));
                         }
                     }
                     FoliaLib foliaLib = Clans.getFoliaLib();
@@ -69,13 +67,13 @@ public class ClanAdmin implements CommandExecutor {
                         ClanCommand.updateBannedTagsList();
                         Clans.getPlugin().messagesFileManager.reloadMessagesConfig();
                         Clans.getPlugin().clanGUIFileManager.reloadClanGUIConfig();
-                        player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("plugin-reload-successful")));
-                        for (Player p : onlinePlayers){
-                            if (p.getName().equalsIgnoreCase(player.getName())){
+                        MessageUtils.sendPlayer(player, messagesConfig.getString("plugin-reload-successful"));
+                        for (Player p : onlinePlayers) {
+                            if (p.getName().equalsIgnoreCase(player.getName())) {
                                 continue;
                             }
-                            if (!onlinePlayers.isEmpty()){
-                                p.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("plugin-reload-successful")));
+                            if (!onlinePlayers.isEmpty()) {
+                                MessageUtils.sendPlayer(p, messagesConfig.getString("plugin-reload-successful"));
                             }
                         }
                     }, 5L, TimeUnit.SECONDS);
@@ -83,60 +81,62 @@ public class ClanAdmin implements CommandExecutor {
 
 //----------------------------------------------------------------------------------------------------------------------
                 if (args[0].equalsIgnoreCase("disband")) {
-                    if (args.length == 2){
-                        if (args[1].length() > 1){
+                    if (args.length == 2) {
+                        if (args[1].length() > 1) {
                             Player onlinePlayerOwner = Bukkit.getPlayer(args[1]);
-                            OfflinePlayer offlinePlayerOwner = UsermapStorageUtil.getBukkitOfflinePlayerByName(args[1]);
-                            if (onlinePlayerOwner != null){
+                            OfflinePlayer offlinePlayerOwner = UserMapStorageUtil.getBukkitOfflinePlayerByName(args[1]);
+                            if (onlinePlayerOwner != null) {
                                 try {
-                                    if (ClansStorageUtil.deleteClan(onlinePlayerOwner)){
-                                        player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-successfully-disbanded")));
-                                    }else {
-                                        player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-admin-disband-failure")));
+                                    if (ClansStorageUtil.deleteClan(onlinePlayerOwner)) {
+                                        MessageUtils.sendPlayer(player, messagesConfig.getString("clan-successfully-disbanded"));
+                                    } else {
+                                        MessageUtils.sendPlayer(player, messagesConfig.getString("clan-admin-disband-failure"));
                                     }
                                 } catch (IOException e) {
-                                    player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clans-update-error-1")));
-                                    player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clans-update-error-2")));
+                                    MessageUtils.sendPlayer(player, messagesConfig.getString("clans-update-error-1"));
+                                    MessageUtils.sendPlayer(player, messagesConfig.getString("clans-update-error-2"));
                                     e.printStackTrace();
                                 }
-                            }else if (offlinePlayerOwner != null){
+                            } else if (offlinePlayerOwner != null) {
                                 try {
-                                    if (ClansStorageUtil.deleteOfflineClan(offlinePlayerOwner)){
-                                        player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-successfully-disbanded")));
-                                    }else {
-                                        player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-admin-disband-failure")));
+                                    if (ClansStorageUtil.deleteOfflineClan(offlinePlayerOwner)) {
+                                        MessageUtils.sendPlayer(player, messagesConfig.getString("clan-successfully-disbanded"));
+                                    } else {
+                                        MessageUtils.sendPlayer(player, messagesConfig.getString("clan-admin-disband-failure"));
                                     }
                                 } catch (IOException e) {
-                                    player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clans-update-error-1")));
-                                    player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clans-update-error-2")));
+                                    MessageUtils.sendPlayer(player, messagesConfig.getString("clans-update-error-1"));
+                                    MessageUtils.sendPlayer(player, messagesConfig.getString("clans-update-error-2"));
                                     e.printStackTrace();
                                 }
-                            }else {
-                                player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("could-not-find-specified-player").replace(PLAYER_TO_KICK, args[1])));
+                            } else {
+                                MessageUtils.sendPlayer(player, messagesConfig.getString("could-not-find-specified-player").replace(PLAYER_TO_KICK, args[1]));
                             }
-                        }else {
-                            player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("incorrect-disband-command-usage")));
+                        } else {
+                            MessageUtils.sendPlayer(player, messagesConfig.getString("incorrect-disband-command-usage"));
                         }
                     }
                 }
 
 //----------------------------------------------------------------------------------------------------------------------
                 if (args[0].equalsIgnoreCase("about")) {
-                    player.sendMessage(ColorUtils.translateColorCodes("&3~~~~~~~~~~ &6&nClansLite&r &3~~~~~~~~~~"));
-                    player.sendMessage(ColorUtils.translateColorCodes("&3Version: &6" + Clans.getPlugin().getDescription().getVersion()));
-                    player.sendMessage(ColorUtils.translateColorCodes("&3Authors: &6" + Clans.getPlugin().getDescription().getAuthors()));
-                    player.sendMessage(ColorUtils.translateColorCodes("&3Description: &6" + Clans.getPlugin().getDescription().getDescription()));
-                    player.sendMessage(ColorUtils.translateColorCodes("&3Website: "));
-                    player.sendMessage(ColorUtils.translateColorCodes("&6" + Clans.getPlugin().getDescription().getWebsite()));
-                    player.sendMessage(ColorUtils.translateColorCodes("&3Discord:"));
-                    player.sendMessage(ColorUtils.translateColorCodes("&6https://discord.gg/crapticraft"));
-                    player.sendMessage(ColorUtils.translateColorCodes("&3~~~~~~~~~~ &6&nClansLite&r &3~~~~~~~~~~"));
+                    MessageUtils.sendPlayer(player, "&3~~~~~~~~~~ &6&nClansLite&r &3~~~~~~~~~~");
+                    MessageUtils.sendPlayer(player, "&3Version: &6" + Clans.getPlugin().getDescription().getVersion());
+                    MessageUtils.sendPlayer(player, "&3Update available: &6" + Clans.getPlugin().isUpdateAvailable());
+                    MessageUtils.sendPlayer(player, "&3Authors: &6" + Clans.getPlugin().getDescription().getAuthors());
+                    MessageUtils.sendPlayer(player, "&3Description: &6" + Clans.getPlugin().getDescription().getDescription());
+                    MessageUtils.sendPlayer(player, "&3Website: ");
+                    MessageUtils.sendPlayer(player, "&6" + Clans.getPlugin().getDescription().getWebsite());
+                    MessageUtils.sendPlayer(player, "&3Discord:");
+                    MessageUtils.sendPlayer(player, "&6https://discord.gg/crapticraft");
+                    MessageUtils.sendPlayer(player, "&3~~~~~~~~~~ &6&nClansLite&r &3~~~~~~~~~~");
                 }
 
 //----------------------------------------------------------------------------------------------------------------------
-            }else {
-                player.sendMessage(ColorUtils.translateColorCodes(sendUsageMessage()));
+            } else {
+                MessageUtils.sendPlayer(player, sendUsageMessage());
             }
+            return true;
         }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -144,29 +144,29 @@ public class ClanAdmin implements CommandExecutor {
 
 //----------------------------------------------------------------------------------------------------------------------
         if (sender instanceof ConsoleCommandSender) {
-            if (args.length > 0){
+            if (args.length > 0) {
                 if (args[0].equalsIgnoreCase("save")) {
-                    console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("saving-clans-start")));
+                    MessageUtils.sendConsole(messagesConfig.getString("saving-clans-start"));
                     try {
-                        if (!ClansStorageUtil.getRawClansList().isEmpty()){
+                        if (!ClansStorageUtil.getRawClansList().isEmpty()) {
                             ClansStorageUtil.saveClans();
-                        }else {
-                            console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("save-failed-no-clans")));
+                        } else {
+                            MessageUtils.sendConsole(messagesConfig.getString("save-failed-no-clans"));
                         }
                     } catch (IOException e) {
-                        console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clans-save-error-1")));
-                        console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clans-save-error-2")));
+                        MessageUtils.sendConsole(messagesConfig.getString("clans-save-error-1"));
+                        MessageUtils.sendConsole(messagesConfig.getString("clans-save-error-2"));
                         e.printStackTrace();
                     }
-                    console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("save-completed")));
+                    MessageUtils.sendConsole(messagesConfig.getString("save-completed"));
                 }
 
 //----------------------------------------------------------------------------------------------------------------------
                 if (args[0].equalsIgnoreCase("reload")) {
-                    console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("plugin-reload-begin")));
-                    for (Player p : onlinePlayers){
-                        if (!onlinePlayers.isEmpty()){
-                            p.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("plugin-reload-broadcast-start")));
+                    MessageUtils.sendConsole(messagesConfig.getString("plugin-reload-begin"));
+                    for (Player p : onlinePlayers) {
+                        if (!onlinePlayers.isEmpty()) {
+                            MessageUtils.sendPlayer(p, messagesConfig.getString("plugin-reload-broadcast-start"));
                         }
                     }
                     FoliaLib foliaLib = Clans.getFoliaLib();
@@ -178,10 +178,11 @@ public class ClanAdmin implements CommandExecutor {
                         ClanCommand.updateBannedTagsList();
                         Clans.getPlugin().messagesFileManager.reloadMessagesConfig();
                         Clans.getPlugin().clanGUIFileManager.reloadClanGUIConfig();
-                        console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("plugin-reload-successful")));
-                        for (Player p : onlinePlayers){
-                            if (!onlinePlayers.isEmpty()){
-                                p.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("plugin-reload-successful")));
+                        MessageUtils.sendConsole(messagesConfig.getString("plugin-reload-successful"));
+                        for (Player p : onlinePlayers) {
+                            if (!onlinePlayers.isEmpty()) {
+                                MessageUtils.sendPlayer(p, messagesConfig.getString("plugin-reload-successful"));
+
                             }
                         }
                     }, 5L, TimeUnit.SECONDS);
@@ -189,59 +190,61 @@ public class ClanAdmin implements CommandExecutor {
 
 //----------------------------------------------------------------------------------------------------------------------
                 if (args[0].equalsIgnoreCase("disband")) {
-                    if (args.length == 2){
-                        if (args[1].length() > 1){
+                    if (args.length == 2) {
+                        if (args[1].length() > 1) {
                             Player onlinePlayerOwner = Bukkit.getPlayer(args[1]);
-                            OfflinePlayer offlinePlayerOwner = UsermapStorageUtil.getBukkitOfflinePlayerByName(args[1]);
-                            if (onlinePlayerOwner != null){
+                            OfflinePlayer offlinePlayerOwner = UserMapStorageUtil.getBukkitOfflinePlayerByName(args[1]);
+                            if (onlinePlayerOwner != null) {
                                 try {
-                                    if (ClansStorageUtil.deleteClan(onlinePlayerOwner)){
-                                        console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-successfully-disbanded")));
-                                    }else {
-                                        console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-admin-disband-failure")));
+                                    if (ClansStorageUtil.deleteClan(onlinePlayerOwner)) {
+                                        MessageUtils.sendConsole(messagesConfig.getString("clan-successfully-disbanded"));
+                                    } else {
+                                        MessageUtils.sendConsole(messagesConfig.getString("clan-admin-disband-failure"));
                                     }
                                 } catch (IOException e) {
-                                    console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clans-update-error-1")));
-                                    console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clans-update-error-2")));
+                                    MessageUtils.sendConsole(messagesConfig.getString("clans-update-error-1"));
+                                    MessageUtils.sendConsole(messagesConfig.getString("clans-update-error-2"));
                                     e.printStackTrace();
                                 }
-                            }else if (offlinePlayerOwner != null){
+                            } else if (offlinePlayerOwner != null) {
                                 try {
-                                    if (ClansStorageUtil.deleteOfflineClan(offlinePlayerOwner)){
-                                        console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-successfully-disbanded")));
-                                    }else {
-                                        console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-admin-disband-failure")));
+                                    if (ClansStorageUtil.deleteOfflineClan(offlinePlayerOwner)) {
+                                        MessageUtils.sendConsole(messagesConfig.getString("clan-successfully-disbanded"));
+                                    } else {
+                                        MessageUtils.sendConsole(messagesConfig.getString("clan-admin-disband-failure"));
                                     }
                                 } catch (IOException e) {
-                                    console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clans-update-error-1")));
-                                    console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clans-update-error-2")));
+                                    MessageUtils.sendConsole(messagesConfig.getString("clans-update-error-1"));
+                                    MessageUtils.sendConsole(messagesConfig.getString("clans-update-error-2"));
                                     e.printStackTrace();
                                 }
-                            }else {
-                                console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("could-not-find-specified-player").replace(PLAYER_TO_KICK, args[1])));
+                            } else {
+                                MessageUtils.sendConsole(messagesConfig.getString("could-not-find-specified-player")
+                                        .replace(PLAYER_TO_KICK, args[1]));
                             }
-                        }else {
-                            console.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("incorrect-disband-command-usage")));
+                        } else {
+                            MessageUtils.sendConsole(messagesConfig.getString("incorrect-disband-command-usage"));
                         }
                     }
                 }
 
 //----------------------------------------------------------------------------------------------------------------------
                 if (args[0].equalsIgnoreCase("about")) {
-                    console.sendMessage(ColorUtils.translateColorCodes("&3~~~~~~~~~~ &6ClansLite &3~~~~~~~~~~"));
-                    console.sendMessage(ColorUtils.translateColorCodes("&3Version: &6" + Clans.getPlugin().getDescription().getVersion()));
-                    console.sendMessage(ColorUtils.translateColorCodes("&3Authors: &6" + Clans.getPlugin().getDescription().getAuthors()));
-                    console.sendMessage(ColorUtils.translateColorCodes("&3Description: &6" + Clans.getPlugin().getDescription().getDescription()));
-                    console.sendMessage(ColorUtils.translateColorCodes("&3Website: "));
-                    console.sendMessage(ColorUtils.translateColorCodes("&6" + Clans.getPlugin().getDescription().getWebsite()));
-                    console.sendMessage(ColorUtils.translateColorCodes("&3Discord:"));
-                    console.sendMessage(ColorUtils.translateColorCodes("&6https://discord.gg/crapticraft"));
-                    console.sendMessage(ColorUtils.translateColorCodes("&3~~~~~~~~~~ &6ClansLite &3~~~~~~~~~~"));
+                    MessageUtils.sendConsole("&3~~~~~~~~~~ &6ClansLite &3~~~~~~~~~~");
+                    MessageUtils.sendConsole("&3Version: &6" + Clans.getPlugin().getDescription().getVersion());
+                    MessageUtils.sendConsole("&3Update available: &6" + Clans.getPlugin().isUpdateAvailable());
+                    MessageUtils.sendConsole("&3Authors: &6" + Clans.getPlugin().getDescription().getAuthors());
+                    MessageUtils.sendConsole("&3Description: &6" + Clans.getPlugin().getDescription().getDescription());
+                    MessageUtils.sendConsole("&3Website: ");
+                    MessageUtils.sendConsole("&6" + Clans.getPlugin().getDescription().getWebsite());
+                    MessageUtils.sendConsole("&3Discord:");
+                    MessageUtils.sendConsole("&6https://discord.gg/crapticraft");
+                    MessageUtils.sendConsole("&3~~~~~~~~~~ &6ClansLite &3~~~~~~~~~~");
                 }
 
 //----------------------------------------------------------------------------------------------------------------------
-            }else {
-                console.sendMessage(ColorUtils.translateColorCodes(sendUsageMessage()));
+            } else {
+                MessageUtils.sendConsole(sendUsageMessage());
             }
         }
         return true;
@@ -250,7 +253,7 @@ public class ClanAdmin implements CommandExecutor {
     private String sendUsageMessage() {
         StringBuilder stringBuilder = new StringBuilder();
         List<String> configStringList = messagesConfig.getStringList("clanadmin-command-incorrect-usage");
-        for (String string : configStringList){
+        for (String string : configStringList) {
             stringBuilder.append(string);
         }
         return stringBuilder.toString();

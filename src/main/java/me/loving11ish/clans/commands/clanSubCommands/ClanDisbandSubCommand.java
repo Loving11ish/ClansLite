@@ -1,5 +1,6 @@
 package me.loving11ish.clans.commands.clanSubCommands;
 
+import me.loving11ish.clans.utils.MessageUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -16,18 +17,21 @@ public class ClanDisbandSubCommand {
     public boolean disbandClanSubCommand(CommandSender sender) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-                try {
-                    if (ClansStorageUtil.deleteClan(player)) {
-                        sender.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-successfully-disbanded")));
-                    } else {
-                        sender.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-disband-failure")));
-                    }
-                } catch (IOException e) {
-                    sender.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clans-update-error-1")));
-                    sender.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clans-update-error-2")));
-                    e.printStackTrace();
+
+            try {
+                if (ClansStorageUtil.deleteClan(player)) {
+                    MessageUtils.sendPlayer(player, messagesConfig.getString("clan-successfully-disbanded"));
+                } else {
+                    MessageUtils.sendPlayer(player, messagesConfig.getString("clan-disband-failure"));
                 }
-                return true;
+
+            } catch (IOException e) {
+                MessageUtils.sendPlayer(player, messagesConfig.getString("clans-update-error-1"));
+                MessageUtils.sendPlayer(player, messagesConfig.getString("clans-update-error-2"));
+                e.printStackTrace();
+            }
+
+            return true;
         }
         return false;
     }

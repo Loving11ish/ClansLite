@@ -9,6 +9,8 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 #ClansLite messages config for ${version}
 
+prefix: "&6ClansLite"
+
 #Clan Creation Messages
 clan-name-too-short: "&3Clan name too short - minimum length is &6%CHARMIN% &3characters."
 clan-name-too-long: "&3Clan name too long - maximum length is &6%CHARMAX% &3characters."

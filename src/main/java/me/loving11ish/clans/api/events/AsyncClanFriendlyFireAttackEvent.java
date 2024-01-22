@@ -1,11 +1,11 @@
-package me.loving11ish.clans.api;
+package me.loving11ish.clans.api.events;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import me.loving11ish.clans.models.Clan;
 
-public class ClanFriendlyFireAttackEvent extends Event {
+public class AsyncClanFriendlyFireAttackEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
     private final Player createdBy;
@@ -14,7 +14,8 @@ public class ClanFriendlyFireAttackEvent extends Event {
     private final Clan attackingClan;
     private final Clan victimClan;
 
-    public ClanFriendlyFireAttackEvent(Player createdBy, Player attackingPlayer, Player victimPlayer, Clan attackingClan, Clan victimClan) {
+    public AsyncClanFriendlyFireAttackEvent(boolean isAsync, Player createdBy, Player attackingPlayer, Player victimPlayer, Clan attackingClan, Clan victimClan) {
+        super(isAsync);
         this.createdBy = createdBy;
         this.attackingPlayer = attackingPlayer;
         this.victimPlayer = victimPlayer;

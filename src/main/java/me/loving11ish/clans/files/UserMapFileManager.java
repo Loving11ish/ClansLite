@@ -1,31 +1,27 @@
 package me.loving11ish.clans.files;
 
-import org.bukkit.Bukkit;
-import org.bukkit.command.ConsoleCommandSender;
+import me.loving11ish.clans.utils.MessageUtils;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import me.loving11ish.clans.Clans;
-import me.loving11ish.clans.utils.ColorUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class UsermapFileManager {
-
-    private final ConsoleCommandSender console = Bukkit.getConsoleSender();
+public class UserMapFileManager {
 
     private Clans plugin;
     private FileConfiguration dataConfig = null;
     private File configFile = null;
 
-    public void UsermapFileManager(Clans plugin){
+    public void UserMapFileManager(Clans plugin){
         this.plugin = plugin;
-        saveDefaultUsermapConfig();
+        saveDefaultUserMapConfig();
     }
 
-    public void reloadUsermapConfig(){
+    public void reloadUserMapConfig(){
         if (this.configFile == null){
             this.configFile = new File(plugin.getDataFolder(), "usermap.yml");
         }
@@ -37,27 +33,27 @@ public class UsermapFileManager {
         }
     }
 
-    public FileConfiguration getUsermapConfig(){
+    public FileConfiguration getUserMapConfig(){
         if (this.dataConfig == null){
-            this.reloadUsermapConfig();
+            this.reloadUserMapConfig();
         }
         return this.dataConfig;
     }
 
-    public void saveUsermapConfig() {
+    public void saveUserMapConfig() {
         if (this.dataConfig == null||this.configFile == null){
             return;
         }
         try {
-            this.getUsermapConfig().save(this.configFile);
+            this.getUserMapConfig().save(this.configFile);
         }catch (IOException e){
-            console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Could not save usermap.yml"));
-            console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite: &4Check the below message for the reasons!"));
+            MessageUtils.sendConsole("&4Could not save usermap.yml");
+            MessageUtils.sendConsole("&4Check the below message for the reasons!");
             e.printStackTrace();
         }
     }
 
-    public void saveDefaultUsermapConfig(){
+    public void saveDefaultUserMapConfig(){
         if (this.configFile == null){
             this.configFile = new File(plugin.getDataFolder(), "usermap.yml");
         }

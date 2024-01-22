@@ -1,5 +1,6 @@
 package me.loving11ish.clans.commands.clanSubCommands;
 
+import me.loving11ish.clans.utils.MessageUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -19,17 +20,21 @@ public class ClanListSubCommand {
     public boolean clanListSubCommand(CommandSender sender) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
+
             Set<Map.Entry<UUID, Clan>> clans = ClansStorageUtil.getClans();
             StringBuilder clansString = new StringBuilder();
+
             if (clans.isEmpty()) {
-                player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("no-clans-to-list")));
+                MessageUtils.sendPlayer(player, messagesConfig.getString("no-clans-to-list"));
+                return true;
+
             } else {
                 clansString.append(ColorUtils.translateColorCodes(messagesConfig.getString("clans-list-header") + "\n"));
                 clans.forEach((clan) ->
                         clansString.append(ColorUtils.translateColorCodes(clan.getValue().getClanFinalName() + "\n")));
                 clansString.append(" ");
                 clansString.append(ColorUtils.translateColorCodes(messagesConfig.getString("clans-list-footer")));
-                player.sendMessage(clansString.toString());
+                MessageUtils.sendPlayer(player, clansString.toString());
             }
             return true;
 

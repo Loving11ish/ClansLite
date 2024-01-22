@@ -1,4 +1,4 @@
-package me.loving11ish.clans.api;
+package me.loving11ish.clans.api.events;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -6,7 +6,7 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.Nullable;
 import me.loving11ish.clans.models.Clan;
 
-public class PlayerPointsAwardedEvent extends Event {
+public class AsyncPlayerPointsAwardedEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
     private final Player createdBy;
@@ -19,7 +19,8 @@ public class PlayerPointsAwardedEvent extends Event {
     private final int pointValue;
     private final boolean isEnemyPointReward;
 
-    public PlayerPointsAwardedEvent(Player createdBy, Player killer, Player victim, @Nullable Clan killerClan, @Nullable Clan victimClan, int pointValue, boolean isEnemyPointReward) {
+    public AsyncPlayerPointsAwardedEvent(boolean isAsync, Player createdBy, Player killer, Player victim, @Nullable Clan killerClan, @Nullable Clan victimClan, int pointValue, boolean isEnemyPointReward) {
+        super(isAsync);
         this.createdBy = createdBy;
         this.killer = killer;
         this.victim = victim;
@@ -31,10 +32,6 @@ public class PlayerPointsAwardedEvent extends Event {
 
     @Override
     public HandlerList getHandlers() {
-        return HANDLERS;
-    }
-
-    public static HandlerList getHandlerList() {
         return HANDLERS;
     }
 
