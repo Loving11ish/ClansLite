@@ -12,12 +12,14 @@ import me.loving11ish.clans.models.ClanPlayer;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class UserMapStorageUtil {
 
     private static final FoliaLib foliaLib = Clans.getFoliaLib();
 
     private static final Map<UUID, ClanPlayer> userMap = new HashMap<>();
+    private static final List<ClanPlayer> topClanPlayersCache = new ArrayList<>();
 
     private static final FileConfiguration userMapConfig = Clans.getPlugin().userMapFileManager.getUserMapConfig();
     private static final FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
@@ -308,6 +310,27 @@ public class UserMapStorageUtil {
             pointValues.add(value);
         }
         return pointValues;
+    }
+
+    public static List<ClanPlayer> getTopClanPlayersByPlayerPoints(int limit) {
+        return userMap.values().stream()
+                .sorted(Comparator.comparingInt(ClanPlayer::getPointBalance).reversed())
+                .limit(limit)
+                .collect(Collectors.toList());
+
+    }
+
+    public static List<ClanPlayer> getTopClanPlayersCache() {
+        return topClanPlayersCache;
+    }
+
+    public static void setTopClanPlayersCache(List<ClanPlayer> topClanPlayers) {
+        topClanPlayersCache.clear();
+        topClanPlayersCache.addAll(topClanPlayers);
+    }
+
+    public static HashMap<UUID, ClanPlayer> getClanPlayersMap() {
+        return (HashMap<UUID, ClanPlayer>) userMap;
     }
 
     public static Map<UUID, ClanPlayer> getUserMap() {

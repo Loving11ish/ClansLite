@@ -9,7 +9,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -20,15 +19,16 @@ import me.loving11ish.clans.models.Clan;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class ClansStorageUtil {
 
-    private static final ConsoleCommandSender console = Bukkit.getConsoleSender();
     private static final FoliaLib foliaLib = Clans.getFoliaLib();
 
     private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + String.valueOf('&') + "[0-9A-FK-OR]");
 
     private static final Map<UUID, Clan> clansList = new HashMap<>();
+    private static final List<Clan> topClansCache = new ArrayList<>();
 
     private static final FileConfiguration clansStorage = Clans.getPlugin().clansFileManager.getClansConfig();
     private static final FileConfiguration messagesConfig = Clans.getPlugin().messagesFileManager.getMessagesConfig();
@@ -221,6 +221,22 @@ public class ClansStorageUtil {
 
     public static boolean isClanOwner(Player player) {
         UUID uuid = player.getUniqueId();
+        String ownerUUID = uuid.toString();
+        Clan clan = clansList.get(uuid);
+        if (clan != null) {
+            if (clan.getClanOwner() == null) {
+                return false;
+            } else {
+                if (clan.getClanOwner().equals(ownerUUID)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean isClanOwner(OfflinePlayer offlinePlayer) {
+        UUID uuid = offlinePlayer.getUniqueId();
         String ownerUUID = uuid.toString();
         Clan clan = clansList.get(uuid);
         if (clan != null) {
@@ -703,8 +719,28 @@ public class ClansStorageUtil {
         return allLockedChests;
     }
 
+    public static List<Clan> getTopClansByClanPoints(int limit) {
+        return clansList.values().stream()
+                .sorted(Comparator.comparingInt(Clan::getClanPoints).reversed())
+                .limit(limit)
+                .collect(Collectors.toList());
+    }
+
+    public static List<Clan> getTopClansCache() {
+        return topClansCache;
+    }
+
+    public static void setTopClansCache(List<Clan> latestTopClansCache) {
+        topClansCache.clear();
+        topClansCache.addAll(latestTopClansCache);
+    }
+
     public static Set<Map.Entry<UUID, Clan>> getClans() {
         return clansList.entrySet();
+    }
+
+    public static HashMap<UUID, Clan> getClansMap() {
+        return (HashMap<UUID, Clan>) clansList;
     }
 
     public static Set<UUID> getRawClansList() {

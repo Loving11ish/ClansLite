@@ -273,6 +273,17 @@ public final class Clans extends JavaPlugin {
         // Set plugin enabled to true
         this.setPluginEnabled(true);
 
+        // Run initial caches and start the top points balance cache update tasks after 5 minutes
+        ClansStorageUtil.setTopClansCache(ClansStorageUtil.getTopClansByClanPoints(10));
+        UserMapStorageUtil.setTopClanPlayersCache(UserMapStorageUtil.getTopClanPlayersByPlayerPoints(10));
+        MessageUtils.sendConsole(messagesFileManager.getMessagesConfig().getString("top-clan-points-cache-update-started"));
+        MessageUtils.sendConsole(messagesFileManager.getMessagesConfig().getString("top-player-points-cache-update-started"));
+        foliaLib.getImpl().runLaterAsync(() -> {
+            TaskTimerUtils.runTopClansCacheUpdateTask();
+            TaskTimerUtils.runTopClanPlayersCacheUpdateTask();
+        }, 304L, TimeUnit.SECONDS);
+        MessageUtils.sendConsole("-------------------------------------------");
+
         // Check for available updates
         new UpdateChecker(97163).getVersion(version -> {
             if (this.getDescription().getVersion().equalsIgnoreCase(version)) {
