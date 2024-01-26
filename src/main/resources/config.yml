@@ -22,6 +22,11 @@ clan-tags:
     - "Gamers"
     - "Rise"
     - "Up"
+    - "Op"
+    - "Operator"
+    - "Staff"
+    - "Helper"
+    - "Moderator"    
   #Add a space after the clan prefix in chat. [Default value: true]
   prefix-add-space-after: true
   #Add `[]` characters before and after the clan prefix in the chat. [Default value: false]
