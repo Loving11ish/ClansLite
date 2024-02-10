@@ -59,7 +59,7 @@ public class ClansLiteAPI {
      * @return Returns true if the plugin was enabled successfully, otherwise returns false.
      */
     public boolean isPluginEnabled() {
-        return Clans.getPlugin().isEnabled();
+        return Clans.getPlugin().isPluginEnabled();
     }
 
     /**
@@ -248,6 +248,16 @@ public class ClansLiteAPI {
     }
 
     /**
+     * This method will only return a clan if the clan name is found.
+     *
+     * @param clanName The name of the clan to get a Clan from.
+     * @return Returns a Clan object or null if not found.
+     */
+    public Clan getClanByClanName(String clanName) {
+        return ClansStorageUtil.findClanByClanName(clanName);
+    }
+
+    /**
      * This method will perform multiple checks to see if the new clan is valid and can be created.
      * This method will create a Clan object and add it to the HashMap of Clans.
      * This method will fire an AsyncClanCreateEvent upon successful Clan creation.
@@ -264,7 +274,7 @@ public class ClansLiteAPI {
             return null;
         }
         for (String names : clanNamesList) {
-            if (StringUtils.containsAnyIgnoreCase(names, clanName)) {
+            if (StringUtils.equalsAnyIgnoreCase(names, clanName)) {
                 return null;
             }
         }

@@ -203,8 +203,16 @@ public class ClansStorageUtil {
             if (clansList.containsKey(uuid)) {
 
                 foliaLib.getImpl().runAsync((task) -> {
-                    fireAsyncOfflineClanDisbandEvent(offlinePlayer);
-                    MessageUtils.sendDebugConsole("Fired AsyncOfflineClanDisbandEvent");
+                    try {
+                        fireAsyncOfflineClanDisbandEvent(offlinePlayer);
+                        MessageUtils.sendDebugConsole("Fired AsyncOfflineClanDisbandEvent");
+                    } catch (NullPointerException e) {
+                        MessageUtils.sendDebugConsole("Failed to fire AsyncOfflineClanDisbandEvent");
+                        MessageUtils.sendDebugConsole("Error: ");
+                        if (Clans.getPlugin().isDebugMode()) {
+                            e.printStackTrace();
+                        }
+                    }
                 });
 
                 clansList.remove(uuid);
@@ -309,6 +317,15 @@ public class ClansStorageUtil {
                         return clan;
                     }
                 }
+            }
+        }
+        return null;
+    }
+
+    public static Clan findClanByClanName(String clanName) {
+        for (Clan clan : clansList.values()) {
+            if (clan.getClanFinalName().equals(clanName)) {
+                return clan;
             }
         }
         return null;

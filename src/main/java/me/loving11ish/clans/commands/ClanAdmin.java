@@ -1,6 +1,7 @@
 package me.loving11ish.clans.commands;
 
 import com.tcoded.folialib.FoliaLib;
+import me.loving11ish.clans.models.Clan;
 import me.loving11ish.clans.utils.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -17,6 +18,7 @@ import me.loving11ish.clans.utils.UserMapStorageUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class ClanAdmin implements CommandExecutor {
@@ -85,35 +87,32 @@ public class ClanAdmin implements CommandExecutor {
                         if (args[1].length() > 1) {
                             Player onlinePlayerOwner = Bukkit.getPlayer(args[1]);
                             OfflinePlayer offlinePlayerOwner = UserMapStorageUtil.getBukkitOfflinePlayerByName(args[1]);
-                            if (onlinePlayerOwner != null) {
-                                try {
-                                    if (ClansStorageUtil.deleteClan(onlinePlayerOwner)) {
-                                        MessageUtils.sendPlayer(player, messagesConfig.getString("clan-successfully-disbanded"));
-                                    } else {
-                                        MessageUtils.sendPlayer(player, messagesConfig.getString("clan-admin-disband-failure"));
-                                    }
-                                } catch (IOException e) {
-                                    MessageUtils.sendPlayer(player, messagesConfig.getString("clans-update-error-1"));
-                                    MessageUtils.sendPlayer(player, messagesConfig.getString("clans-update-error-2"));
-                                    e.printStackTrace();
-                                }
-                            } else if (offlinePlayerOwner != null) {
-                                try {
-                                    if (ClansStorageUtil.deleteOfflineClan(offlinePlayerOwner)) {
-                                        MessageUtils.sendPlayer(player, messagesConfig.getString("clan-successfully-disbanded"));
-                                    } else {
-                                        MessageUtils.sendPlayer(player, messagesConfig.getString("clan-admin-disband-failure"));
-                                    }
-                                } catch (IOException e) {
-                                    MessageUtils.sendPlayer(player, messagesConfig.getString("clans-update-error-1"));
-                                    MessageUtils.sendPlayer(player, messagesConfig.getString("clans-update-error-2"));
-                                    e.printStackTrace();
-                                }
-                            } else {
-                                MessageUtils.sendPlayer(player, messagesConfig.getString("could-not-find-specified-player").replace(PLAYER_TO_KICK, args[1]));
-                            }
+                            deleteClan(args, onlinePlayerOwner, player, offlinePlayerOwner);
                         } else {
                             MessageUtils.sendPlayer(player, messagesConfig.getString("incorrect-disband-command-usage"));
+                        }
+                    }
+                    
+                    else if (args.length == 3) {
+                        if (args[1].equalsIgnoreCase("byclanname")) {
+                            String clanName = args[2];
+                            
+                            if (clanName == null) {
+                                MessageUtils.sendPlayer(player, messagesConfig.getString("incorrect-disband-command-usage"));
+                                return true;
+                            }
+
+                            Clan clan = ClansStorageUtil.findClanByClanName(clanName);
+                            
+                            if (clan == null) {
+                                MessageUtils.sendPlayer(player, messagesConfig.getString("clan-not-found").replace("%CLAN%", clanName));
+                                return true;
+                            }
+
+                            Player onlinePlayerOwner = UserMapStorageUtil.getBukkitPlayerByUUID(UUID.fromString(clan.getClanOwner()));
+                            OfflinePlayer offlinePlayerOwner = UserMapStorageUtil.getBukkitOfflinePlayerByUUID(UUID.fromString(clan.getClanOwner()));
+                            
+                            deleteClan(args, onlinePlayerOwner, player, offlinePlayerOwner);
                         }
                     }
                 }
@@ -194,36 +193,32 @@ public class ClanAdmin implements CommandExecutor {
                         if (args[1].length() > 1) {
                             Player onlinePlayerOwner = Bukkit.getPlayer(args[1]);
                             OfflinePlayer offlinePlayerOwner = UserMapStorageUtil.getBukkitOfflinePlayerByName(args[1]);
-                            if (onlinePlayerOwner != null) {
-                                try {
-                                    if (ClansStorageUtil.deleteClan(onlinePlayerOwner)) {
-                                        MessageUtils.sendConsole(messagesConfig.getString("clan-successfully-disbanded"));
-                                    } else {
-                                        MessageUtils.sendConsole(messagesConfig.getString("clan-admin-disband-failure"));
-                                    }
-                                } catch (IOException e) {
-                                    MessageUtils.sendConsole(messagesConfig.getString("clans-update-error-1"));
-                                    MessageUtils.sendConsole(messagesConfig.getString("clans-update-error-2"));
-                                    e.printStackTrace();
-                                }
-                            } else if (offlinePlayerOwner != null) {
-                                try {
-                                    if (ClansStorageUtil.deleteOfflineClan(offlinePlayerOwner)) {
-                                        MessageUtils.sendConsole(messagesConfig.getString("clan-successfully-disbanded"));
-                                    } else {
-                                        MessageUtils.sendConsole(messagesConfig.getString("clan-admin-disband-failure"));
-                                    }
-                                } catch (IOException e) {
-                                    MessageUtils.sendConsole(messagesConfig.getString("clans-update-error-1"));
-                                    MessageUtils.sendConsole(messagesConfig.getString("clans-update-error-2"));
-                                    e.printStackTrace();
-                                }
-                            } else {
-                                MessageUtils.sendConsole(messagesConfig.getString("could-not-find-specified-player")
-                                        .replace(PLAYER_TO_KICK, args[1]));
-                            }
+                            deleteClan(args, onlinePlayerOwner, offlinePlayerOwner);
                         } else {
                             MessageUtils.sendConsole(messagesConfig.getString("incorrect-disband-command-usage"));
+                        }
+                    }
+
+                    else if (args.length == 3) {
+                        if (args[1].equalsIgnoreCase("byclanname")) {
+                            String clanName = args[2];
+
+                            if (clanName == null) {
+                                MessageUtils.sendConsole(messagesConfig.getString("incorrect-disband-command-usage"));
+                                return true;
+                            }
+
+                            Clan clan = ClansStorageUtil.findClanByClanName(clanName);
+
+                            if (clan == null) {
+                                MessageUtils.sendConsole(messagesConfig.getString("clan-not-found").replace("%CLAN%", clanName));
+                                return true;
+                            }
+
+                            Player onlinePlayerOwner = UserMapStorageUtil.getBukkitPlayerByUUID(UUID.fromString(clan.getClanOwner()));
+                            OfflinePlayer offlinePlayerOwner = UserMapStorageUtil.getBukkitOfflinePlayerByUUID(UUID.fromString(clan.getClanOwner()));
+
+                            deleteClan(args, onlinePlayerOwner, offlinePlayerOwner);
                         }
                     }
                 }
@@ -257,5 +252,65 @@ public class ClanAdmin implements CommandExecutor {
             stringBuilder.append(string);
         }
         return stringBuilder.toString();
+    }
+
+    private void deleteClan(String[] args, Player onlinePlayerOwner, Player player, OfflinePlayer offlinePlayerOwner) {
+        if (onlinePlayerOwner != null) {
+            try {
+                if (ClansStorageUtil.deleteClan(onlinePlayerOwner)) {
+                    MessageUtils.sendPlayer(player, messagesConfig.getString("clan-successfully-disbanded"));
+                } else {
+                    MessageUtils.sendPlayer(player, messagesConfig.getString("clan-admin-disband-failure"));
+                }
+            } catch (IOException e) {
+                MessageUtils.sendPlayer(player, messagesConfig.getString("clans-update-error-1"));
+                MessageUtils.sendPlayer(player, messagesConfig.getString("clans-update-error-2"));
+                e.printStackTrace();
+            }
+        } else if (offlinePlayerOwner != null) {
+            try {
+                if (ClansStorageUtil.deleteOfflineClan(offlinePlayerOwner)) {
+                    MessageUtils.sendPlayer(player, messagesConfig.getString("clan-successfully-disbanded"));
+                } else {
+                    MessageUtils.sendPlayer(player, messagesConfig.getString("clan-admin-disband-failure"));
+                }
+            } catch (IOException e) {
+                MessageUtils.sendPlayer(player, messagesConfig.getString("clans-update-error-1"));
+                MessageUtils.sendPlayer(player, messagesConfig.getString("clans-update-error-2"));
+                e.printStackTrace();
+            }
+        } else {
+            MessageUtils.sendPlayer(player, messagesConfig.getString("could-not-find-specified-player").replace(PLAYER_TO_KICK, args[1]));
+        }
+    }
+
+    private void deleteClan(String[] args, Player onlinePlayerOwner, OfflinePlayer offlinePlayerOwner) {
+        if (onlinePlayerOwner != null) {
+            try {
+                if (ClansStorageUtil.deleteClan(onlinePlayerOwner)) {
+                    MessageUtils.sendConsole(messagesConfig.getString("clan-successfully-disbanded"));
+                } else {
+                    MessageUtils.sendConsole(messagesConfig.getString("clan-admin-disband-failure"));
+                }
+            } catch (IOException e) {
+                MessageUtils.sendConsole(messagesConfig.getString("clans-update-error-1"));
+                MessageUtils.sendConsole(messagesConfig.getString("clans-update-error-2"));
+                e.printStackTrace();
+            }
+        } else if (offlinePlayerOwner != null) {
+            try {
+                if (ClansStorageUtil.deleteOfflineClan(offlinePlayerOwner)) {
+                    MessageUtils.sendConsole(messagesConfig.getString("clan-successfully-disbanded"));
+                } else {
+                    MessageUtils.sendConsole(messagesConfig.getString("clan-admin-disband-failure"));
+                }
+            } catch (IOException e) {
+                MessageUtils.sendConsole(messagesConfig.getString("clans-update-error-1"));
+                MessageUtils.sendConsole(messagesConfig.getString("clans-update-error-2"));
+                e.printStackTrace();
+            }
+        } else {
+            MessageUtils.sendConsole(messagesConfig.getString("could-not-find-specified-player").replace(PLAYER_TO_KICK, args[1]));
+        }
     }
 }

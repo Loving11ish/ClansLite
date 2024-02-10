@@ -27,6 +27,7 @@ clan-created-broadcast-title-2: "&3The new clan is called &6%CLAN%&3!"
 clan-successfully-disbanded: "&3Clan was disbanded!"
 clan-disband-failure: "&3Failed to disband clan - Please make sure you're the owner!"
 clan-admin-disband-failure: "&3Failed to disband clan - make sure that the provided player is a clan owner!"
+clan-not-found: "&3The provided clan name &6%CLAN% &3was not found!"
 incorrect-disband-command-usage: "&3Unrecognised argument please use &6/clanadmin disband <clan-owner>&3."
 
 #Clan Transfer Ownership Messages
@@ -299,9 +300,9 @@ clanadmin-command-incorrect-usage:
 update-check-failure: "&6ClansLite: &4Unable to check for updates! - &c"
 update-available:
   1: "&4*-------------------------------------------*"
-  2: "&6ClansLite: &cA new version is available!"
+  2: "&cA new version is available!"
   3: "&4*-------------------------------------------*"
 no-update-available:
   1: "&a*-------------------------------------------*"
-  2: "&6ClansLite: &aPlugin is up to date!"
+  2: "&aPlugin is up to date!"
   3: "&a*-------------------------------------------*"

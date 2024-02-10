@@ -46,14 +46,9 @@ public class ClanCreateSubCommand {
                     return true;
                 }
 
-                if (clanNamesList.contains(args[1])) {
-                    MessageUtils.sendPlayer(player, messagesConfig.getString("clan-name-already-taken")
-                            .replace(CLAN_PLACEHOLDER, args[1]));
-                    return true;
-                }
-
+                // Check if the clan name is already taken
                 for (String names : clanNamesList) {
-                    if (StringUtils.containsAnyIgnoreCase(names, args[1])) {
+                    if (StringUtils.equalsAnyIgnoreCase(names, args[1])) {
                         MessageUtils.sendPlayer(player, messagesConfig.getString("clan-name-already-taken")
                                 .replace(CLAN_PLACEHOLDER, args[1]));
                         return true;
