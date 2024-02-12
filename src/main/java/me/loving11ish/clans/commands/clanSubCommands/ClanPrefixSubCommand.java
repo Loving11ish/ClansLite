@@ -1,5 +1,6 @@
 package me.loving11ish.clans.commands.clanSubCommands;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -24,46 +25,63 @@ public class ClanPrefixSubCommand {
     public boolean clanPrefixSubCommand(CommandSender sender, String[] args, List<String> bannedTags) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            clans.forEach((clans) ->
-                    clansPrefixList.add(clans.getValue().getClanPrefix()));
+            clans.forEach((clans) -> clansPrefixList.add(clans.getValue().getClanPrefix()));
+
             if (args.length == 2) {
-                if (bannedTags.contains(args[1])){
-                    player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-prefix-is-banned").replace("%CLANPREFIX%", args[1])));
+                String prefixRaw = args[1];
+                String prefixColorStripped = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', prefixRaw));
+
+                // Check banned
+                if (bannedTags.contains(prefixRaw)){
+                    player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-prefix-is-banned").replace("%CLANPREFIX%", prefixRaw)));
                     return true;
                 }
-                if (clansPrefixList.contains(args[1])){
-                    player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-prefix-already-taken").replace("%CLANPREFIX%", args[1])));
+
+                // Check taken
+                if (clansPrefixList.contains(prefixRaw)){
+                    player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-prefix-already-taken").replace("%CLANPREFIX%", prefixRaw)));
                     return true;
                 }
-                if (args[1].contains("&")||args[1].contains("#") && !player.hasPermission("clanslite.clan.prefixcolors")){
+
+                // Check colors
+                if (prefixRaw.contains("&")|| prefixRaw.contains("#") && !player.hasPermission("clanslite.clan.prefixcolors")){
                     player.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-prefix-no-colours-permission")));
                     return true;
                 }
-                if (ClansStorageUtil.isClanOwner(player)){
-                    if (args[1].length() >= MIN_CHAR_LIMIT && args[1].length() <= MAX_CHAR_LIMIT) {
-                        Clan playerClan = ClansStorageUtil.findClanByOwner(player);
-                        ClansStorageUtil.updatePrefix(player, args[1]);
-                        String prefixConfirmation = ColorUtils.translateColorCodes(messagesConfig.getString("clan-prefix-change-successful")).replace("%CLANPREFIX%", playerClan.getClanPrefix());
-                        sender.sendMessage(prefixConfirmation);
-                        clansPrefixList.clear();
-                        return true;
-                    }else if (args[1].length() > MAX_CHAR_LIMIT) {
+
+                // Check owner
+                if (ClansStorageUtil.isClanOwner(player)) {
+                    // Check max length
+                    if (prefixColorStripped.length() > MAX_CHAR_LIMIT) {
                         int maxCharLimit = clansConfig.getInt("clan-tags.max-character-limit");
                         sender.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-prefix-too-long").replace("%CHARMAX%", String.valueOf(maxCharLimit))));
                         clansPrefixList.clear();
                         return true;
-                    }else {
+                    }
+                    // Check min length
+                    else if (prefixColorStripped.length() < MIN_CHAR_LIMIT) {
                         int minCharLimit = clansConfig.getInt("clan-tags.min-character-limit");
                         sender.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-prefix-too-short").replace("%CHARMIN%", String.valueOf(minCharLimit))));
                         clansPrefixList.clear();
                         return true;
                     }
-                }else {
+                    // Update prefix
+                    else {
+                        Clan playerClan = ClansStorageUtil.findClanByOwner(player);
+                        ClansStorageUtil.updatePrefix(player, prefixRaw);
+                        String prefixConfirmation = ColorUtils.translateColorCodes(messagesConfig.getString("clan-prefix-change-successful")).replace("%CLANPREFIX%", playerClan.getClanPrefix());
+                        sender.sendMessage(prefixConfirmation);
+                        clansPrefixList.clear();
+                        return true;
+                    }
+                }
+                else {
                     sender.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("must-be-owner-to-change-prefix")));
                     clansPrefixList.clear();
                     return true;
                 }
-            }else {
+            }
+            else {
                 sender.sendMessage(ColorUtils.translateColorCodes(messagesConfig.getString("clan-invalid-prefix")));
                 clansPrefixList.clear();
             }
