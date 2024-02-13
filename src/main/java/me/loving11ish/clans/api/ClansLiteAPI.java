@@ -99,8 +99,16 @@ public class ClansLiteAPI {
      *
      * @return Returns `true` if your current ClansLite plugin version does NOT mach the latest version listed on SpigotMC.
      */
-    public boolean isEpicEcoPluginUpdateAvailable() {
+    public boolean isClansLitePluginUpdateAvailable() {
         return Clans.getPlugin().isUpdateAvailable();
+    }
+
+    /**
+     *
+     * @return Returns the URL of the development build repository for ClansLite.
+     */
+    public String getClansLiteDevelopmentBuildRepository() {
+        return Clans.getPlugin().getDevBuildRepository();
     }
 
     /**

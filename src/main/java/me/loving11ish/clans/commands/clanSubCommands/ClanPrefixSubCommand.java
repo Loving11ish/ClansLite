@@ -2,8 +2,10 @@ package me.loving11ish.clans.commands.clanSubCommands;
 
 import com.tcoded.folialib.FoliaLib;
 import me.loving11ish.clans.api.events.AsyncClanPrefixChangeEvent;
+import me.loving11ish.clans.utils.ColorUtils;
 import me.loving11ish.clans.utils.MessageUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -34,48 +36,54 @@ public class ClanPrefixSubCommand {
 
             if (args.length == 2) {
 
-                if (bannedTags.contains(args[1])) {
-                    MessageUtils.sendPlayer(player, messagesConfig.getString("clan-prefix-is-banned").replace("%CLANPREFIX%", args[1]));
+                String prefixRaw = args[1];
+                String prefixColorStripped = ClansStorageUtil.stripClanPrefixColorCodes(prefixRaw);
+
+                if (bannedTags.contains(prefixRaw)) {
+                    MessageUtils.sendPlayer(player, messagesConfig.getString("clan-prefix-is-banned").replace("%CLANPREFIX%", prefixRaw));
                     return true;
                 }
 
-                if (clansPrefixList.contains(args[1])) {
-                    MessageUtils.sendPlayer(player, messagesConfig.getString("clan-prefix-already-taken").replace("%CLANPREFIX%", args[1]));
+                if (clansPrefixList.contains(prefixRaw)) {
+                    MessageUtils.sendPlayer(player, messagesConfig.getString("clan-prefix-already-taken").replace("%CLANPREFIX%", prefixRaw));
                     return true;
                 }
 
-                if ((args[1].contains("&") || args[1].contains("#")) && !player.hasPermission("clanslite.clan.prefixcolors")) {
+                if ((prefixRaw.contains("&") || prefixRaw.contains("#")) && !player.hasPermission("clanslite.clan.prefixcolors")) {
                     MessageUtils.sendPlayer(player, messagesConfig.getString("clan-prefix-no-colours-permission"));
                     return true;
                 }
 
                 if (ClansStorageUtil.isClanOwner(player)) {
 
-                    if (args[1].length() >= MIN_CHAR_LIMIT && args[1].length() <= MAX_CHAR_LIMIT) {
-                        Clan playerClan = ClansStorageUtil.findClanByOwner(player);
-
-                        foliaLib.getImpl().runAsync((task) -> {
-                           fireAsyncClanPrefixChangeEvent(player, playerClan, playerClan.getClanPrefix(), args[1]);
-                            MessageUtils.sendDebugConsole("Fired AsyncClan Prefix Change Event");
-                        });
-
-                        ClansStorageUtil.updatePrefix(player, args[1]);
-                        MessageUtils.sendPlayer(player, messagesConfig.getString("clan-prefix-change-successful").replace("%CLANPREFIX%", args[1]));
-
-                        clansPrefixList.clear();
-                        return true;
-
-                    } else if (args[1].length() > MAX_CHAR_LIMIT) {
+                    if (prefixColorStripped.length() > MAX_CHAR_LIMIT) {
                         int maxCharLimit = clansConfig.getInt("clan-tags.max-character-limit");
                         MessageUtils.sendPlayer(player, messagesConfig.getString("clan-prefix-too-long").replace("%CHARMAX%", String.valueOf(maxCharLimit)));
                         clansPrefixList.clear();
                         return true;
+                    }
 
-                    } else {
+                    else if (prefixColorStripped.length() < MIN_CHAR_LIMIT) {
                         int minCharLimit = clansConfig.getInt("clan-tags.min-character-limit");
                         MessageUtils.sendPlayer(player, messagesConfig.getString("clan-prefix-too-short").replace("%CHARMIN%", String.valueOf(minCharLimit)));
                         clansPrefixList.clear();
                         return true;
+                    }
+
+                    else {
+                        Clan playerClan = ClansStorageUtil.findClanByOwner(player);
+
+                        foliaLib.getImpl().runAsync((task) -> {
+                            fireAsyncClanPrefixChangeEvent(player, playerClan, playerClan.getClanPrefix(), prefixRaw);
+                            MessageUtils.sendDebugConsole("Fired AsyncClanPrefixChangeEvent");
+                        });
+
+                        ClansStorageUtil.updatePrefix(player, prefixRaw);
+                        MessageUtils.sendPlayer(player, messagesConfig.getString("clan-prefix-change-successful").replace("%CLANPREFIX%", prefixRaw));
+
+                        clansPrefixList.clear();
+                        return true;
+
                     }
 
                 } else {

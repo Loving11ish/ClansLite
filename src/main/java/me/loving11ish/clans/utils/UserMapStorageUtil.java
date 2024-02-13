@@ -99,10 +99,8 @@ public class UserMapStorageUtil {
         if (userMap.containsKey(uuid)) {
             return userMap.get(uuid);
         } else {
-            MessageUtils.sendConsole(messagesConfig.getString("clan-player-not-found-1")
-                    .replace(PLAYER_PLACEHOLDER, player.getName()));
-            MessageUtils.sendConsole(messagesConfig.getString("clan-player-not-found-2")
-                    .replace(PLAYER_PLACEHOLDER, player.getName()));
+            MessageUtils.sendDebugConsole(messagesConfig.getString("clan-player-not-found-1"));
+            MessageUtils.sendDebugConsole(messagesConfig.getString("clan-player-not-found-2"));
         }
         return null;
     }
@@ -112,10 +110,8 @@ public class UserMapStorageUtil {
         if (userMap.containsKey(uuid)) {
             return userMap.get(uuid);
         } else {
-            MessageUtils.sendConsole(messagesConfig.getString("clan-player-not-found-1")
-                    .replace(PLAYER_PLACEHOLDER, offlinePlayer.getName()));
-            MessageUtils.sendConsole(messagesConfig.getString("clan-player-not-found-2")
-                    .replace(PLAYER_PLACEHOLDER, offlinePlayer.getName()));
+            MessageUtils.sendDebugConsole(messagesConfig.getString("clan-player-not-found-1"));
+            MessageUtils.sendDebugConsole(messagesConfig.getString("clan-player-not-found-2"));
         }
         return null;
     }
@@ -125,10 +121,8 @@ public class UserMapStorageUtil {
             if (clanPlayer.getLastPlayerName().equalsIgnoreCase(name)) {
                 return Bukkit.getPlayer(clanPlayer.getLastPlayerName());
             } else {
-                MessageUtils.sendConsole(messagesConfig.getString("clan-player-not-found-1")
-                        .replace(PLAYER_PLACEHOLDER, name));
-                MessageUtils.sendConsole(messagesConfig.getString("clan-player-not-found-2")
-                        .replace(PLAYER_PLACEHOLDER, name));
+                MessageUtils.sendDebugConsole(messagesConfig.getString("clan-player-not-found-1"));
+                MessageUtils.sendDebugConsole(messagesConfig.getString("clan-player-not-found-2"));
             }
         }
         return null;

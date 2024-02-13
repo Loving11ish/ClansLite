@@ -94,11 +94,11 @@ public class ClanAdmin implements CommandExecutor {
                     }
                     
                     else if (args.length == 3) {
-                        if (args[1].equalsIgnoreCase("byclanname")) {
+                        if (args[1].equalsIgnoreCase("byclanname:")) {
                             String clanName = args[2];
                             
                             if (clanName == null) {
-                                MessageUtils.sendPlayer(player, messagesConfig.getString("incorrect-disband-command-usage"));
+                                MessageUtils.sendPlayer(player, messagesConfig.getString("incorrect-disband-by-name-command-usage"));
                                 return true;
                             }
 
@@ -109,11 +109,15 @@ public class ClanAdmin implements CommandExecutor {
                                 return true;
                             }
 
-                            Player onlinePlayerOwner = UserMapStorageUtil.getBukkitPlayerByUUID(UUID.fromString(clan.getClanOwner()));
-                            OfflinePlayer offlinePlayerOwner = UserMapStorageUtil.getBukkitOfflinePlayerByUUID(UUID.fromString(clan.getClanOwner()));
+                            Player onlinePlayerOwner = Bukkit.getPlayer(UUID.fromString(clan.getClanOwner()));
+                            OfflinePlayer offlinePlayerOwner = Bukkit.getOfflinePlayer(UUID.fromString(clan.getClanOwner()));
                             
                             deleteClan(args, onlinePlayerOwner, player, offlinePlayerOwner);
+                        } else {
+                            MessageUtils.sendPlayer(player, messagesConfig.getString("incorrect-disband-command-usage"));
+                            MessageUtils.sendPlayer(player, messagesConfig.getString("incorrect-disband-by-name-command-usage"));
                         }
+                        return true;
                     }
                 }
 
@@ -128,6 +132,8 @@ public class ClanAdmin implements CommandExecutor {
                     MessageUtils.sendPlayer(player, "&6" + Clans.getPlugin().getDescription().getWebsite());
                     MessageUtils.sendPlayer(player, "&3Discord:");
                     MessageUtils.sendPlayer(player, "&6https://discord.gg/crapticraft");
+                    MessageUtils.sendPlayer(player, "&3Development builds available at:");
+                    MessageUtils.sendPlayer(player, "&6" + Clans.getPlugin().getDevBuildRepository());
                     MessageUtils.sendPlayer(player, "&3~~~~~~~~~~ &6&nClansLite&r &3~~~~~~~~~~");
                 }
 
@@ -200,11 +206,11 @@ public class ClanAdmin implements CommandExecutor {
                     }
 
                     else if (args.length == 3) {
-                        if (args[1].equalsIgnoreCase("byclanname")) {
+                        if (args[1].equalsIgnoreCase("byclanname:")) {
                             String clanName = args[2];
 
                             if (clanName == null) {
-                                MessageUtils.sendConsole(messagesConfig.getString("incorrect-disband-command-usage"));
+                                MessageUtils.sendConsole(messagesConfig.getString("incorrect-disband-by-name-command-usage"));
                                 return true;
                             }
 
@@ -215,11 +221,15 @@ public class ClanAdmin implements CommandExecutor {
                                 return true;
                             }
 
-                            Player onlinePlayerOwner = UserMapStorageUtil.getBukkitPlayerByUUID(UUID.fromString(clan.getClanOwner()));
-                            OfflinePlayer offlinePlayerOwner = UserMapStorageUtil.getBukkitOfflinePlayerByUUID(UUID.fromString(clan.getClanOwner()));
+                            Player onlinePlayerOwner = Bukkit.getPlayer(UUID.fromString(clan.getClanOwner()));
+                            OfflinePlayer offlinePlayerOwner = Bukkit.getOfflinePlayer(UUID.fromString(clan.getClanOwner()));
 
                             deleteClan(args, onlinePlayerOwner, offlinePlayerOwner);
+                        } else {
+                            MessageUtils.sendConsole(messagesConfig.getString("incorrect-disband-command-usage"));
+                            MessageUtils.sendConsole(messagesConfig.getString("incorrect-disband-by-name-command-usage"));
                         }
+                        return true;
                     }
                 }
 
@@ -234,6 +244,8 @@ public class ClanAdmin implements CommandExecutor {
                     MessageUtils.sendConsole("&6" + Clans.getPlugin().getDescription().getWebsite());
                     MessageUtils.sendConsole("&3Discord:");
                     MessageUtils.sendConsole("&6https://discord.gg/crapticraft");
+                    MessageUtils.sendConsole("&3Development builds available at:");
+                    MessageUtils.sendConsole("&6" + Clans.getPlugin().getDevBuildRepository());
                     MessageUtils.sendConsole("&3~~~~~~~~~~ &6ClansLite &3~~~~~~~~~~");
                 }
 

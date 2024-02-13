@@ -446,13 +446,23 @@ public class ClansStorageUtil {
 
     public static String stripClanNameColorCodes(Clan clan) {
         String clanFinalName = clan.getClanFinalName();
-        if (Clans.getPlugin().isDebugMode() || !clansStorage.getBoolean("name-strip-colour-complete")
+        if (!clansStorage.getBoolean("name-strip-colour-complete")
                 || clanFinalName.contains("&") || clanFinalName.contains("#")) {
-            MessageUtils.sendConsole("Found Colour Code To Strip");
-            MessageUtils.sendConsole("Original Name: " + clanFinalName);
-            MessageUtils.sendConsole("New Name: " + (clanFinalName == null ? null : STRIP_COLOR_PATTERN.matcher(clanFinalName).replaceAll("")));
+            MessageUtils.sendDebugConsole("Found Colour Code To Strip");
+            MessageUtils.sendDebugConsole("Original Name: " + clanFinalName);
+            MessageUtils.sendDebugConsole("New Name: " + (clanFinalName == null ? null : STRIP_COLOR_PATTERN.matcher(clanFinalName).replaceAll("")));
         }
         return clanFinalName == null ? null : STRIP_COLOR_PATTERN.matcher(clanFinalName).replaceAll("");
+    }
+
+    public static String stripClanPrefixColorCodes(String clanPrefix) {
+        if (clanPrefix == null) {
+            return null;
+        }
+        MessageUtils.sendDebugConsole("Found Colour Code To Strip");
+        MessageUtils.sendDebugConsole("Original Prefix: " + clanPrefix);
+        MessageUtils.sendDebugConsole("New Prefix After Strip: " + STRIP_COLOR_PATTERN.matcher(clanPrefix).replaceAll(""));
+        return STRIP_COLOR_PATTERN.matcher(clanPrefix).replaceAll("");
     }
 
     public static Clan transferClanOwner(Clan originalClan, Player originalClanOwner, Player newClanOwner) throws IOException {

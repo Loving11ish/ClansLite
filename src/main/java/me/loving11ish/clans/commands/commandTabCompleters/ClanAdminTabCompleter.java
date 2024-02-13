@@ -43,7 +43,7 @@ public class ClanAdminTabCompleter implements TabCompleter {
         else if (args.length == 2) {
             List<String> onlinePlayerNames = new ArrayList<>();
             Bukkit.getOnlinePlayers().forEach(player -> onlinePlayerNames.add(player.getName()));
-            onlinePlayerNames.add("byclanname");
+            onlinePlayerNames.add("byclanname:");
 
             for (String a : onlinePlayerNames){
                 if (a.toLowerCase().startsWith(args[1].toLowerCase())){

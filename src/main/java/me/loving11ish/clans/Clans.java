@@ -22,7 +22,6 @@ import me.loving11ish.clans.files.MessagesFileManager;
 import me.loving11ish.clans.files.UserMapFileManager;
 import me.loving11ish.clans.listeners.*;
 import me.loving11ish.clans.menusystem.PlayerMenuUtility;
-import me.loving11ish.clans.menusystem.paginatedMenu.ClanListGUI;
 import me.loving11ish.clans.updatesystem.JoinEvent;
 import me.loving11ish.clans.updatesystem.UpdateChecker;
 import me.loving11ish.clans.utils.*;
@@ -348,11 +347,6 @@ public final class Clans extends JavaPlugin {
                 MessageUtils.sendDebugConsole("&aTimed task inviteClearTask canceled successfully");
                 TaskTimerUtils.inviteClearTask.cancel();
             }
-            if (ClanListGUI.autoGUIRefreshTask != null && !ClanListGUI.autoGUIRefreshTask.isCancelled()) {
-                MessageUtils.sendDebugConsole("&aWrapped task: " + ClanListGUI.autoGUIRefreshTask.toString());
-                MessageUtils.sendDebugConsole("&aTimed task autoGUIRefreshTask canceled successfully");
-                ClanListGUI.autoGUIRefreshTask.cancel();
-            }
             if (foliaLib.isUnsupported()) {
                 Bukkit.getScheduler().cancelTasks(this);
                 MessageUtils.sendDebugConsole("&aBukkit scheduler tasks canceled successfully");
@@ -483,5 +477,9 @@ public final class Clans extends JavaPlugin {
 
     public void setUpdateAvailable(boolean updateAvailable) {
         this.updateAvailable = updateAvailable;
+    }
+
+    public String getDevBuildRepository() {
+        return "https://patreon.com/CraptiCraftDevelopment";
     }
 }

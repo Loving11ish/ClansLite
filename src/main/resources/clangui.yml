@@ -29,11 +29,6 @@ clan-list:
     close-go-back-icon-name: "&4Close/Go Back"
 
   icons:
-    #Do you want to use the auto data update system for the icons in the GUI? [Default value: true]
-    ##Disabling this option may help performance on lower spec servers!##
-    auto-refresh-data:
-      enabled: true
-
     icon-display-name:
       #Do you want to use the Clan Name as the title for the icon: [Default value: true]
       #If below is 'false' the name will be empty.

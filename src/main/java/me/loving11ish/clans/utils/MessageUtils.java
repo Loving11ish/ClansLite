@@ -49,7 +49,7 @@ public class MessageUtils {
      */
     public static void sendDebugConsole(String message) {
         if (debug) {
-            console.sendMessage(ColorUtils.translateColorCodes("&3EpicEco-Debug&7: &2" + message));
+            console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug&7: &2" + message));
         }
     }
 
@@ -61,7 +61,7 @@ public class MessageUtils {
     public static void sendDebugConsole(String level, String message) {
         if (debug) {
             level = setDebugLevel(level);
-            console.sendMessage(ColorUtils.translateColorCodes("&3EpicEco-Debug&7: [" + level + "&7] - " + levelColor + message));
+            console.sendMessage(ColorUtils.translateColorCodes("&6ClansLite-Debug&7: [" + level + "&7] - " + levelColor + message));
         }
     }
 
